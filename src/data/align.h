@@ -1,0 +1,13 @@
+
+
+//
+// Created by Luecx on 05.01.2022.
+//
+
+#ifndef CUDATEST1_SRC_DATA_ALIGN_H_
+#define CUDATEST1_SRC_DATA_ALIGN_H_
+
+#define ALIGNED_BITS  (512)
+#define ALIGNED_BYTES (ALIGNED_BITS / 8)
+
+#endif //CUDATEST1_SRC_DATA_ALIGN_H_
