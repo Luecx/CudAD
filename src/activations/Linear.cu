@@ -4,25 +4,28 @@
 //
 
 #include "Linear.h"
-#include <assert.h>
+#include "../operations/operations.h"
 #include "../misc/logging.h"
 
-void Linear::apply      (DenseMatrix &in, DenseMatrix &out, Mode mode){
-    assert(out.values.size == out.values.size);
-    if(mode == MODE_GPU){
-        out.values.set<MODE_GPU>(out.values);
+
+void Linear::apply      (const SArray<float> &in,
+                               SArray<float> &out, Mode mode) {
+
+    if(mode == HOST){
+        add<HOST>(in, out, out, 1,0);
+    }else{
+        add<DEVICE>(in, out, out, 1,0);
     }
-    if(mode == MODE_CPU){
-        out.values.set<MODE_CPU>(out.values);
-    }
+
 }
-void Linear::backprop   (DenseMatrix &in, DenseMatrix &out, Mode mode){
-    assert(out.values.size == out.values.size);
-    if(mode == MODE_GPU){
-        in.gradients.set<MODE_GPU>(out.gradients);
-    }
-    if(mode == MODE_CPU){
-        in.gradients.set<MODE_CPU>(out.gradients);
+void Linear::backprop   (const SArray<float> &in,
+                               SArray<float> &in_grd,
+                         const SArray<float> &out,
+                         const SArray<float> &out_grd, Mode mode) {
+    if(mode == HOST){
+        add<HOST>(out_grd, in_grd, in_grd, 1,0);
+    }else{
+        add<DEVICE>(out_grd, in_grd, in_grd, 1,0);
     }
 }
 

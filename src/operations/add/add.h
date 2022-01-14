@@ -14,21 +14,21 @@ void add_host(
     const float* A,
     const float* B,
           float* C,
-    const unsigned int A_size,
-    const unsigned int B_size,
-    const unsigned int C_size,
-    const float alpha,
-    const float beta);
+          unsigned int A_size,
+          unsigned int B_size,
+          unsigned int C_size,
+          float alpha,
+          float beta);
 
 __global__ void add_kernel(
     const float* __restrict__ A,
     const float* __restrict__ B,
           float* __restrict__ C,
-    const unsigned int A_size,
-    const unsigned int B_size,
-    const unsigned int C_size,
-    const float alpha,
-    const float beta);
+          unsigned int A_size,
+          unsigned int B_size,
+          unsigned int C_size,
+          float alpha,
+          float beta);
 
 /**
  * performs C = A * alpha + B * beta
@@ -41,11 +41,11 @@ __global__ void add_kernel(
  * @param beta
  */
 template<Mode mode>
-inline void add   ( SArray<float> &A,
-                    SArray<float> &B,
-                    SArray<float> &C,
-                    float alpha,
-                    float beta){
+inline void add   ( const SArray<float> &A,
+                    const SArray<float> &B,
+                          SArray<float> &C,
+                          float alpha,
+                          float beta){
 
 
     if(mode == DEVICE){

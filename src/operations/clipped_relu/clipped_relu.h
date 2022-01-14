@@ -9,6 +9,7 @@
 #include "../../data/mode.h"
 #include "../../data/SArray.h"
 #include <iostream>
+#include <cmath>
 
 void clipped_relu_host(
     const float* A,
@@ -33,9 +34,9 @@ __global__ void clipped_relu_kernel(
  * @param beta
  */
 template<Mode mode>
-inline void clipped_relu   (SArray<float> &A,
-                            SArray<float> &B,
-                            float max){
+inline void clipped_relu   (const SArray<float> &A,
+                                  SArray<float> &B,
+                                  float max){
 
     ASSERT(A.size == B.size)
 

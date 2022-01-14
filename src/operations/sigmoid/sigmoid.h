@@ -33,9 +33,9 @@ __global__ void sigmoid_kernel(
  * @param beta
  */
 template<Mode mode>
-inline void sigmoid   (SArray<float> &A,
-                       SArray<float> &B,
-                       float scalar){
+inline void sigmoid   (const SArray<float> &A,
+                             SArray<float> &B,
+                             float scalar){
 
     ASSERT(A.size == B.size)
 

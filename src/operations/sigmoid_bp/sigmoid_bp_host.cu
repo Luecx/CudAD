@@ -2,6 +2,7 @@
 //
 // Created by Luecx on 13.01.2022.
 //
+#include "sigmoid_bp.h"
 #include <iostream>
 /**
  * performs C = alpha * A + beta * B

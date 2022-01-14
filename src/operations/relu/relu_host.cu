@@ -18,6 +18,6 @@ void relu_host(
     unsigned int size){
 
     for(int i = 0; i < size; i++){
-        B[i] = std::max(A[i], 0);
+        B[i] = std::max(A[i], 0.0f);
     }
 }

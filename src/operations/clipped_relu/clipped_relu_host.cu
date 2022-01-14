@@ -3,6 +3,7 @@
 // Created by Luecx on 13.01.2022.
 //
 #include <iostream>
+#include <cmath>
 /**
  * performs C = alpha * A + beta * B
  * @param A
@@ -19,6 +20,6 @@ void clipped_relu_host(
     float max){
 
     for(int i = 0; i < size; i++){
-        B[i] = std::min(max, std::max(A[i], 0));
+        B[i] = std::min(max, std::max(A[i], 0.0f));
     }
 }

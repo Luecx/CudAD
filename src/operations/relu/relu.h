@@ -31,8 +31,8 @@ __global__ void relu_kernel(
  * @param beta
  */
 template<Mode mode>
-inline void relu   (SArray<float> &A,
-                    SArray<float> &B){
+inline void relu   (const SArray<float> &A,
+                          SArray<float> &B){
 
     ASSERT(A.size == B.size)
 

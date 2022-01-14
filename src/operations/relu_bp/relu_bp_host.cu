@@ -3,6 +3,7 @@
 // Created by Luecx on 13.01.2022.
 //
 #include <iostream>
+#include "relu_bp.h"
 /**
  * performs C = alpha * A + beta * B
  * @param A

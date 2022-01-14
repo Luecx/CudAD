@@ -22,5 +22,5 @@ __global__ void relu_kernel(
 
     if(idx >= size) return;
 
-    B[idx] = max(0, A[idx]);
+    B[idx] = max(0.0f, A[idx]);
 }

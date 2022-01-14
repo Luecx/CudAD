@@ -23,5 +23,5 @@ __global__ void clipped_relu_kernel(
 
     if(idx >= size) return;
 
-    B[idx] = min(mmax, max(0, A[idx]));
+    B[idx] = min(mmax, max(0.0f, A[idx]));
 }
