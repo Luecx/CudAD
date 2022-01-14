@@ -11,20 +11,9 @@
 
 int main() {
 
-
-
-
-
     init();
 
-//    ReLU relu{};
-    Linear linear{};
-
-
-
-
-
-
+    
 
     close();
 

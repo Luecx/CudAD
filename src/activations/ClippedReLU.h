@@ -13,6 +13,8 @@
 struct ClippedReLU : Activation{
     float max = 127;
 
+
+
     void apply      (const SArray<float> &in,
                            SArray<float> &out, Mode mode) ;
     void backprop   (const SArray<float> &in,

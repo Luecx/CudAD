@@ -22,8 +22,6 @@ void add_host(
     const float alpha,
     const float beta){
 
-    std::cout << A_size << " " << B_size << " " << C_size<< std::endl;
-
     for(int i = 0; i < C_size; i++){
         C[i] = A[i % A_size] * alpha + B[i % B_size] * beta;
     }
