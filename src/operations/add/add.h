@@ -66,7 +66,7 @@ inline void add   ( SArray<float> &A,
             C.size,
             alpha,
             beta);
-        cudaDeviceSynchronize();
+//        cudaDeviceSynchronize();
     }else{
         add_host(
             A.cpu_values,

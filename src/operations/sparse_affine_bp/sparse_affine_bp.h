@@ -65,6 +65,9 @@ inline void sparse_affine_bp(
         ASSERT(bia_grd.gpu_values)
         ASSERT(res_grd.gpu_values)
 
+//        mat_grd.clear<DEVICE>();
+//        bia_grd.clear<DEVICE>();
+
         constexpr int block_size_x = 1;
         constexpr int block_size_y = 256;
 

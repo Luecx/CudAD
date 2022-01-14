@@ -6,7 +6,7 @@
 #include <cmath>
 void adam_host(
               float* values,
-        const float* gradients,
+              float* gradients,
               float* first_moment,
               float* second_moment,
               int   size,
@@ -24,6 +24,7 @@ void adam_host(
 
         float delta = alpha * first_moment[idx] / (sqrtf(second_moment[idx]) + eps);
         values[idx] -= delta;
+        gradients[idx] = 0;
     }
 
 }

@@ -36,7 +36,7 @@ inline void mm_cublas(
 
     CUDA_ASSERT( cudaPeekAtLastError() );
 
-    cudaDeviceSynchronize();
+//    cudaDeviceSynchronize();
 }
 
 #endif //CUDATEST1_SRC_OPERATIONS_MAT_MAT_PRODUCT_MAT_MAT_PRODUCT_CUBLAS_H_

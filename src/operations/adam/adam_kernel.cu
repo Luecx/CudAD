@@ -5,7 +5,7 @@
 
 __global__ void adam_kernel(
           float* __restrict__ values,
-    const float* __restrict__ gradients,
+          float* __restrict__ gradients,
           float* __restrict__ first_moment,
           float* __restrict__ second_moment,
           int   size,
@@ -22,4 +22,5 @@ __global__ void adam_kernel(
 
     float delta = alpha * first_moment[idx] / (sqrtf(second_moment[idx]) + eps);
     values[idx] -= delta;
+    gradients[idx] = 0;
 }

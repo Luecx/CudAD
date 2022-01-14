@@ -70,7 +70,8 @@ int main() {
 //        wgt.gpu_download();
 ////        std::cout << wgt << std::endl;
 ////        std::cout << wgt_grd << std::endl;
-//        adam<DEVICE>(wgt, wgt_grd, wgt_fm, wgt_sm, 0.001, 0.9, 0.999, 1e-8);
+//        add<DEVICE>(wgt, wgt_grd, wgt, 1, 0.01);
+        adam<DEVICE>(wgt, wgt_grd, wgt_fm, wgt_sm, 0.001, 0.9, 0.999, 1e-8);
 
 //        wgt.gpu_download();
 ////        std::cout << wgt << std::endl;

@@ -7,6 +7,12 @@
 #ifndef CUDAD_SRC_OPERATIONS_OPERATIONS_H_
 #define CUDAD_SRC_OPERATIONS_OPERATIONS_H_
 
+#include "clipped_relu/clipped_relu.h"
+#include "clipped_relu_bp/clipped_relu_bp.h"
+#include "relu/relu.h"
+#include "relu_bp/relu_bp.h"
+#include "sigmoid/sigmoid.h"
+#include "sigmoid_bp/sigmoid_bp.h"
 #include "add/add.h"
 #include "adam/adam.h"
 #include "mm/mm.h"

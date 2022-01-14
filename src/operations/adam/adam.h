@@ -12,7 +12,7 @@
 
 __global__ void adam_kernel(
           float* __restrict__ values,
-    const float* __restrict__ gradients,
+          float* __restrict__ gradients,
           float* __restrict__ first_moment,
           float* __restrict__ second_moment,
           int size,
@@ -23,7 +23,7 @@ __global__ void adam_kernel(
 
 void adam_host(
           float* values,
-    const float* gradients,
+          float* gradients,
           float* first_moment,
           float* second_moment,
           int size,
@@ -67,7 +67,7 @@ inline void adam(SArray<float>& values,
             values.size,
             alpha, beta1, beta2, eps);
     }
-    cudaDeviceSynchronize();
+//    cudaDeviceSynchronize();
 }
 
 
