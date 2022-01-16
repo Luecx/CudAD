@@ -69,7 +69,7 @@ inline void sparse_affine_bp(
 //        bia_grd.clear<DEVICE>();
 
         constexpr int block_size_x = 1;
-        constexpr int block_size_y = 256;
+        constexpr int block_size_y = 512;
 
         dim3 block(block_size_x, block_size_y);
         dim3 grid (std::ceil((float)res_grd.n / block_size_x),

@@ -30,6 +30,9 @@ __global__ void sparse_affine_bp_kernel(
     // track the sum
     float res_grd_v = res_grd[MATRIX_INDEX(ldc, row, col)];
 
+    // dont do anything if the gradient is 0. Theoretical impact on memory
+    if(res_grd_v == 0) return;
+
     atomicAdd(&bia_grd[row], res_grd_v);
 
     // start at offset + 1 (offset contains the amount of values to read)

@@ -14,6 +14,8 @@
 #include "sigmoid/sigmoid.h"
 #include "sigmoid_bp/sigmoid_bp.h"
 #include "add/add.h"
+#include "add_mv/add_mv.h"
+#include "add_mv_bp/add_mv_bp.h"
 #include "adam/adam.h"
 #include "mm/mm.h"
 #include "mm_bp/mm_bp.h"

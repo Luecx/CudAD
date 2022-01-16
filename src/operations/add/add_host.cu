@@ -19,10 +19,11 @@ void add_host(
     const unsigned int A_size,
     const unsigned int B_size,
     const unsigned int C_size,
+    const unsigned int size,
     const float alpha,
     const float beta){
 
-    for(int i = 0; i < C_size; i++){
+    for(int i = 0; i < size; i++){
         C[i] = A[i % A_size] * alpha + B[i % B_size] * beta;
     }
 

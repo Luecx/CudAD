@@ -14,21 +14,31 @@ struct DenseMatrix:  public Matrix, public SArray<float>{
 
 public:
     DenseMatrix(uint32_t m, uint32_t n) : Matrix(m,n), SArray(m * n), leading_dimension{m}{
-        SArray::malloc_cpu();
         SArray::malloc_gpu();
+        SArray::malloc_cpu();
     }
 
     DenseMatrix(const DenseMatrix& other) : Matrix(other.m, other.n), SArray<float>(other) , leading_dimension{other.leading_dimension}{}
 
     DenseMatrix(DenseMatrix&& other) : Matrix(other.m, other.n), SArray<float>(other) , leading_dimension{other.leading_dimension}{}
 
-    DenseMatrix(const DenseMatrix& other, int m_start, int n_start, uint32_t m, uint32_t n) :
+    DenseMatrix(const DenseMatrix& other, uint32_t m_start, uint32_t n_start, uint32_t m, uint32_t n) :
         Matrix(m, n),
-        SArray<float>(other, MATRIX_INDEX(other.leading_dimension, m_start, n_start),
-                      other.size - MATRIX_INDEX(other.leading_dimension, m_start, n_start)),
+        SArray<float>(other,       MATRIX_INDEX(other.leading_dimension, m_start, n_start),
+                      other.leading_dimension * n),
         leading_dimension{other.leading_dimension}{
         ASSERT(m + m_start <= other.m)
         ASSERT(n + n_start <= other.n)
+        ASSERT(other.size >= m * n + MATRIX_INDEX(other.leading_dimension, m_start, n_start))
+    }
+
+    DenseMatrix& operator=(const DenseMatrix& other){
+        SArray<float>::operator=(other);
+        Matrix::operator=(other);
+    }
+    DenseMatrix& operator=(DenseMatrix&& other){
+        SArray<float>::operator=(other);
+        Matrix::operator=(other);
     }
 
     float& get(int p_m, int p_n) const{

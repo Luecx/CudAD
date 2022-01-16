@@ -17,6 +17,7 @@ void add_host(
           unsigned int A_size,
           unsigned int B_size,
           unsigned int C_size,
+          unsigned int size,
           float alpha,
           float beta);
 
@@ -27,6 +28,7 @@ __global__ void add_kernel(
           unsigned int A_size,
           unsigned int B_size,
           unsigned int C_size,
+          unsigned int size,
           float alpha,
           float beta);
 
@@ -45,8 +47,13 @@ inline void add   ( const SArray<float> &A,
                     const SArray<float> &B,
                           SArray<float> &C,
                           float alpha,
-                          float beta){
+                          float beta,
+                          int size = -1){
 
+
+    if (size == -1){
+        size = C.size;
+    }
 
     if(mode == DEVICE){
 
@@ -56,7 +63,7 @@ inline void add   ( const SArray<float> &A,
 
         constexpr int block_size = 1024;
         dim3 block(block_size);
-        dim3 grid (std::ceil((float)C.size / block_size));
+        dim3 grid (std::ceil((float)size / block_size));
         add_kernel<<<grid, block>>>(
             A.gpu_values,
             B.gpu_values,
@@ -64,9 +71,9 @@ inline void add   ( const SArray<float> &A,
             A.size,
             B.size,
             C.size,
+            size,
             alpha,
             beta);
-//        cudaDeviceSynchronize();
     }else{
         add_host(
             A.cpu_values,
@@ -75,6 +82,7 @@ inline void add   ( const SArray<float> &A,
             A.size,
             B.size,
             C.size,
+            size,
             alpha,
             beta);
     }

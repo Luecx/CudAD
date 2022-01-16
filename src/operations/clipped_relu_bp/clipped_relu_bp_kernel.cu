@@ -25,7 +25,7 @@ __global__ void clipped_relu_bp_kernel(
 
     if(idx >= size) return;
 
-    if(A[idx] > 0 && A[idx] < mmax){
+    if(B[idx] > 0 && B[idx] < mmax){
         A_grd[idx] = B_grd[idx];
     }else{
         A_grd[idx] = 0;

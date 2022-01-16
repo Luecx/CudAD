@@ -12,10 +12,29 @@
 class Matrix{
 
 public:
-    const uint32_t m;
-    const uint32_t n;
+    uint32_t m;
+    uint32_t n;
 
     Matrix(uint32_t m, uint32_t n) : m(m), n(n) {}
+    Matrix(const Matrix& other){
+        this->m = other.m;
+        this->n = other.n;
+    }
+    Matrix(Matrix&& other){
+        this->m = other.m;
+        this->n = other.n;
+    }
+    Matrix& operator=(const Matrix& other){
+        this->m = other.m;
+        this->n = other.n;
+        return *this;
+    }
+    Matrix& operator=(Matrix&& other){
+        this->m = other.m;
+        this->n = other.n;
+        return *this;
+    }
+
 };
 
 #endif //CUDAD_SRC_DATA_MATRIX_H_

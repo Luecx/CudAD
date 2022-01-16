@@ -10,7 +10,7 @@
 
 
 template<Mode mode>
-inline void mm(DenseMatrix &mat1,
+inline void mm_bp(DenseMatrix &mat1,
         DenseMatrix &mat1_grd,
         DenseMatrix &mat2,
         DenseMatrix &mat2_grd,
@@ -32,12 +32,12 @@ inline void mm(DenseMatrix &mat1,
             true);      //
 
         mm_cublas(
-            res_grd,
             mat1,
+            res_grd,
             mat2_grd,
             1,          // alpha = 1
             0,          // beta = 0
-            true,       // transpose weights
+            true,       // transpose res_grd
             false);     //
 
     }else{

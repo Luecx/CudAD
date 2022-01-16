@@ -22,7 +22,7 @@ void clipped_relu_bp_host(
     float max){
 
     for(int idx = 0; idx < size; idx++){
-        if(A[idx] > 0 && A[idx] < max){
+        if(B[idx] > 0 && B[idx] < max){
             A_grd[idx] = B_grd[idx];
         }else{
             A_grd[idx] = 0;

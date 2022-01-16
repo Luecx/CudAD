@@ -20,12 +20,15 @@ __global__ void add_kernel(
     const unsigned int A_size,
     const unsigned int B_size,
     const unsigned int C_size,
+    const unsigned int size,
     const float alpha,
     const float beta){
 
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
-    if(idx >= C_size) return;
+    if(idx >= size) return;
 
-    C[idx] = A[idx % A_size] * alpha + B[idx % B_size] * beta;
+    C[idx] = (
+               A[idx % A_size] * alpha +
+               B[idx % B_size] * beta);
 }

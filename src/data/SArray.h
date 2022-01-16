@@ -118,7 +118,7 @@ class SArray {
     void malloc_gpu() {
         if (gpu_is_allocated())
             free_gpu();
-        //         make sure to clean once we are done
+        // make sure to clean once we are done
         clean_gpu = true;
         CUDA_ASSERT(cudaMalloc(&gpu_values, size * sizeof(Type)));
     }
