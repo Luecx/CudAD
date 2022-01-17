@@ -36,13 +36,13 @@ public:
         f.apply(out.values, out.values, DEVICE);
     }
 
-    void backprop(Tape &input, Tape& out) {
+    void backprop(Tape &input, Tape& out) override {
         // hack (out.values is not the actual input but the output)
         // this works for the current activation functions since they do not use that value
         f.backprop(out.values, out.gradients, out.values, out.gradients, DEVICE);
         mm_bp<DEVICE>(weights.values, weights.gradients, input.values, input.gradients, out.gradients);
     }
-    void backprop(SparseInput &input, Tape& out) {
+    void backprop(SparseInput &input, Tape& out) override {
         // hack (out.values is not the actual input but the output)
         // this works for the current activation functions since they do not use that value
         f.backprop(out.values, out.gradients, out.values, out.gradients, DEVICE);
@@ -55,7 +55,7 @@ public:
     int  getInputSize() override {
         return I;
     }
-    virtual std::vector<Tape*> getTunableParameters() {
+    std::vector<Tape*> getTunableParameters() override {
         std::vector<Tape*> values{};
         values.push_back(&tunable_values);
         return values;

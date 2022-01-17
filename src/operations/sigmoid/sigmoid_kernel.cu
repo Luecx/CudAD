@@ -23,5 +23,5 @@ __global__ void sigmoid_kernel(
 
     if(idx >= size) return;
 
-    B[idx] = 1.0f / (1.0f + expf(A[idx] * scalar));
+    B[idx] = 1.0f / (1.0f + expf(- A[idx] * scalar));
 }

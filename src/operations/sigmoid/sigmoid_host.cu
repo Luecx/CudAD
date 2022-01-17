@@ -20,6 +20,6 @@ void sigmoid_host(
     float scalar){
 
     for(int i = 0; i < size; i++){
-        B[i] = 1.0f / (1.0f + expf(scalar * A[i]));
+        B[i] = 1.0f / (1.0f + expf(- scalar * A[i]));
     }
 }

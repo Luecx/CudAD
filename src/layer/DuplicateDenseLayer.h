@@ -10,43 +10,74 @@
 
 template<int I, int O, typename F>
 class DuplicateDenseLayer : public LayerInterface{
-public:
-    DenseMatrix      weights             {O,I};
-    DenseMatrix      bias                {O};
-    F         f                          {};
-//    Data*     im1[NN_THREADS]            {};
-//    Data*     im2[NN_THREADS]            {};
-//    Data*     im1_g[NN_THREADS]          {};
-//    Data*     im2_g[NN_THREADS]          {};
+    public:
+    Tape tunable_values            {O, I + 1};                  // update weights + biases at the same
+    Tape weights                   {tunable_values, 0, 0, O,I}; // time
+    Tape bias                      {tunable_values, 0, I, O, 1};
+    F           f {};
 
-    DuplicateDenseLayer(int expected_active_inputs=I) {
-        weights.values.randomiseGaussian(0, 2.0 / sqrt(expected_active_inputs));
-        bias   .values.randomiseGaussian(0,0);
+    explicit DuplicateDenseLayer(int expected_active_inputs=I) {
+        weights.values.randomiseGaussian(0, 2.0f / sqrtf((float)expected_active_inputs));
 
         weights.values.gpu_upload();
         bias   .values.gpu_upload();
     }
 
-    void apply(DenseMatrix &in, DenseMatrix &out) override{
+    void apply(Tape &in, Tape &out) override{
 //        mat_mat_product<MODE_GPU>(weights, in, out);
 //        vm_add<MODE_GPU>(out, bias, out);
 //        f.apply(out, out, MODE_GPU);
+        ASSERT(false);
     }
-    void apply(SparseInput &in, DenseMatrix &out) override{
+    void apply(SparseInput &in, Tape &out) override{
 //        bin_sparse_mm_prod_half<MODE_GPU>(weights, in, bias, out);
 //        vm_add<MODE_GPU>(out, bias, out);
 //        f.apply(out, out, MODE_GPU);
+        ASSERT(false);
+    }
+    void apply(SparseInput &in1,SparseInput &in2, Tape &out){
+
+
+
+        uint32_t B = out.values.n;
+
+        // create submatrices for the output
+        DenseMatrix mat_res_1{out.values, 0,0,O,B};
+        DenseMatrix mat_res_2{out.values, O,0,O,B};
+
+        sparse_affine<DEVICE>(weights.values, in1, bias.values, mat_res_1);
+        sparse_affine<DEVICE>(weights.values, in2, bias.values, mat_res_2);
+//        //        bin_sparse_mm_prod_half<MODE_GPU>(weights, in, bias, out);
+//        //        vm_add<MODE_GPU>(out, bias, out);
+        f.apply(out.values, out.values, DEVICE);
     }
 
-    void backprop(DenseMatrix &input, DenseMatrix& out) {
+    void backprop(SparseInput &in1,SparseInput &in2, Tape &out){
+        uint32_t B = out.values.n;
+
+        f.backprop(out.values, out.gradients,out.values, out.gradients, DEVICE);
+
+        // create submatrices for the output
+        DenseMatrix mat_res_1{out.gradients, 0,0,O,B};
+        DenseMatrix mat_res_2{out.gradients, O,0,O,B};
+
+        sparse_affine_bp<DEVICE>(weights.gradients, in1, bias.gradients, mat_res_1);
+        sparse_affine_bp<DEVICE>(weights.gradients, in2, bias.gradients, mat_res_2);
+        //        //        bin_sparse_mm_prod_half<MODE_GPU>(weights, in, bias, out);
+        //        //        vm_add<MODE_GPU>(out, bias, out);
+    }
+
+    void backprop(Tape &input, Tape& out) override {
 //        f.backprop(out,out, MODE_GPU);
 //        vm_add_backprop<MODE_GPU>(out, bias, out);
 //        mat_mat_product_backprop<MODE_GPU>(weights, input, out);
+        ASSERT(false);
     }
-    void backprop(SparseInput &input, DenseMatrix& out) {
+    void backprop(SparseInput &input, Tape& out) override {
 //        f.backprop(out,out, MODE_GPU);
 //        vm_add_backprop<MODE_GPU>(out, bias, out);
 //        bin_sparse_mm_prod_half_backprop<MODE_GPU>(weights, input, bias, out);
+        ASSERT(false);
     }
 
 //    void apply(Data *input, ThreadData *td) override {
@@ -86,11 +117,10 @@ public:
     int  getInputSize() override {
         return I*2;
     }
-    DenseMatrix *getBias() override {
-        return &bias;
-    }
-    DenseMatrix *getWeights() override {
-        return &weights;
+    std::vector<Tape*> getTunableParameters() override {
+        std::vector<Tape*> values{};
+        values.push_back(&tunable_values);
+        return values;
     }
 //    DenseMatrix newWeightInstance() override {
 //        return weights.newInstance();

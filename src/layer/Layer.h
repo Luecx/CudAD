@@ -12,7 +12,6 @@
 
 #include <vector>
 
-class ThreadData;
 
 struct LayerInterface{
 protected:
