@@ -7,7 +7,7 @@
 #ifndef CUDATEST1_SRC_DATA_SPARSEINPUT_H_
 #define CUDATEST1_SRC_DATA_SPARSEINPUT_H_
 
-#include "../config/config.h"
+#include "../misc/config.h"
 #include "align.h"
 
 #include <cmath>
@@ -38,12 +38,23 @@ struct SparseInput : public Matrix {
         column_indices.cpu_values[offset + column_indices.cpu_values[offset]] = index;
     }
 
+    void clear(){
+        for(int i = 0; i < n; i++){
+            column_indices.cpu_values[i * (max_entries_per_column + 1)] = 0;
+        }
+    }
+
     friend std::ostream& operator<<(std::ostream& os, const SparseInput& data) {
         os << std::fixed << std::setprecision(0);
         for (int p_i = 0; p_i <= data.max_entries_per_column; p_i++) {
             for (int p_n = 0; p_n < data.n; p_n++) {
-                os << std::setw(11)
-                   << (int) data.column_indices(p_i + p_n * (data.max_entries_per_column + 1));
+                int count = data.column_indices(p_n * (data.max_entries_per_column + 1));
+                if(p_i > count){
+                    os << std::setw(11) << "";
+                }else{
+                    os << std::setw(11)
+                       << (int) data.column_indices(p_i + p_n * (data.max_entries_per_column + 1));
+                }
             }
             os << "\n";
             if (p_i == 0) {

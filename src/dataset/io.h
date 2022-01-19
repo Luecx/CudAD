@@ -1,0 +1,14 @@
+
+//
+// Created by Luecx on 28.11.2021.
+//
+
+#ifndef BINARYPOSITIONWRAPPER_SRC_DATASET_IO_H_
+#define BINARYPOSITIONWRAPPER_SRC_DATASET_IO_H_
+
+enum Format{
+    BINARY,
+    TEXT
+};
+
+#endif    // BINARYPOSITIONWRAPPER_SRC_DATASET_IO_H_

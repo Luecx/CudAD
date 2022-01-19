@@ -7,6 +7,7 @@
 #ifndef CUDAD_SRC_OPERATIONS_OPERATIONS_H_
 #define CUDAD_SRC_OPERATIONS_OPERATIONS_H_
 
+#include "mse/mse.h"
 #include "clipped_relu/clipped_relu.h"
 #include "clipped_relu_bp/clipped_relu_bp.h"
 #include "relu/relu.h"

@@ -6,7 +6,7 @@
 #ifndef CUDATEST1_SRC_OPERATIONS_MAT_MAT_PRODUCT_MAT_MAT_PRODUCT_CUBLAS_H_
 #define CUDATEST1_SRC_OPERATIONS_MAT_MAT_PRODUCT_MAT_MAT_PRODUCT_CUBLAS_H_
 
-#include "../../config/config.h"
+#include "../../misc/config.h"
 #include "../../data/DenseMatrix.h"
 inline void mm_cublas(
     const DenseMatrix &A,

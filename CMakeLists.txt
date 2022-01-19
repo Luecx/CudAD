@@ -1,10 +1,10 @@
-cmake_minimum_required(VERSION 3.21)
+cmake_minimum_required(VERSION 3.17)
 project(CudAD VERSION 1.0 LANGUAGES CUDA CXX)
 
-find_package(CUDA REQUIRED)
+find_package(CUDA)
 set(CMAKE_CUDA_STANDARD 14)
 
-file(GLOB_RECURSE SRCS src/*.cu src/*.h)
+file(GLOB_RECURSE SRCS src/*.cu src/*.cpp src/*.h)
 
 add_executable(CudAD ${SRCS})
 
@@ -13,8 +13,16 @@ add_executable(CudAD ${SRCS})
 #        src/operations/add/add_host.cu
 #        src/operations/add/add_kernel.cu)
 
+set_property(TARGET CudAD PROPERTY CUDA_ARCHITECTURES OFF)
+
 set_target_properties(CudAD PROPERTIES
         CUDA_SEPARABLE_COMPILATION ON)
+
+set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -Xcompiler -openmp ")
+set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -dlto")
+
+
+#target_compile_options(CudAD PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:--std=c++17>)
 
 target_link_libraries(CudAD ${CUDA_LIBRARIES})
 target_link_libraries(CudAD ${CUDA_CUBLAS_LIBRARIES})

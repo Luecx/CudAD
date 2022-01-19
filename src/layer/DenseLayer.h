@@ -5,7 +5,7 @@
 #ifndef DIFFERENTIATION_DENSELAYER_H
 #define DIFFERENTIATION_DENSELAYER_H
 
-#include "../config/config.h"
+#include "../misc/config.h"
 #include "Layer.h"
 #include "../operations/operations.h"
 #include "../data/Tape.h"
