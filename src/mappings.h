@@ -14,20 +14,58 @@
 
 namespace dense_relative {
 
+
+
+inline int king_square_index(Square relative_king_square){
+
+    constexpr int indices[N_SQUARES]{
+        0 ,1 ,2 ,3 ,3 ,2 ,1 ,0 ,
+        4 ,5 ,6 ,7 ,7 ,6 ,5 ,4 ,
+        8 ,9 ,10,11,11,10,9 ,8 ,
+        8 ,9 ,10,11,11,10,9 ,8 ,
+        12,12,13,13,13,13,12,12,
+        12,12,13,13,13,13,12,12,    
+        14,14,15,15,15,15,14,14,
+        14,14,15,15,15,15,14,14,
+    };
+
+    return indices[relative_king_square];
+}
+
 inline int index(Square psq, Piece p, Square kingSquare, Color view) {
+    constexpr int pieceTypeFactor  = 64;
+    constexpr int pieceColorFactor = 64 * 6;
+    constexpr int kingSideFactor   = 64 * 6 * 2;
 
-    Square    relativeSquare = view == WHITE ? psq : mirrorVertically(psq);
-    Color     pieceColor     = p >= BLACK_PAWN ? BLACK : WHITE;
-    PieceType pieceType      = p % 8;
-    bool      kingSide       = (kingSquare & 7) > 3;
-
-    if (kingSide) {
-        relativeSquare ^= 7;
-    }
+    const Square  relativeSquare    = view == WHITE ? psq : mirrorVertically(psq);
+    const PieceType pieceType       = p % 8;
+    const Color pieceColor          = p >= BLACK_PAWN ? BLACK : WHITE;
+    const bool kingSide             = (kingSquare & 7) > 3;
 
     return relativeSquare
-           + (pieceColor == view) * 64 * 6
-           + pieceType * 64;
+           + pieceType * pieceTypeFactor
+           + (pieceColor == view) * pieceColorFactor
+           + kingSide * kingSideFactor;
+
+//    constexpr int pieceTypeFactor  = 64;
+//    constexpr int pieceColorFactor = 64 * 6;
+//    constexpr int kingSquareFactor = 64 * 6 * 2;
+//
+//    const PieceType pieceType          = getPieceType(p);
+//    const Color     pieceColor         = getPieceColor(p);
+//    const Square    relativeKingSquare = view == WHITE ? kingSquare : mirrorVertically(kingSquare);
+//    const bool      kingSide           = fileIndex(kingSquare) > 3;
+//    const int       kingSquareIndex    = king_square_index(relativeKingSquare);
+//    Square          relativeSquare     = view == WHITE ? psq : mirrorVertically(psq);
+//
+//    if (kingSide) {
+//        relativeSquare = mirrorHorizontally(relativeSquare);
+//    }
+//
+//    return relativeSquare
+//           + pieceType              * pieceTypeFactor
+//           + (pieceColor == view)   * pieceColorFactor
+//           + kingSquareIndex        * kingSquareFactor;
 }
 
 inline void assign_input(Position& p, SparseInput& in1, SparseInput& in2, SArray<float>& output, int id) {
@@ -53,6 +91,7 @@ inline void assign_input(Position& p, SparseInput& in1, SparseInput& in2, SArray
 
     BB bb{p.m_occupancy};
     int idx = 0;
+
 
     while(bb){
         Square sq  = bitscanForward(bb);

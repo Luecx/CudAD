@@ -20,16 +20,16 @@ public:
 //    virtual DenseMatrix* getBias   () = 0;
 //    virtual DenseMatrix* getWeights() = 0;
 
-    virtual int getOutputSize() = 0;
-    virtual int getInputSize()  = 0;
+    virtual uint32_t getOutputSize() = 0;
+    virtual uint32_t getInputSize()  = 0;
 
     virtual Activation* getActivationFunction() = 0;
     virtual std::vector<Tape*> getTunableParameters() = 0;
 
-    virtual void apply   (Tape &input, Tape& out) = 0;
-    virtual void backprop(Tape &input, Tape& out) = 0;
-    virtual void apply   (SparseInput &input, Tape& out) = 0;
-    virtual void backprop(SparseInput &input, Tape& out) = 0;
+    virtual void apply   (std::vector<Tape*> inputs, Tape& out) = 0;
+    virtual void backprop(std::vector<Tape*> inputs, Tape& out) = 0;
+    virtual void apply   (std::vector<SparseInput*> inputs, Tape& out) = 0;
+    virtual void backprop(std::vector<SparseInput*> inputs, Tape& out) = 0;
 
     void assignID(int id){
         layerID = id;
