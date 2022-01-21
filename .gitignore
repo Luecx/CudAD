@@ -6,3 +6,5 @@ cmake-build-debug/
 .idea/
 
 bin/
+
+resources/
