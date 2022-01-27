@@ -40,7 +40,7 @@ public:
         // hack (out.values is not the actual input but the output)
         // this works for the current activation functions since they do not use that value
         f.backprop(out.values, out.gradients, out.values, out.gradients, DEVICE);
-//        add_mv_bp<DEVICE>(out.gradients, bias.gradients, out.gradients);
+        add_mv_bp<DEVICE>(out.gradients, bias.gradients, out.gradients);
         mm_bp<DEVICE>(weights.values, weights.gradients, inputs[0]->values, inputs[0]->gradients, out.gradients);
     }
     void backprop(std::vector<SparseInput*> inputs, Tape& out) override {
