@@ -24,13 +24,13 @@ __global__ void sparse_affine_bp_kernel(
 
 /**
  * Performs
- * res = matrix * inp + bia
+ * networks = matrix * inp + bia
  *
  * Dimensions:
  * matrix = [M,N]
  * bias   = [M,1]
  * inp    = [N,B]
- * res    = [M,B]
+ * networks    = [M,B]
  *
  * where B = BATCH_SIZE
  *       M = OUTPUT SIZE

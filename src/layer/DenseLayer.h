@@ -16,7 +16,7 @@ template<int I, int O, typename F>
 class DenseLayer : public LayerInterface{
 public:
     Tape tunable_values            {O, I + 1};                  // update weights + biases at the same
-    Tape weights                   {tunable_values, 0, 0, O,I}; // time
+    Tape weights                   {tunable_values, 0, 0, O, I}; // time
     Tape bias                      {tunable_values, 0, I, O, 1};
     F    f                         {};
 
@@ -26,33 +26,34 @@ public:
         bias   .values.gpu_upload();
     }
 
-    void apply(Tape &in, Tape &out) override{
-        mm<DEVICE>(weights.values, in.values, out.values);
+    void apply(std::vector<Tape*> inputs, Tape &out) override{
+        mm<DEVICE>(weights.values, inputs[0]->values, out.values);
         add_mv<DEVICE>(out.values, bias.values, out.values);
         f.apply(out.values, out.values, DEVICE);
     }
-    void apply(SparseInput &in, Tape &out) override{
-        sparse_affine<DEVICE>(weights.values, in, bias.values, out.values);
+    void apply(std::vector<SparseInput*> inputs, Tape &out) override{
+        sparse_affine<DEVICE>(weights.values, *inputs[0], bias.values, out.values);
         f.apply(out.values, out.values, DEVICE);
     }
 
-    void backprop(Tape &input, Tape& out) override {
+    void backprop(std::vector<Tape*> inputs, Tape& out) override {
         // hack (out.values is not the actual input but the output)
         // this works for the current activation functions since they do not use that value
         f.backprop(out.values, out.gradients, out.values, out.gradients, DEVICE);
-        mm_bp<DEVICE>(weights.values, weights.gradients, input.values, input.gradients, out.gradients);
+        add_mv_bp<DEVICE>(out.gradients, bias.gradients, out.gradients);
+        mm_bp<DEVICE>(weights.values, weights.gradients, inputs[0]->values, inputs[0]->gradients, out.gradients);
     }
-    void backprop(SparseInput &input, Tape& out) override {
+    void backprop(std::vector<SparseInput*> inputs, Tape& out) override {
         // hack (out.values is not the actual input but the output)
         // this works for the current activation functions since they do not use that value
         f.backprop(out.values, out.gradients, out.values, out.gradients, DEVICE);
-        sparse_affine_bp<DEVICE>(weights.gradients, input, bias.gradients, out.gradients);
+        sparse_affine_bp<DEVICE>(weights.gradients, *inputs[0], bias.gradients, out.gradients);
     }
 
-    int  getOutputSize() override {
+    uint32_t  getOutputSize() override {
         return O;
     }
-    int  getInputSize() override {
+    uint32_t  getInputSize() override {
         return I;
     }
     std::vector<Tape*> getTunableParameters() override {
@@ -60,18 +61,6 @@ public:
         values.push_back(&tunable_values);
         return values;
     }
-    //    DenseMatrix *getBias() override {
-//        return &bias;
-//    }
-//    DenseMatrix *getWeights() override {
-//        return &weights;
-//    }
-//    DenseMatrix newWeightInstance() override {
-//        return weights.newInstance();
-//    }
-//    DenseMatrix newBiasInstance() override {
-//        return bias.newInstance();
-//    }
     Activation* getActivationFunction() override { return &f; }
 };
 

@@ -37,6 +37,15 @@ inline Square squareIndex(std::string& str) {
     return squareIndex(r, f);
 }
 
+inline Rank rankIndex(Square square_index) {
+    return square_index >> 3;
+}
+
+inline File fileIndex(Square square_index) {
+    return square_index & 7;
+}
+
+
 inline Square mirrorVertically(Square square){
     return square ^ 56;
 }
