@@ -33,6 +33,7 @@ void test_fen(Network& network, const std::string& fen, uint32_t input_size){
     network.getOutput(1).values.gpu_download();
 
     std::cout << network.getOutput(0).values << std::endl;
+    std::cout << network.getOutput(1).values << std::endl;
 
     std::cout << "testing fen: " << fen << std::endl;
     std::cout << "eval: " << network.getOutput().values << std::endl;
@@ -50,10 +51,15 @@ void writeMatrix(FILE* file, DenseMatrix& matrix, float scaling, bool column_maj
     for(uint32_t i = 0; i < (column_major ? n:m); i++){
         for(uint32_t j = 0; j < (column_major ? m:n); j++){
             float original_value = column_major ? matrix(j,i) : matrix(i,j);
-            data(idx++) = static_cast<type>(round(original_value * scaling));
+            if (std::is_integral_v<type>){
+                data(idx++) = static_cast<type>(round(original_value * scaling));
+            } else if (std::is_floating_point_v<type>){
+                data(idx++) = static_cast<type>(original_value * scaling);
+            }
         }
     }
 
+    std::cout << "writing matrix: " << " element size= " << sizeof(type) << " element count= " << data.size << std::endl;
     fwrite(data.cpu_values, sizeof(type), data.size, file);
 }
 
@@ -68,11 +74,12 @@ void writeLayer(FILE* file, Tape* tunable_values, float wgt_scaling, float bia_s
     writeMatrix<bia_type>(file, bia, bia_scaling);
 }
 
-void quantitize(const std::string& path, Network& network, float scalar_1, float scalar_2){
+void quantitize(const std::string& path, Network& network, float scalar_1, float scalar_2, float scalar_3){
     FILE *f = fopen(path.c_str(), "wb");
 
     writeLayer<int16_t, int16_t>(f, network.getLayers()[0]->getTunableParameters()[0], scalar_1, scalar_1           , true);
-    writeLayer<int16_t, int32_t>(f, network.getLayers()[1]->getTunableParameters()[0], scalar_2, scalar_2 * scalar_1, true);
+    writeLayer< int8_t, int32_t>(f, network.getLayers()[1]->getTunableParameters()[0], scalar_2, scalar_2 * scalar_1, false);
+    writeLayer< float , float  >(f, network.getLayers()[2]->getTunableParameters()[0], scalar_3, scalar_3           , false);
 
     fclose(f);
 }
@@ -86,11 +93,16 @@ void computeScalars(BatchLoader& batch_loader, Network& network, int batches, ui
 
     std::vector<SArray<float>> maximum{};
     std::vector<SArray<float>> minimum{};
+    std::vector<float> maximum_wgt{};
+    std::vector<float> minimum_wgt{};
     for(LayerInterface* layer_interface:network.getLayers()){
-        maximum.emplace_back(1);
+        maximum.emplace_back(layer_interface->getOutputSize());
         maximum[maximum.size()-1].malloc_cpu();
-        minimum.emplace_back(1);
+        minimum.emplace_back(layer_interface->getOutputSize());
         minimum[minimum.size()-1].malloc_cpu();
+
+        maximum_wgt.emplace_back(layer_interface->getTunableParameters()[0]->values.max());
+        minimum_wgt.emplace_back(layer_interface->getTunableParameters()[0]->values.min());
     }
 
     for (int batch = 0; batch < batches; batch++){
@@ -111,16 +123,22 @@ void computeScalars(BatchLoader& batch_loader, Network& network, int batches, ui
 
             network.getOutput(i).values.gpu_download();
 
-            maximum[i](0) = std::max(maximum[i](0), network.getOutput(i).values.max());
-            minimum[i](0) = std::min(minimum[i](0), network.getOutput(i).values.min());
+            for(int j = 0; j < network.getLayers()[i]->getOutputSize(); j++){
+
+                maximum[i](j) = std::max(maximum[i](j), network.getOutput(i).values.max());
+                minimum[i](j) = std::min(minimum[i](j), network.getOutput(i).values.min());
+            }
         }
     }
     std::cout << std::endl;
 
     for(int i = 0; i < maximum.size(); i++){
-        std::cout << "layer: " << i << std::endl;
-        std::cout << "min: " << std::left << std::setw(10) << minimum[i](0)
-                  << "max: " << std::left << std::setw(10) << maximum[i](0) << std::endl;
+        std::cout << minimum[i] << "\n" << maximum[i] << std::endl;
+        std::cout << "layer  : " << i << std::endl;
+        std::cout << "min    : " << std::left << std::setw(10) << minimum[i].min()
+                  << "max    : " << std::left << std::setw(10) << maximum[i].max()
+                  << "max wgt: " << std::left << std::setw(10) << maximum_wgt[i]
+                  << "min wgt: " << std::left << std::setw(10) << minimum_wgt[i] << std::endl;
     }
 }
 

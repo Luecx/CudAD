@@ -18,24 +18,24 @@ namespace dense_relative {
 
 inline int king_square_index(Square relative_king_square){
 
-//    constexpr int indices[N_SQUARES]{
-//        0 ,1 ,2 ,3 ,3 ,2 ,1 ,0 ,
-//        4 ,5 ,6 ,7 ,7 ,6 ,5 ,4 ,
-//        8 ,9 ,10,11,11,10,9 ,8 ,
-//        8 ,9 ,10,11,11,10,9 ,8 ,
-//        12,12,13,13,13,13,12,12,
-//        12,12,13,13,13,13,12,12,
-//        14,14,15,15,15,15,14,14,
-//        14,14,15,15,15,15,14,14,
-//    };
-//
-//    return indices[relative_king_square];
+    constexpr int indices[N_SQUARES]{
+        0 ,1 ,2 ,3 ,3 ,2 ,1 ,0 ,
+        4 ,5 ,6 ,7 ,7 ,6 ,5 ,4 ,
+        8 ,9 ,10,11,11,10,9 ,8 ,
+        8 ,9 ,10,11,11,10,9 ,8 ,
+        12,12,13,13,13,13,12,12,
+        12,12,13,13,13,13,12,12,
+        14,14,15,15,15,15,14,14,
+        14,14,15,15,15,15,14,14,
+    };
+
+    return indices[relative_king_square];
 
 
-    if (fileIndex(relative_king_square) > 3){
-        relative_king_square = mirrorHorizontally(relative_king_square);
-    }
-    return rankIndex(relative_king_square) * 4 + fileIndex(relative_king_square);
+//    if (fileIndex(relative_king_square) > 3){
+//        relative_king_square = mirrorHorizontally(relative_king_square);
+//    }
+//    return rankIndex(relative_king_square) * 4 + fileIndex(relative_king_square);
 }
 
 inline int index(Square psq, Piece p, Square kingSquare, Color view) {

@@ -15,6 +15,9 @@ struct Tape {
     DenseMatrix values;
     DenseMatrix gradients;
 
+    float min_allowed_value = std::numeric_limits<float>::min();
+    float max_allowed_value = std::numeric_limits<float>::max();
+
     Tape(uint32_t m, uint32_t n) : values(DenseMatrix {m, n}), gradients(DenseMatrix {m, n}) {};
 
     Tape(DenseMatrix values, DenseMatrix gradients)

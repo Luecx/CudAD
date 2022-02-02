@@ -62,11 +62,10 @@ void Network::batch(const std::vector<SparseInput*>& inputs,
                 target,
                 loss);
 
-    for(int i = 1; i < layers.size(); i++){
+    for(int i = layers.size() - 1; i >= 1; i--){
         layers[i]->backprop({&output_tapes[i-1]}, output_tapes[i]);
     }
     layers[0]->backprop(inputs, output_tapes[0]);
-
 }
 
 void Network::feed(const std::vector<SparseInput*> &inputs){

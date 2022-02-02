@@ -5,13 +5,16 @@
 #ifndef CUDAD_SRC_OPTIMIZER_ADAM_H_
 #define CUDAD_SRC_OPTIMIZER_ADAM_H_
 
+#include <tuple>
 #include "Optimiser.h"
 #include "../operations/adam/adam.h"
+#include "../operations/clamp/clamp.h"
 
 struct Adam : Optimiser {
     private:
     std::vector<SArray<float>> first_moments{};
     std::vector<SArray<float>> second_moments{};
+    std::vector<std::tuple<float,float>> value_ranges{};
 
     public:
     double alpha = 0.01;
@@ -25,6 +28,7 @@ struct Adam : Optimiser {
             second_moments.push_back(SArray<float>{t->values.size});
             first_moments [first_moments.size()-1].malloc_gpu();
             second_moments[first_moments.size()-1].malloc_gpu();
+            value_ranges.push_back(std::tuple<float, float>{t->min_allowed_value, t->max_allowed_value});
         }
     }
     virtual void apply(int batch_size) {
@@ -35,6 +39,14 @@ struct Adam : Optimiser {
                          first_moments [i],
                          second_moments[i],
                          alpha, beta1, beta2, eps);
+
+            auto range = value_ranges[i];
+            auto min = std::get<0>(range);
+            auto max = std::get<1>(range);
+            if( min != std::numeric_limits<float>::min() ||
+                max != std::numeric_limits<float>::max()){
+                clamp<DEVICE>(tunable_values[i]->values, min, max);
+            }
         }
     }
     virtual void newEpoch() {}
