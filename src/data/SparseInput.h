@@ -35,6 +35,7 @@ struct SparseInput : public Matrix {
     void set(int input_idx, int index) {
         auto offset = (max_entries_per_column + 1) * input_idx;
         column_indices.cpu_values[offset]++;
+        ASSERT(column_indices.cpu_values[offset] <= max_entries_per_column);
         column_indices.cpu_values[offset + column_indices.cpu_values[offset]] = index;
     }
 

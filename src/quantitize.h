@@ -21,19 +21,23 @@ void test_fen(Network& network, const std::string& fen, uint32_t input_size){
 
     SArray<float> target{1};
     target.malloc_cpu();
+    SArray<bool> target_mask{1};
+    target_mask.malloc_cpu();
 
-    dense_relative::assign_input(p, sp1, sp2,target,0);
+    dense_relative::assign_input(p, sp1,sp2, target,target_mask,0);
     sp1.column_indices.gpu_upload();
     sp2.column_indices.gpu_upload();
 
-    network.feed({&sp1, &sp2});
+
+    network.feed(std::vector<SparseInput*>{&sp1, &sp2});
     network.getOutput().values.gpu_download();
 
-    network.getOutput(0).values.gpu_download();
-    network.getOutput(1).values.gpu_download();
+//    network.getOutput(0).values.gpu_download();
+//    network.getOutput(1).values.gpu_download();
 
-    std::cout << network.getOutput(0).values << std::endl;
-    std::cout << network.getOutput(1).values << std::endl;
+//    std::cout << sp1 << " " << sp2 << std::endl;
+//    std::cout << network.getOutput(0).values << std::endl;
+//    std::cout << network.getOutput(1).values << std::endl;
 
     std::cout << "testing fen: " << fen << std::endl;
     std::cout << "eval: " << network.getOutput().values << std::endl;
@@ -78,8 +82,8 @@ void quantitize(const std::string& path, Network& network, float scalar_1, float
     FILE *f = fopen(path.c_str(), "wb");
 
     writeLayer<int16_t, int16_t>(f, network.getLayers()[0]->getTunableParameters()[0], scalar_1, scalar_1           , true);
-    writeLayer< int8_t, int32_t>(f, network.getLayers()[1]->getTunableParameters()[0], scalar_2, scalar_2 * scalar_1, false);
-    writeLayer< float , float  >(f, network.getLayers()[2]->getTunableParameters()[0], scalar_3, scalar_3           , false);
+    writeLayer<int16_t, int32_t>(f, network.getLayers()[1]->getTunableParameters()[0], scalar_2, scalar_2 * scalar_1, false);
+//    writeLayer< float , float  >(f, network.getLayers()[2]->getTunableParameters()[0], scalar_3, scalar_3           , false);
 
     fclose(f);
 }
@@ -90,6 +94,8 @@ void computeScalars(BatchLoader& batch_loader, Network& network, int batches, ui
     SparseInput sparse_input_2{input_size, (uint32_t) batch_loader.batch_size, 32};
     SArray<float> target{(uint32_t) batch_loader.batch_size};
     target.malloc_cpu();
+    SArray<bool> target_mask{(uint32_t) batch_loader.batch_size};
+    target_mask.malloc_cpu();
 
     std::vector<SArray<float>> maximum{};
     std::vector<SArray<float>> minimum{};
@@ -109,12 +115,13 @@ void computeScalars(BatchLoader& batch_loader, Network& network, int batches, ui
         // get the next dataset (batch)
         auto* ds = batch_loader.next();
         // assign to the inputs and compute the target
-        dense_relative::assign_inputs_batch(*ds, sparse_input_1, sparse_input_2, target);
+        dense_relative::assign_inputs_batch(*ds, sparse_input_1, sparse_input_2, target,target_mask);
         // upload relevant data
         sparse_input_1.column_indices .gpu_upload();
         sparse_input_2.column_indices .gpu_upload();
         target                        .gpu_upload();
-        network.feed({&sparse_input_1, &sparse_input_2});
+        target_mask                   .gpu_upload();
+        network.feed(std::vector<SparseInput*>{&sparse_input_1, &sparse_input_2});
 
         std::cout << "\rProcessing batch: " << (batch + 1) << "/" << batches << std::flush;
 
@@ -125,20 +132,20 @@ void computeScalars(BatchLoader& batch_loader, Network& network, int batches, ui
 
             for(int j = 0; j < network.getLayers()[i]->getOutputSize(); j++){
 
-                maximum[i](j) = std::max(maximum[i](j), network.getOutput(i).values.max());
-                minimum[i](j) = std::min(minimum[i](j), network.getOutput(i).values.min());
+                maximum[i](j) = std::max(maximum[i](j), network.getOutput(i).values(j));
+                minimum[i](j) = std::min(minimum[i](j), network.getOutput(i).values(j));
             }
         }
     }
     std::cout << std::endl;
 
     for(int i = 0; i < maximum.size(); i++){
-        std::cout << minimum[i] << "\n" << maximum[i] << std::endl;
+//        std::cout << minimum[i] << "\n" << maximum[i] << std::endl;
         std::cout << "layer  : " << i << std::endl;
         std::cout << "min    : " << std::left << std::setw(10) << minimum[i].min()
                   << "max    : " << std::left << std::setw(10) << maximum[i].max()
-                  << "max wgt: " << std::left << std::setw(10) << maximum_wgt[i]
-                  << "min wgt: " << std::left << std::setw(10) << minimum_wgt[i] << std::endl;
+                  << "min wgt: " << std::left << std::setw(10) << minimum_wgt[i]
+                  << "max wgt: " << std::left << std::setw(10) << maximum_wgt[i] << std::endl;
     }
 }
 

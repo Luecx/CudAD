@@ -17,6 +17,7 @@ void display_header()
 {
     const int kb = 1024;
     const int mb = kb * kb;
+    std::cout << "C++ version:    v" << __cplusplus << std::endl;
     std::cout << "CUDA version:   v" << CUDART_VERSION << std::endl;
 
     int devCount;

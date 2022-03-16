@@ -2,11 +2,11 @@ cmake_minimum_required(VERSION 3.17)
 project(CudAD VERSION 1.0 LANGUAGES CUDA CXX)
 
 find_package(CUDA)
-set(CMAKE_CUDA_STANDARD 14)
+set(CMAKE_CUDA_STANDARD 17)
 
 file(GLOB_RECURSE SRCS src/*.cu src/*.cpp src/*.h)
 
-add_executable(CudAD ${SRCS})
+add_executable(CudAD ${SRCS} )
 
 #add_executable(CudAD src/main.cu
 #        src/config/config.cu
@@ -19,6 +19,7 @@ set_target_properties(CudAD PROPERTIES
         CUDA_SEPARABLE_COMPILATION ON)
 
 set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -Xcompiler -openmp ")
+set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -std=c++17 ")
 set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -dlto")
 
 

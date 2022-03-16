@@ -29,7 +29,8 @@ inline void bucket_bp(const SArray<float> &inp,
     if(mode == DEVICE){
 
         ASSERT(inp.gpu_values);
-        ASSERT(out.gpu_values);
+        ASSERT(inp_grd.gpu_values);
+        ASSERT(out_grd.gpu_values);
 
         constexpr int block_size_x = 1024;
         dim3 block(block_size_x);

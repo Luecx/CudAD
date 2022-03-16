@@ -9,7 +9,9 @@
 
 #include "bucket/bucket.h"
 #include "bucket_bp/bucket_bp.h"
+#include "mle/mle.h"
 #include "mse/mse.h"
+#include "mpe/mpe.h"
 #include "clipped_relu/clipped_relu.h"
 #include "clipped_relu_bp/clipped_relu_bp.h"
 #include "relu/relu.h"
