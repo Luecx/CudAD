@@ -47,7 +47,7 @@ public:
         // hack (out.values is not the actual input but the output)
         // this works for the current activation functions since they do not use that value
         f.backprop(out.values, out.gradients, out.values, out.gradients, DEVICE);
-        sparse_affine_bp<DEVICE>(weights.gradients, *inputs[0], bias.gradients, out.gradients);
+        sparse_affine_bp<DEVICE>(weights.gradients, *inputs[0], bias.gradients, out.values, out.gradients);
     }
 
     uint32_t  getOutputSize() override {

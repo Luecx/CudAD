@@ -9,6 +9,7 @@ __global__ void sparse_affine_bp_kernel(
     const unsigned int* __restrict__ inp_col_indices,
     const unsigned int               inp_col_max_entries,
           float*        __restrict__ bia_grd,
+    const float*        __restrict__ res,
     const float*        __restrict__ res_grd,
     const unsigned int               m,
     const unsigned int               n,
@@ -32,6 +33,9 @@ __global__ void sparse_affine_bp_kernel(
 
     // dont do anything if the gradient is 0. Theoretical impact on memory
     if(res_grd_v == 0) return;
+
+    // lasso
+//    res_grd_v += 1e-9f * (res[MATRIX_INDEX(ldc, row, col)] > 0);
 
     atomicAdd(&bia_grd[row], res_grd_v);
 

@@ -45,13 +45,18 @@ inline File fileIndex(Square square_index) {
     return square_index & 7;
 }
 
-
 inline Square mirrorVertically(Square square){
     return square ^ 56;
 }
 
 inline Square mirrorHorizontally(Square square){
     return square ^ 7;
+}
+
+inline Color getSquareColor(Square square){
+    constexpr BB white_squares{0x55AA55AA55AA55AAULL};
+    if (getBit(white_squares, square)) return WHITE;
+    return BLACK;
 }
 
 #endif //BINARYPOSITIONWRAPPER_SRC_SQUARE_H_

@@ -50,11 +50,13 @@ class DuplicateDenseLayer : public LayerInterface{
         f.backprop(out.values, out.gradients,out.values, out.gradients, DEVICE);
 
         // create submatrices for the output
-        DenseMatrix mat_res_1{out.gradients, 0,0,O,B};
-        DenseMatrix mat_res_2{out.gradients, O,0,O,B};
+        DenseMatrix mat_grd_1{out.gradients, 0,0,O,B};
+        DenseMatrix mat_grd_2{out.gradients, O,0,O,B};
+        DenseMatrix mat_res_1{out.values   , 0,0,O,B};
+        DenseMatrix mat_res_2{out.values   , O,0,O,B};
 
-        sparse_affine_bp<DEVICE>(weights.gradients, *inputs[0], bias.gradients, mat_res_1);
-        sparse_affine_bp<DEVICE>(weights.gradients, *inputs[1], bias.gradients, mat_res_2);
+        sparse_affine_bp<DEVICE>(weights.gradients, *inputs[0], bias.gradients, mat_res_1, mat_grd_1);
+        sparse_affine_bp<DEVICE>(weights.gradients, *inputs[1], bias.gradients, mat_res_2, mat_grd_2);
     }
 
     uint32_t getOutputSize() override {

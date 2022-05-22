@@ -16,6 +16,7 @@ __global__ void sparse_affine_bp_kernel(
     const unsigned int* __restrict__ inp_col_indices,
     const unsigned int               inp_col_max_entries,
           float*        __restrict__ bia_grd,
+    const float*        __restrict__ res,
     const float*        __restrict__ res_grd,
     const unsigned int               m,
     const unsigned int               n,
@@ -46,6 +47,7 @@ inline void sparse_affine_bp(
                    DenseMatrix& mat_grd,
                    SparseInput& inp,
                    DenseMatrix& bia_grd,
+                   DenseMatrix& res,
                    DenseMatrix& res_grd){
 
     auto M = mat_grd.m;
@@ -64,6 +66,7 @@ inline void sparse_affine_bp(
         ASSERT(inp    .column_indices.gpu_values)
         ASSERT(bia_grd.gpu_values)
         ASSERT(res_grd.gpu_values)
+        ASSERT(res    .gpu_values)
 
 //        mat_grd.clear<DEVICE>();
 //        bia_grd.clear<DEVICE>();
@@ -80,6 +83,7 @@ inline void sparse_affine_bp(
             inp.column_indices.gpu_values,
             inp.max_entries_per_column,
             bia_grd.gpu_values,
+            res.gpu_values,
             res_grd.gpu_values,
             M,B,
             mat_grd.leading_dimension,
