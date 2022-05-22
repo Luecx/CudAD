@@ -39,7 +39,6 @@ inline DataSet read(const std::string& file, uint64_t count=-1) {
         return DataSet {};
     }
 
-
     if(format == BINARY){
 
         // read the header
@@ -80,42 +79,12 @@ inline DataSet read(const std::string& file, uint64_t count=-1) {
         std::cout << std::endl;
     }
 
-
-    fclose(f);
     return data_set;
 }
 
 template<Format format>
 inline bool isReadable(const std::string& file){
-//    if (!std::filesystem::exists(file)) return false;
-
-    if (format == BINARY){
-//        std::filesystem::path p{file};
-//        auto size = std::filesystem::file_size(p);
-
-        struct stat stat_buf;
-        int rc = stat(file.c_str(), &stat_buf);
-        auto size = rc == 0 ? stat_buf.st_size : -1;
-
-        FILE*              f;
-        f = fopen(file.c_str(), "rb");
-        if(f == nullptr){
-            return false;
-        }
-
-        Header header{};
-        fread(&header, sizeof(Header), 1, f);
-
-        auto expected_size = header.position_count * sizeof(Position) + sizeof(Header);
-
-        return expected_size == size;
-
-    }else{
-        return true;
-    }
-
-
-
+    return true;
 }
 
 #endif    // BINARYPOSITIONWRAPPER_SRC_DATASET_READER_H_

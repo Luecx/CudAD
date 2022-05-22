@@ -78,12 +78,11 @@ void writeLayer(FILE* file, Tape* tunable_values, float wgt_scaling, float bia_s
     writeMatrix<bia_type>(file, bia, bia_scaling);
 }
 
-void quantitize(const std::string& path, Network& network, float scalar_1, float scalar_2, float scalar_3){
+void quantitize(const std::string& path, Network& network, float scalar_1 = 1.0f, float scalar_2 = 1.0f) {
     FILE *f = fopen(path.c_str(), "wb");
 
-    writeLayer<int16_t, int16_t>(f, network.getLayers()[0]->getTunableParameters()[0], scalar_1, scalar_1           , true);
-    writeLayer<int16_t, int32_t>(f, network.getLayers()[1]->getTunableParameters()[0], scalar_2, scalar_2 * scalar_1, false);
-//    writeLayer< float , float  >(f, network.getLayers()[2]->getTunableParameters()[0], scalar_3, scalar_3           , false);
+    writeLayer<float, float>(f, network.getLayers()[0]->getTunableParameters()[0], scalar_1, scalar_1, true);
+    writeLayer<float, float>(f, network.getLayers()[1]->getTunableParameters()[0], scalar_2, scalar_1 * scalar_2, false);
 
     fclose(f);
 }
