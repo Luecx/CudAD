@@ -27,20 +27,25 @@
 #include <filesystem>
 #include <iostream>
 
+const std::string data_path = "E:/berserk/training-data/berserk9dev2/finny-data/";
+const std::string output = "./resources/runs/experiment_3/";
+
 int main() {
 
     init();
 
     // definitions
-    constexpr uint32_t       I = 768 * 2;
+    constexpr uint32_t       I = 12 * 2 * 64;
     constexpr uint32_t       H = 512;
     constexpr uint32_t       O = 1;
     constexpr uint32_t       B = 16384;
+    constexpr uint32_t BATCHES_PER_EPOCH = 6100;
+
 
     // Load files
     std::vector<std::string> files {};
-    for (int i = 0; i < 21; i++)
-        files.push_back("E:\\berserk-finny-data\\berserk9dev2.d9.finny" + std::to_string(i) + ".bin");
+    for (int i = 0; i < 7; i++)
+        files.push_back(data_path + "berserk9dev2.d9." + std::to_string(i) + ".bin");
 
     BatchLoader  batch_loader {files, B, 1};
 
@@ -74,12 +79,14 @@ int main() {
     // optimizer
     Adam adam {};
     adam.init(layers);
+    adam.alpha = 0.01;
+    adam.beta1 = 0.9f;
+    adam.beta2 = 0.999f;
 
-    constexpr int BATCHES_PER_EPOCH = 6100;
-    logging::open("D:\\berserk\\nets\\experiments\\finny-trainer2\\log.txt");
+    logging::open(output + "loss.csv");
 
     Timer t {};
-    for (int epoch = 1; epoch <= 400; epoch++) {
+    for (int epoch = 1; epoch <= 420; epoch++) {
         float epoch_loss = 0;
         t.tick();
         for (int batch = 0; batch < BATCHES_PER_EPOCH; batch++) {
@@ -126,13 +133,12 @@ int main() {
             adam.apply(1);
         }
         std::cout << std::endl;
-        logging::write("epoch          : " + std::to_string(epoch)
-                       + "   train loss     : " + std::to_string(epoch_loss / BATCHES_PER_EPOCH));
+        logging::write("\"" + std::to_string(epoch) + "\",\"" + std::to_string(epoch_loss / BATCHES_PER_EPOCH) + "\"");
 
-        network.saveWeights("D:\\berserk\\nets\\experiments\\finny-trainer2\\weights-epoch" + std::to_string(epoch) + ".nn");
-        quantitize("D:\\berserk\\nets\\experiments\\finny-trainer2\\nn-epoch" + std::to_string(epoch) + ".nnue", network);
+        network.saveWeights(output + "weights-epoch" + std::to_string(epoch) + ".nn");
+        quantitize(output + "nn-epoch" + std::to_string(epoch) + ".nnue", network);
 
-        if (epoch % 300 == 0)
+        if (epoch % 105 == 0)
             adam.alpha *= 0.1f;
     }
 

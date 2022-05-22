@@ -63,7 +63,6 @@ void writeMatrix(FILE* file, DenseMatrix& matrix, float scaling, bool column_maj
         }
     }
 
-    std::cout << "writing matrix: " << " element size= " << sizeof(type) << " element count= " << data.size << std::endl;
     fwrite(data.cpu_values, sizeof(type), data.size, file);
 }
 
