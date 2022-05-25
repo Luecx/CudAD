@@ -30,7 +30,7 @@ __global__ void mpe_kernel(
         float derivative = powf(abs_diff, power-1) * sign;
         float loss_val   = powf(abs_diff, power);
 
-        output_gradient[idx] = derivative / size;
+        output_gradient[idx] = derivative;
         atomicAdd(loss, loss_val / size);
     }else{
         output_gradient[idx] = 0;

@@ -28,25 +28,25 @@
 #include <iostream>
 
 const std::string data_path = "E:/berserk/training-data/berserk9dev2/finny-data/";
-std::string output = "./resources/runs/testing/";
+std::string output = "./resources/runs/8buckets_3/";
 
 int main() {
     init();
 
     // definitions
-    constexpr uint32_t       I = 12 * 2 * 64;
+    constexpr uint32_t       I = 8 * 12 * 64;
     constexpr uint32_t       H = 512;
     constexpr uint32_t       O = 1;
-    constexpr uint32_t       B = 4096;
-    constexpr uint32_t     BPE = 24400;
-    constexpr  int32_t       E = 21 * (5 * 3 + 1);
+    constexpr uint32_t       B = 16384;
+    constexpr uint32_t     BPE = 6100;
+    constexpr  int32_t       E = 600;
 
     // Load files
     std::vector<std::string> files {};
     for (int i = 0; i < 7; i++)
         files.push_back(data_path + "berserk9dev2.d9." + std::to_string(i) + ".bin");
     
-    BatchLoader  batch_loader {files, B, 8};
+    BatchLoader  batch_loader {files, B, 1};
 
     // Input data (perspective)
     SparseInput  i0 {I, B, 32};    // 32 max inputs
@@ -108,7 +108,8 @@ int main() {
             std::printf("\rep/ba = [%3d/%5d], ", epoch, batch + 1);
             std::printf("batch_loss = [%1.8f], ", loss_function.loss(0));
             std::printf("epoch_loss = [%1.8f], ", epoch_loss / (batch + 1));
-            std::printf("speed = [%9.0f pos/s]", std::round(1000.0f * (B * (batch + 1) / (float) t.duration())));
+            std::printf("speed = [%9d pos/s], ", (int) std::round(1000.0f * B * (batch + 1) / t.duration()));
+            std::printf("time = [%3ds]", (int) t.duration() / 1000);
             std::cout << std::flush;
 
             epoch_loss += loss_function.loss(0);
@@ -118,9 +119,7 @@ int main() {
             loss_function.loss.gpu_upload();
 
             // feed forward
-            network.batch(std::vector<SparseInput*> {&i0, &i1},
-                        target,
-                        target_mask);
+            network.batch(std::vector<SparseInput*> {&i0, &i1}, target, target_mask);
 
             // update weights
             adam.apply(1);
@@ -131,8 +130,7 @@ int main() {
         network.saveWeights(output + "weights-epoch" + std::to_string(epoch) + ".nn");
         quantitize(output + "nn-epoch" + std::to_string(epoch) + ".nnue", network);
 
-        if (epoch % (5 * 21) == 0)
-            adam.alpha *= 0.1f;
+        adam.alpha *= 0.9925;
     }
 
     close();

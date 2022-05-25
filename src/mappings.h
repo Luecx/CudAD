@@ -282,14 +282,14 @@ namespace dense_berky {
 inline int king_square_index(Square relative_king_square) {
 
     constexpr int indices[N_SQUARES] {
-        3, 3, 3, 3, 1, 1, 1, 1,    //
-        3, 3, 3, 3, 1, 1, 1, 1,    //
-        3, 3, 3, 3, 1, 1, 1, 1,    //
-        3, 3, 3, 3, 1, 1, 1, 1,    //
-        2, 2, 2, 2, 0, 0, 0, 0,    //
-        2, 2, 2, 2, 0, 0, 0, 0,    //
-        2, 2, 2, 2, 0, 0, 0, 0,    //
-        2, 2, 2, 2, 0, 0, 0, 0,    //
+        -1, -1, -1, -1, 7, 7, 7, 7,    //
+        -1, -1, -1, -1, 7, 7, 7, 7,    //
+        -1, -1, -1, -1, 6, 6, 6, 6,    //
+        -1, -1, -1, -1, 6, 6, 6, 6,    //
+        -1, -1, -1, -1, 4, 4, 5, 5,    //
+        -1, -1, -1, -1, 4, 4, 5, 5,    //
+        -1, -1, -1, -1, 0, 1, 2, 3,    //
+        -1, -1, -1, -1, 0, 1, 2, 3,    //
     };
 
     return indices[relative_king_square];
@@ -306,9 +306,7 @@ inline int index(Square psq, Piece p, Square kingSquare, Color view) {
     const int oK = (7 * !(kingSquare & 4)) ^ (56 * view) ^ kingSquare;
     const int oSq = (7 * !(kingSquare & 4)) ^ (56 * view) ^ psq;
 
-    return oP * 2 * 64 //
-        + king_square_index(oK) * 64 //
-        + oSq;
+    return king_square_index(oK) * 12 * 64 + oP * 64 + oSq;
 }
 
 inline void assign_input(Position&      p,
