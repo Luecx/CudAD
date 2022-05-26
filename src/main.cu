@@ -28,7 +28,7 @@
 #include <iostream>
 
 const std::string data_path = "E:/berserk/training-data/berserk9dev2/finny-data/";
-std::string output = "./resources/runs/8buckets_3/";
+std::string output = "./resources/runs/8buckets_2/";
 
 int main() {
     init();
@@ -39,7 +39,7 @@ int main() {
     constexpr uint32_t       O = 1;
     constexpr uint32_t       B = 16384;
     constexpr uint32_t     BPE = 6100;
-    constexpr  int32_t       E = 600;
+    constexpr  int32_t       E = 630;
 
     // Load files
     std::vector<std::string> files {};
@@ -130,7 +130,8 @@ int main() {
         network.saveWeights(output + "weights-epoch" + std::to_string(epoch) + ".nn");
         quantitize(output + "nn-epoch" + std::to_string(epoch) + ".nnue", network);
 
-        adam.alpha *= 0.9925;
+        if (epoch % (21 * 15) == 0)
+            adam.alpha *= 0.1f;
     }
 
     close();
