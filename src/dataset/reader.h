@@ -79,6 +79,7 @@ inline DataSet read(const std::string& file, uint64_t count=-1) {
         std::cout << std::endl;
     }
 
+    fclose(f);
     return data_set;
 }
 

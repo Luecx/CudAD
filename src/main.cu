@@ -10,6 +10,7 @@
 #include "dataset/io.h"
 #include "dataset/reader.h"
 #include "dataset/writer.h"
+#include "dataset/shuffle.h"
 #include "layer/DenseLayer.h"
 #include "layer/DuplicateDenseLayer.h"
 #include "loss/MLE.h"
@@ -28,7 +29,7 @@
 #include <iostream>
 
 const std::string data_path = "E:/berserk/training-data/berserk9dev2/finny-data/";
-std::string output = "./resources/runs/8buckets_2/";
+std::string output = "./resources/runs/.../";
 
 int main() {
     init();
@@ -38,15 +39,15 @@ int main() {
     constexpr uint32_t       H = 512;
     constexpr uint32_t       O = 1;
     constexpr uint32_t       B = 16384;
-    constexpr uint32_t     BPE = 6100;
-    constexpr  int32_t       E = 630;
+    constexpr uint32_t     BPE = 100000000 / B;
+    constexpr  int32_t       E = 10000;
 
     // Load files
     std::vector<std::string> files {};
     for (int i = 0; i < 7; i++)
         files.push_back(data_path + "berserk9dev2.d9." + std::to_string(i) + ".bin");
-    
-    BatchLoader  batch_loader {files, B, 1};
+
+    BatchLoader  batch_loader {files, B};
 
     // Input data (perspective)
     SparseInput  i0 {I, B, 32};    // 32 max inputs
@@ -87,9 +88,11 @@ int main() {
     Timer t {};
     for (int epoch = 1; epoch <= E; epoch++) {
         float epoch_loss = 0;
-        t.tick();
-        for (int batch = 0; batch < BPE; batch++) {
+        long long prev_duration = 0;
 
+        t.tick();
+
+        for (int batch = 1; batch <= BPE; batch++) {
             // get the next dataset (batch)
             auto* ds = batch_loader.next();
             // assign to the inputs and compute the target
@@ -105,12 +108,16 @@ int main() {
 
             // measure time and print output
             t.tock();
-            std::printf("\rep/ba = [%3d/%5d], ", epoch, batch + 1);
-            std::printf("batch_loss = [%1.8f], ", loss_function.loss(0));
-            std::printf("epoch_loss = [%1.8f], ", epoch_loss / (batch + 1));
-            std::printf("speed = [%9d pos/s], ", (int) std::round(1000.0f * B * (batch + 1) / t.duration()));
-            std::printf("time = [%3ds]", (int) t.duration() / 1000);
-            std::cout << std::flush;
+            if (batch == BPE || t.duration() - prev_duration > 1000) {
+                prev_duration = t.duration();
+
+                std::printf("\rep/ba = [%3d/%5d], ", epoch, batch + 1);
+                std::printf("batch_loss = [%1.8f], ", loss_function.loss(0));
+                std::printf("epoch_loss = [%1.8f], ", epoch_loss / (batch + 1));
+                std::printf("speed = [%9d pos/s], ", (int) std::round(1000.0f * B * (batch + 1) / t.duration()));
+                std::printf("time = [%3ds]", (int) t.duration() / 1000);
+                std::cout << std::flush;
+            }
 
             epoch_loss += loss_function.loss(0);
             // make sure to reset the loss here since the mse increments the loss in order to not have
@@ -130,7 +137,7 @@ int main() {
         network.saveWeights(output + "weights-epoch" + std::to_string(epoch) + ".nn");
         quantitize(output + "nn-epoch" + std::to_string(epoch) + ".nnue", network);
 
-        if (epoch % (21 * 15) == 0)
+        if (epoch % 300 == 0)
             adam.alpha *= 0.1f;
     }
 
