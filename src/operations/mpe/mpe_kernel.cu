@@ -15,7 +15,8 @@ __global__ void mpe_kernel(
     const bool * __restrict__ mask,
           float* __restrict__ loss,
           float power,
-    unsigned int size){
+    unsigned int size,
+    unsigned int grad_division){
 
 
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -30,7 +31,7 @@ __global__ void mpe_kernel(
         float derivative = powf(abs_diff, power-1) * sign;
         float loss_val   = powf(abs_diff, power);
 
-        output_gradient[idx] = derivative / size;
+        output_gradient[idx] = derivative;
         atomicAdd(loss, loss_val / size);
     }else{
         output_gradient[idx] = 0;
