@@ -31,7 +31,7 @@ struct BatchLoader {
     int                      positions_left_in_file = 0;
     int                      current_file_index     = 0;
 
-    BatchLoader(std::vector<std::string> p_files, int batch_size): batch_size(batch_size) {
+    BatchLoader(std::vector<std::string> p_files, int batch_size, int validate_files=true): batch_size(batch_size) {
         load_buffer            = new DataSet {};
         load_buffer       ->positions.resize(static_cast<uint64_t>(batch_size));
         load_buffer       ->header.position_count = batch_size;
@@ -44,12 +44,15 @@ struct BatchLoader {
         positions_left_in_file = 0;
         next_batch_loaded      = false;
 
-        files.erase(
-            std::remove_if(
-                files.begin(),
-                files.end(),
-                [](const std::string& s){return !isReadable<BINARY>(s);}),
-            files.end());
+        if(validate_files){
+            files.erase(
+                std::remove_if(
+                    files.begin(),
+                    files.end(),
+                    [](const std::string& s){return !isReadable<BINARY>(s);}),
+                files.end());
+        }
+
 
         if (files.size() == 0) {
             logging::write("Cannot create BatchLoader with no valid files. EXITING");
@@ -69,7 +72,7 @@ struct BatchLoader {
 
         while (!file.is_open()) {
             current_file_index = (current_file_index + 1) % files.size();
-            
+
             file = std::ifstream {files[current_file_index], std::ios::binary};
 
             if (!file.is_open()) {

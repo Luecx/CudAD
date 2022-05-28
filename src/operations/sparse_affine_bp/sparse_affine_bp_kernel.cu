@@ -14,7 +14,8 @@ __global__ void sparse_affine_bp_kernel(
     const unsigned int               m,
     const unsigned int               n,
     const unsigned int               lda,
-    const unsigned int               ldc){
+    const unsigned int               ldc,
+          float                      lasso_regularization){
 
     // compute which output value we are looking at
     int col = blockIdx.x * blockDim.x + threadIdx.x;
@@ -32,7 +33,8 @@ __global__ void sparse_affine_bp_kernel(
     float res_grd_v = res_grd[MATRIX_INDEX(ldc, row, col)];
 
     // lasso
-    res_grd_v += (1.0 / 8388608.0) * (res[MATRIX_INDEX(ldc, row, col)] > 0);
+//    res_grd_v += (1.0 / 8388608.0) * (res[MATRIX_INDEX(ldc, row, col)] > 0);
+    res_grd_v += lasso_regularization * (res[MATRIX_INDEX(ldc, row, col)] > 0);
 
     // dont do anything if the gradient is 0. Theoretical impact on memory
     if (res_grd_v == 0) return;

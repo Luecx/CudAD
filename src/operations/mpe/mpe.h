@@ -18,7 +18,8 @@ __global__ void mpe_kernel(
     const bool * __restrict__ mask,
           float* __restrict__ loss,
           float power,
-    unsigned int size);
+    unsigned int size,
+    unsigned int grad_division);
 
 
 
@@ -28,7 +29,8 @@ inline void mpe (const SArray<float>& output,
                  const SArray<float>& target,
                  const SArray< bool>& mask,
                        SArray<float>& loss,
-                              float   power){
+                              float   power,
+                              bool    avg_grad=true){
 
     if(mode == DEVICE){
 
@@ -49,7 +51,8 @@ inline void mpe (const SArray<float>& output,
             mask            .gpu_values,
             loss            .gpu_values,
             power,
-            output.size);
+            output.size,
+            avg_grad ? output.size : 1);
 
     }else{
         ASSERT(false);

@@ -21,7 +21,8 @@ __global__ void sparse_affine_bp_kernel(
     const unsigned int               m,
     const unsigned int               n,
     const unsigned int               lda,
-    const unsigned int               ldc);
+    const unsigned int               ldc,
+          float                      lasso_regularization);
 
 /**
  * Performs
@@ -48,7 +49,8 @@ inline void sparse_affine_bp(
                    SparseInput& inp,
                    DenseMatrix& bia_grd,
                    DenseMatrix& res,
-                   DenseMatrix& res_grd){
+                   DenseMatrix& res_grd,
+                   float        lasso_regularization=0){
 
     auto M = mat_grd.m;
     auto N = mat_grd.n;
@@ -87,7 +89,8 @@ inline void sparse_affine_bp(
             res_grd.gpu_values,
             M,B,
             mat_grd.leading_dimension,
-            res_grd.leading_dimension);
+            res_grd.leading_dimension,
+            lasso_regularization);
     }else{
         ASSERT(false)
     }

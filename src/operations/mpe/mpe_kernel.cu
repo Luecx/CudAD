@@ -15,7 +15,8 @@ __global__ void mpe_kernel(
     const bool * __restrict__ mask,
           float* __restrict__ loss,
           float power,
-    unsigned int size){
+    unsigned int size,
+    unsigned int grad_division){
 
 
     int idx = blockIdx.x * blockDim.x + threadIdx.x;

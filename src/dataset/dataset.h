@@ -9,20 +9,20 @@
 #include "../position/position.h"
 #include "header.h"
 
+#include <algorithm>
 #include <random>
 #include <vector>
-#include <algorithm>
 
 struct DataSet {
 
     Header                header {};
     std::vector<Position> positions {};
 
-    void addData(DataSet& other){
+    void addData(DataSet& other) {
         positions.insert(std::end(positions), std::begin(other.positions), std::end(other.positions));
     }
 
-    void shuffle(){
+    void shuffle() {
         std::shuffle(positions.begin(), positions.end(), std::mt19937(std::random_device()()));
     }
 };
