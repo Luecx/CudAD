@@ -337,7 +337,7 @@ inline void assign_input(Position&      p,
         w_value = -w_value;
     }
 
-    float p_target      = 1 / (1 + expf(-p_value * 3.68415f / 512));
+    float p_target      = 1 / (1 + expf(-p_value / 139.0));
     float w_target      = (w_value + 1) / 2.0f;
 
     output(id)          = (p_target + w_target) / 2;
@@ -357,7 +357,7 @@ inline void assign_inputs_batch(DataSet&       positions,
     in2.clear();
     output_mask.clear();
 
-#pragma omp parallel for schedule(static) num_threads(16)
+#pragma omp parallel for schedule(static) num_threads(4)
     for (int i = 0; i < positions.positions.size(); i++) {
         assign_input(positions.positions[i], in1,in2, output, output_mask, i);
     }

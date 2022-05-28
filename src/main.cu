@@ -17,6 +17,7 @@
 #include "loss/MPE.h"
 #include "loss/MSE.h"
 #include "mappings.h"
+#include "misc/csv.h"
 #include "misc/timer.h"
 #include "network/Network.h"
 #include "operations/operations.h"
@@ -40,7 +41,7 @@ int main() {
     constexpr uint32_t       O = 1;
     constexpr uint32_t       B = 16384;
     constexpr uint32_t     BPE = 100000000 / B;
-    constexpr  int32_t       E = 10000;
+    constexpr  int32_t       E = 600;
 
     // Load files
     std::vector<std::string> files {};
@@ -60,10 +61,10 @@ int main() {
 
     // 1536 -> (2x512) -> 1
     DuplicateDenseLayer<I, H, ReLU> l1 {};
-    DenseLayer<H * 2, O, Sigmoid>   l2 {};
+    l1.lasso_regularization = 1.0 / 8388608.0;
 
-    // Berserk sigmoid
-    dynamic_cast<Sigmoid*>(l2.getActivationFunction())->scalar = 3.68415f / 512;
+    DenseLayer<H * 2, O, Sigmoid>   l2 {};
+    dynamic_cast<Sigmoid*>(l2.getActivationFunction())->scalar = 1.0 / 139;
 
     // stack layers to build network
     std::vector<LayerInterface*> layers {};
@@ -73,17 +74,17 @@ int main() {
     Network network {layers};
 
     // loss function
-    MPE     loss_function {2.5};
+    MPE     loss_function {2.5, false};
     network.setLossFunction(&loss_function);
 
     // optimizer
     Adam adam {};
     adam.init(layers);
-    adam.alpha = 0.01;
+    adam.alpha = 0.015;
     adam.beta1 = 0.95;
     adam.beta2 = 0.999;
 
-    logging::open(output + "loss.csv");
+    CSVWriter csv {output + "loss.csv"};
 
     Timer t {};
     for (int epoch = 1; epoch <= E; epoch++) {
@@ -131,14 +132,13 @@ int main() {
             // update weights
             adam.apply(1);
         }
+
         std::cout << std::endl;
-        logging::write("\"" + std::to_string(epoch) + "\",\"" + std::to_string(epoch_loss / BPE) + "\"");
 
-        network.saveWeights(output + "weights-epoch" + std::to_string(epoch) + ".nn");
-        quantitize(output + "nn-epoch" + std::to_string(epoch) + ".nnue", network);
+        csv.write({std::to_string(epoch),  std::to_string(epoch_loss / BPE)});
+        quantitize(output + "nn-epoch" + std::to_string(epoch) + ".nnue", network, 16, 512);
 
-        if (epoch % 300 == 0)
-            adam.alpha *= 0.1f;
+        adam.alpha *= 0.992;
     }
 
     close();

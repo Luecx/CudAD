@@ -80,6 +80,9 @@ void writeLayer(FILE* file, Tape* tunable_values, float wgt_scaling, float bia_s
 void quantitize(const std::string& path, Network& network, float scalar_1 = 16, float scalar_2 = 512) {
     FILE *f = fopen(path.c_str(), "wb");
 
+    network.getLayers()[0]->getTunableParameters()[0]->values.gpu_download();
+    network.getLayers()[1]->getTunableParameters()[0]->values.gpu_download();
+
     writeLayer<int16_t, int16_t>(f, network.getLayers()[0]->getTunableParameters()[0], scalar_1, scalar_1, true);
     writeLayer<int16_t, int32_t>(f, network.getLayers()[1]->getTunableParameters()[0], scalar_2, scalar_1 * scalar_2, false);
 
