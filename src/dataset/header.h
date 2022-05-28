@@ -16,24 +16,24 @@ struct Header {
     char     engine_2[128];
     char     comments[1024];
 
-
-    void     setEngine1(const std::string &string) {
+    // some setters
+    void setEngine1(const std::string& string) {
         std::memset(engine_1, ' ', sizeof(char) * 128);
-        for (int i = 0; i < std::min((int)string.size(), 128); i++) {
+        for (int i = 0; i < std::min((int) string.size(), 128); i++) {
             engine_1[i] = string[i];
         }
         engine_1[127] = 0;
     }
-    void setEngine2(const std::string &string) {
+    void setEngine2(const std::string& string) {
         std::memset(engine_2, ' ', sizeof(char) * 128);
-        for (int i = 0; i < std::min((int)string.size(), 128); i++) {
+        for (int i = 0; i < std::min((int) string.size(), 128); i++) {
             engine_2[i] = string[i];
         }
         engine_2[127] = 0;
     }
-    void setComment(const std::string &string) {
+    void setComment(const std::string& string) {
         std::memset(comments, ' ', sizeof(char) * 1024);
-        for (int i = 0; i < std::min((int)string.size(), 1024); i++) {
+        for (int i = 0; i < std::min((int) string.size(), 1024); i++) {
             comments[i] = string[i];
         }
         comments[1023] = 0;
