@@ -1,8 +1,3 @@
-
-//
-// Created by Luecx on 18.12.2021.
-//
-
 #ifndef DIFFERENTIATION_SRC_MISC_CSV_H_
 #define DIFFERENTIATION_SRC_MISC_CSV_H_
 
@@ -10,23 +5,23 @@
 #include <fstream>
 struct CSVWriter {
 
-    std::ofstream csv_file{};
+    std::ofstream csv_file {};
 
-    CSVWriter(std::string res){
-        csv_file = std::ofstream {res};
-    }
+    CSVWriter(std::string res) { csv_file = std::ofstream {res}; }
 
-    virtual ~CSVWriter() {
-        csv_file.close();
-    }
+    virtual ~CSVWriter() { csv_file.close(); }
 
-    void write(std::initializer_list<std::string> args){
-        for(auto h:args){
-            csv_file << h << ",";
+    void write(std::initializer_list<std::string> args) {
+        for (auto col = args.begin(); col != args.end(); ++col) {
+            if (col != args.begin())
+                csv_file << ",";
+
+            csv_file << "\"" << *col << "\"";
         }
-        csv_file <<"\n" << std::flush;
+        
+        // new line and flush output
+        csv_file << std::endl;
     }
-
 };
 
 #endif    // DIFFERENTIATION_SRC_MISC_CSV_H_
