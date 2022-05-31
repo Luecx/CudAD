@@ -29,12 +29,12 @@
 #include <filesystem>
 #include <iostream>
 
-const std::string data_path = "E:/berserk/training-data/berserk9dev2/finny-data/";
-std::string output = "./resources/runs/.../";
+const std::string data_path = "E:/berserk/training-data/master/";
+std::string output = "./resources/runs/testing/";
 
 int main() {
     init();
-
+    
     // definitions
     constexpr uint32_t       I = 8 * 12 * 64;
     constexpr uint32_t       H = 512;
@@ -45,7 +45,7 @@ int main() {
 
     // Load files
     std::vector<std::string> files {};
-    for (int i = 0; i < 7; i++)
+    for (int i = 0; i < 10; i++)
         files.push_back(data_path + "berserk9dev2.d9." + std::to_string(i) + ".bin");
 
     BatchLoader  batch_loader {files, B};
@@ -80,7 +80,7 @@ int main() {
     // optimizer
     Adam adam {};
     adam.init(layers);
-    adam.alpha = 0.015;
+    adam.alpha = 0.01;
     adam.beta1 = 0.95;
     adam.beta2 = 0.999;
 
@@ -138,7 +138,8 @@ int main() {
         csv.write({std::to_string(epoch),  std::to_string(epoch_loss / BPE)});
         quantitize(output + "nn-epoch" + std::to_string(epoch) + ".nnue", network, 16, 512);
 
-        adam.alpha *= 0.992;
+        if (epoch % 100 == 0)
+            adam.alpha *= 0.3;
     }
 
     close();
