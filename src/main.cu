@@ -30,7 +30,7 @@
 #include <iostream>
 
 const std::string data_path = "E:/berserk/training-data/master/";
-std::string output = "./resources/runs/testing/";
+std::string output = "./resources/runs/exp13/";
 
 int main() {
     init();
@@ -45,7 +45,7 @@ int main() {
 
     // Load files
     std::vector<std::string> files {};
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < 20; i++)
         files.push_back(data_path + "berserk9dev2.d9." + std::to_string(i) + ".bin");
 
     BatchLoader  batch_loader {files, B};
