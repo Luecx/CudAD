@@ -30,7 +30,14 @@
 #include <iostream>
 
 const std::string data_path = "E:/berserk/training-data/n5k/";
-std::string output = "./resources/runs/exp17/";
+std::string output = "./resources/runs/testing/";
+
+float validate(Network&     network,
+               DataSet&     data_set,
+               DenseMatrix& target,
+               SArray<bool>& target_mask,
+               SparseInput& i1,
+               SparseInput& i2);
 
 int main() {
     init();
@@ -49,6 +56,7 @@ int main() {
         files.push_back(data_path + "n5k." + std::to_string(i) + ".bin");
 
     BatchLoader  batch_loader {files, B};
+    DataSet validation = read<BINARY>(data_path + "validation.bin");
 
     // Input data (perspective)
     SparseInput  i0 {I, B, 32};    // 32 max inputs
@@ -85,6 +93,7 @@ int main() {
     adam.beta2 = 0.999;
 
     CSVWriter csv {output + "loss.csv"};
+    csv.write({"epoch", "training_loss", "validation_loss"});
 
     Timer t {};
     for (int epoch = 1; epoch <= E; epoch++) {
@@ -133,9 +142,16 @@ int main() {
             adam.apply(1);
         }
 
+        float validation_loss = validate(network, validation, target, target_mask, i0, i1);
+        t.tock();
+        std::printf("\rep/ba = [%3d/%5d], ", epoch, BPE);
+        std::printf("valid_loss = [%1.8f], ", validation_loss);
+        std::printf("epoch_loss = [%1.8f], ", epoch_loss / BPE);
+        std::printf("speed = [%9d pos/s], ", (int) std::round(1000.0f * (B * BPE + validation.header.position_count) / t.duration()));
+        std::printf("time = [%3ds]", (int) t.duration() / 1000);
         std::cout << std::endl;
 
-        csv.write({std::to_string(epoch),  std::to_string(epoch_loss / BPE)});
+        csv.write({std::to_string(epoch),  std::to_string(epoch_loss / BPE), std::to_string(validation_loss)});
 
         if (epoch % 10 == 0)
             quantitize(output + "nn-epoch" + std::to_string(epoch) + ".nnue", network, 16, 512);
@@ -145,4 +161,51 @@ int main() {
     }
 
     close();
+}
+
+float validate(Network&     network,
+               DataSet&     data_set,
+               DenseMatrix& target,
+               SArray<bool>& target_mask,
+               SparseInput& i1,
+               SparseInput& i2) {
+
+    int B = i1.n;
+
+    // reset loss
+    float prev_loss = network.getLossFunction()->getLoss().get(0);
+    network.getLossFunction()->getLoss().get(0) = 0;
+    network.getLossFunction()->getLoss().gpu_upload();
+
+    int c = std::floor(data_set.positions.size() / B);
+    for(int i = 0; i < c; i++){
+        int id1 = i   * B;
+        int id2 = id1 + B;
+        DataSet temp{};
+        temp.header.position_count = B;
+        temp.positions.assign(&data_set.positions[id1],&data_set.positions[id2]);
+
+        dense_berky::assign_inputs_batch(temp, i1, i2, target, target_mask);
+
+        i1.column_indices.gpu_upload();
+        i2.column_indices.gpu_upload();
+        target.gpu_upload();
+        target_mask.gpu_upload();
+
+        network.feed(std::vector<SparseInput*> {&i1, &i2});
+
+        network.getLossFunction()->apply(network.getOutput().values,
+                                         network.getOutput().gradients,
+                                         target,
+                                         target_mask,
+                                         DEVICE);
+    }
+
+    network.getLossFunction()->getLoss().gpu_download();
+    float loss = network.getLossFunction()->getLoss().get(0);
+
+    network.getLossFunction()->getLoss().get(0) = prev_loss;
+    network.getLossFunction()->getLoss().gpu_upload();
+
+    return loss / c;
 }

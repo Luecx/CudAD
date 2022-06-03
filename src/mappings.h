@@ -357,7 +357,7 @@ inline void assign_inputs_batch(DataSet&       positions,
     in2.clear();
     output_mask.clear();
 
-#pragma omp parallel for schedule(static) num_threads(4)
+#pragma omp parallel for schedule(static) num_threads(8)
     for (int i = 0; i < positions.positions.size(); i++) {
         assign_input(positions.positions[i], in1,in2, output, output_mask, i);
     }
