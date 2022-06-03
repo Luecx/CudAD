@@ -29,24 +29,24 @@
 #include <filesystem>
 #include <iostream>
 
-const std::string data_path = "E:/berserk/training-data/master/";
-std::string output = "./resources/runs/exp13/";
+const std::string data_path = "E:/berserk/training-data/n5k/";
+std::string output = "./resources/runs/exp17/";
 
 int main() {
     init();
-    
+
     // definitions
     constexpr uint32_t       I = 8 * 12 * 64;
     constexpr uint32_t       H = 512;
     constexpr uint32_t       O = 1;
     constexpr uint32_t       B = 16384;
     constexpr uint32_t     BPE = 100000000 / B;
-    constexpr  int32_t       E = 600;
+    constexpr  int32_t       E = 450;
 
     // Load files
     std::vector<std::string> files {};
     for (int i = 0; i < 20; i++)
-        files.push_back(data_path + "berserk9dev2.d9." + std::to_string(i) + ".bin");
+        files.push_back(data_path + "n5k." + std::to_string(i) + ".bin");
 
     BatchLoader  batch_loader {files, B};
 
@@ -136,7 +136,9 @@ int main() {
         std::cout << std::endl;
 
         csv.write({std::to_string(epoch),  std::to_string(epoch_loss / BPE)});
-        quantitize(output + "nn-epoch" + std::to_string(epoch) + ".nnue", network, 16, 512);
+
+        if (epoch % 10 == 0)
+            quantitize(output + "nn-epoch" + std::to_string(epoch) + ".nnue", network, 16, 512);
 
         if (epoch % 100 == 0)
             adam.alpha *= 0.3;
