@@ -32,12 +32,12 @@ void test_fen(Network& network, const std::string& fen, uint32_t input_size){
     network.feed(std::vector<SparseInput*>{&sp1, &sp2});
     network.getOutput().values.gpu_download();
 
-//    network.getOutput(0).values.gpu_download();
-//    network.getOutput(1).values.gpu_download();
+    network.getOutput(0).values.gpu_download();
+    network.getOutput(1).values.gpu_download();
 
 //    std::cout << sp1 << " " << sp2 << std::endl;
-//    std::cout << network.getOutput(0).values << std::endl;
-//    std::cout << network.getOutput(1).values << std::endl;
+    std::cout << network.getOutput(0).values << std::endl;
+    std::cout << network.getOutput(1).values << std::endl;
 
     std::cout << "testing fen: " << fen << std::endl;
     std::cout << "eval: " << network.getOutput().values << std::endl;
@@ -81,7 +81,8 @@ void quantitize(const std::string& path, Network& network, float scalar_1 = 16, 
     FILE *f = fopen(path.c_str(), "wb");
 
     writeLayer<int16_t, int16_t>(f, network.getLayers()[0]->getTunableParameters()[0], scalar_1, scalar_1, true);
-    writeLayer<int16_t, int32_t>(f, network.getLayers()[1]->getTunableParameters()[0], scalar_2, scalar_1 * scalar_2, false);
+    writeLayer<float  , float  >(f, network.getLayers()[1]->getTunableParameters()[0], 1, 1, false);
+    writeLayer<float  , float  >(f, network.getLayers()[2]->getTunableParameters()[0], 1, 1, false);
 
     fclose(f);
 }
@@ -139,11 +140,20 @@ void computeScalars(BatchLoader& batch_loader, Network& network, int batches, ui
 
     for(int i = 0; i < maximum.size(); i++){
 //        std::cout << minimum[i] << "\n" << maximum[i] << std::endl;
+
+        int died = 0;
+        for(int j = 0; j < minimum[i].size; j++){
+            if(abs(maximum[i].get(j) - minimum[i].get(j)) < 1e-8){
+                died ++;
+            }
+        }
+
         std::cout << "layer  : " << i << std::endl;
         std::cout << "min    : " << std::left << std::setw(10) << minimum[i].min()
                   << "max    : " << std::left << std::setw(10) << maximum[i].max()
                   << "min wgt: " << std::left << std::setw(10) << minimum_wgt[i]
-                  << "max wgt: " << std::left << std::setw(10) << maximum_wgt[i] << std::endl;
+                  << "max wgt: " << std::left << std::setw(10) << maximum_wgt[i]
+                  << "died   : " << std::left << std::setw(10) << died * 100 / minimum[i].size << " %" << std::endl;
     }
 }
 

@@ -39,8 +39,8 @@ struct SparseInput : public Matrix {
         column_indices.cpu_values[offset + column_indices.cpu_values[offset]] = index;
     }
 
-    void clear(){
-        for(int i = 0; i < n; i++){
+    void clear() {
+        for (int i = 0; i < n; i++) {
             column_indices.cpu_values[i * (max_entries_per_column + 1)] = 0;
         }
     }
@@ -50,9 +50,9 @@ struct SparseInput : public Matrix {
         for (int p_i = 0; p_i <= data.max_entries_per_column; p_i++) {
             for (int p_n = 0; p_n < data.n; p_n++) {
                 int count = data.column_indices(p_n * (data.max_entries_per_column + 1));
-                if(p_i > count){
+                if (p_i > count) {
                     os << std::setw(11) << "";
-                }else{
+                } else {
                     os << std::setw(11)
                        << (int) data.column_indices(p_i + p_n * (data.max_entries_per_column + 1));
                 }

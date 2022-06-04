@@ -11,10 +11,12 @@
 template<int I, int O, typename F>
 class DuplicateDenseLayer : public LayerInterface {
     public:
+    // clang-format off
     Tape tunable_values {O, I + 1};               // update weights + biases at the same
     Tape weights        {tunable_values, 0, 0, O, I};    // time
     Tape bias           {tunable_values, 0, I, O, 1};
     F    f              {};
+    // clang-format on
     // regularization
     float lasso_regularization = 0;
 
@@ -49,13 +51,25 @@ class DuplicateDenseLayer : public LayerInterface {
         f.backprop(out.values, out.gradients, out.values, out.gradients, DEVICE);
 
         // create submatrices for the output
+        // clang-format off
         DenseMatrix mat_grd_1 {out.gradients, 0, 0, O, B};
         DenseMatrix mat_grd_2 {out.gradients, O, 0, O, B};
-        DenseMatrix mat_res_1 {out.values, 0, 0, O, B};
-        DenseMatrix mat_res_2 {out.values, O, 0, O, B};
+        DenseMatrix mat_res_1 {out.values   , 0, 0, O, B};
+        DenseMatrix mat_res_2 {out.values   , O, 0, O, B};
+        // clang-format on
 
-        sparse_affine_bp<DEVICE>(weights.gradients, *inputs[0], bias.gradients, mat_res_1, mat_grd_1, lasso_regularization);
-        sparse_affine_bp<DEVICE>(weights.gradients, *inputs[1], bias.gradients, mat_res_2, mat_grd_2, lasso_regularization);
+        sparse_affine_bp<DEVICE>(weights.gradients,
+                                 *inputs[0],
+                                 bias.gradients,
+                                 mat_res_1,
+                                 mat_grd_1,
+                                 lasso_regularization);
+        sparse_affine_bp<DEVICE>(weights.gradients,
+                                 *inputs[1],
+                                 bias.gradients,
+                                 mat_res_2,
+                                 mat_grd_2,
+                                 lasso_regularization);
     }
 
     uint32_t           getOutputSize() override { return O * 2; }

@@ -6,6 +6,7 @@
 #ifndef BINARYPOSITIONWRAPPER_SRC_SQUARE_H_
 #define BINARYPOSITIONWRAPPER_SRC_SQUARE_H_
 
+// clang-format off
 enum Squares {
     A1, B1, C1, D1, E1, F1, G1, H1,
     A2, B2, C2, D2, E2, F2, G2, H2,
@@ -25,9 +26,8 @@ constexpr char const* square_identifier[] {
     "a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7", "a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8",
 };
 
-inline Square squareIndex(Rank rank, File file) {
-    return 8 * rank + file;
-}
+// clang-format on
+inline Square squareIndex(Rank rank, File file) { return 8 * rank + file; }
 
 inline Square squareIndex(std::string& str) {
 
@@ -37,26 +37,19 @@ inline Square squareIndex(std::string& str) {
     return squareIndex(r, f);
 }
 
-inline Rank rankIndex(Square square_index) {
-    return square_index >> 3;
-}
+inline Rank   rankIndex(Square square_index) { return square_index >> 3; }
 
-inline File fileIndex(Square square_index) {
-    return square_index & 7;
-}
+inline File   fileIndex(Square square_index) { return square_index & 7; }
 
-inline Square mirrorVertically(Square square){
-    return square ^ 56;
-}
+inline Square mirrorVertically(Square square) { return square ^ 56; }
 
-inline Square mirrorHorizontally(Square square){
-    return square ^ 7;
-}
+inline Square mirrorHorizontally(Square square) { return square ^ 7; }
 
-inline Color getSquareColor(Square square){
-    constexpr BB white_squares{0x55AA55AA55AA55AAULL};
-    if (getBit(white_squares, square)) return WHITE;
+inline Color  getSquareColor(Square square) {
+    constexpr BB white_squares {0x55AA55AA55AA55AAULL};
+    if (getBit(white_squares, square))
+        return WHITE;
     return BLACK;
 }
 
-#endif //BINARYPOSITIONWRAPPER_SRC_SQUARE_H_
+#endif    // BINARYPOSITIONWRAPPER_SRC_SQUARE_H_

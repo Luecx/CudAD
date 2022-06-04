@@ -1,10 +1,10 @@
-#include "../../data/mode.h"
 #include "../../data/DenseMatrix.h"
-
+#include "../../data/mode.h"
 
 #ifndef CUDATEST1_SRC_OPERATIONS_RANGER_RANGER_H_
 #define CUDATEST1_SRC_OPERATIONS_RANGER_RANGER_H_
 
+// clang-format off
 __global__ void ranger_kernel(
           float* __restrict__ values,
           float* __restrict__ gradients,
@@ -81,6 +81,6 @@ inline void ranger(SArray<float>& values,
             alpha, k, N_sma_threshold);
     }
 }
+// clang-format on
 
-
-#endif //CUDATEST1_SRC_OPERATIONS_RANGER_RANGER_H_
+#endif    // CUDATEST1_SRC_OPERATIONS_RANGER_RANGER_H_

@@ -19,9 +19,7 @@
  * @param index     index of bit starting at the LST
  * @return          the manipulated number
  */
-inline void toggleBit(BB &number, Square index) {
-    number ^= (1ULL << index);
-}
+inline void   toggleBit(BB& number, Square index) { number ^= (1ULL << index); }
 
 /**
  * set the bit
@@ -29,9 +27,7 @@ inline void toggleBit(BB &number, Square index) {
  * @param index     index of bit starting at the LST
  * @return          the manipulated number
  */
-inline void setBit(BB &number, Square index) {
-    number |= (1ULL << index);
-}
+inline void   setBit(BB& number, Square index) { number |= (1ULL << index); }
 
 /**
  * unset the bit
@@ -39,9 +35,7 @@ inline void setBit(BB &number, Square index) {
  * @param index     index of bit starting at the LST
  * @return          the manipulated number
  */
-inline void unsetBit(BB &number, Square index) {
-    number &= ~(1ULL << index);
-}
+inline void   unsetBit(BB& number, Square index) { number &= ~(1ULL << index); }
 
 /**
  * get the bit
@@ -49,9 +43,7 @@ inline void unsetBit(BB &number, Square index) {
  * @param index     index of bit starting at the LST
  * @return          the manipulated number
  */
-inline bool getBit(BB number, Square index) {
-    return ((number >> index) & 1ULL) == 1;
-}
+inline bool   getBit(BB number, Square index) { return ((number >> index) & 1ULL) == 1; }
 
 /**
  * returns the index of the LSB
@@ -71,9 +63,8 @@ inline Square bitscanForward(BB bb) {
 inline Square bitscanReverse(BB bb) {
     //    UCI_ASSERT(bb != 0);
     ASSERT(false);
-//    return __builtin_clzll(bb) ^ 63;
+    //    return __builtin_clzll(bb) ^ 63;
 }
-
 
 /**
  * returns the index of the nth set bit, starting at the lsb
@@ -83,19 +74,19 @@ inline Square bitscanReverse(BB bb) {
 inline Square bitscanForwardIndex(BB bb, Square n) {
 
 #ifdef __ARM__
-    https://stackoverflow.com/questions/7669057/find-nth-set-bit-in-an-int
+https:    // stackoverflow.com/questions/7669057/find-nth-set-bit-in-an-int
     n += 1;
-    BB shifted = 0; // running total
-    BB nBits;       // value for this iteration
+    BB shifted = 0;    // running total
+    BB nBits;          // value for this iteration
 
     // handle no solution
-    if (n > bitCount(bb)) return 64;
+    if (n > bitCount(bb))
+        return 64;
 
-    while (n > 7)
-    {
+    while (n > 7) {
         // for large n shift out lower n-1 bits from v.
-        nBits = n-1;
-        n -= bitCount(bb & ((1<<nBits)-1));
+        nBits = n - 1;
+        n -= bitCount(bb & ((1 << nBits) - 1));
         bb >>= nBits;
         shifted += nBits;
     }
@@ -103,8 +94,7 @@ inline Square bitscanForwardIndex(BB bb, Square n) {
     BB next;
     // n is now small, clear out n-1 bits and return the next bit
     // v&(v-1): a well known software trick to remove the lowest set bit.
-    while (next = bb&(bb-1), --n)
-    {
+    while (next = bb & (bb - 1), --n) {
         bb = next;
     }
     return bitscanForward((bb ^ next) << shifted);
@@ -113,22 +103,17 @@ inline Square bitscanForwardIndex(BB bb, Square n) {
 #endif
 }
 
-
-
 /**
  * returns the amount of set bits in the given bitboard.
  * @param bb
  * @return
  */
-inline int bitCount(BB bb) {
-    return __popcnt64(bb);
-}
-
+inline int bitCount(BB bb) { return __popcnt64(bb); }
 
 /**
  * counts the ones inside the bitboard before the given index
  */
-inline int bitCount(BB bb, int pos){
+inline int bitCount(BB bb, int pos) {
     BB mask = ((BB) 1 << pos) - 1;
     return bitCount(bb & mask);
 }
@@ -138,14 +123,12 @@ inline int bitCount(BB bb, int pos){
  * @param number
  * @return
  */
-inline BB lsbReset(BB number) {
-    return number & (number - 1);
-}
+inline BB lsbReset(BB number) { return number & (number - 1); }
 
 /**
  * find fully set groups of 4
  */
-inline BB highlightGroupsOf4(BB bb){
+inline BB highlightGroupsOf4(BB bb) {
     bb &= (bb >> 1);
     bb &= (bb >> 2);
     return bb;
@@ -155,8 +138,8 @@ inline BB highlightGroupsOf4(BB bb){
  * stream bits of 4
  */
 template<uint8_t values>
-constexpr inline BB repeatGroupsOf4(){
-    BB bb{};
+constexpr inline BB repeatGroupsOf4() {
+    BB bb {};
     bb |= (BB) values & 0xF;
     bb |= (bb << 32);
     bb |= (bb << 16);
@@ -188,8 +171,8 @@ inline void printBitboard(BB bb) {
  * @param bb
  */
 inline void printBits(BB bb) {
-    for(int i = 63; i>= 0; i--){
-        if(getBit(bb, i))
+    for (int i = 63; i >= 0; i--) {
+        if (getBit(bb, i))
             std::cout << "1";
         else
             std::cout << "0";
@@ -203,10 +186,9 @@ inline void printBits(BB bb) {
 /**
  *
  */
-template<unsigned N,typename T=BB>
-inline T mask(){
-    return (T) (((T)1 << N) - 1);
+template<unsigned N, typename T = BB>
+inline T mask() {
+    return (T) (((T) 1 << N) - 1);
 }
 
-
-#endif //BINARYPOSITIONWRAPPER__BITBOARD_H_
+#endif    // BINARYPOSITIONWRAPPER__BITBOARD_H_

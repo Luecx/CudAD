@@ -3,13 +3,13 @@
 //
 // Created by Luecx on 11.01.2022.
 //
-#include "../../data/mode.h"
 #include "../../data/DenseMatrix.h"
-
+#include "../../data/mode.h"
 
 #ifndef CUDATEST1_SRC_OPERATIONS_CLAMP_CLAMP_H_
 #define CUDATEST1_SRC_OPERATIONS_CLAMP_CLAMP_H_
 
+// clang-format off
 __global__ void clamp_kernel(
         float* __restrict__ values,
         float min,
@@ -43,5 +43,6 @@ inline void clamp(SArray<float>& values,
 //    cudaDeviceSynchronize();
 }
 
+// clang-format on
 
-#endif //CUDATEST1_SRC_OPERATIONS_CLAMP_CLAMP_H_
+#endif    // CUDATEST1_SRC_OPERATIONS_CLAMP_CLAMP_H_

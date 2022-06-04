@@ -1,10 +1,10 @@
-#include "../../data/mode.h"
 #include "../../data/DenseMatrix.h"
-
+#include "../../data/mode.h"
 
 #ifndef CUDATEST1_SRC_OPERATIONS_RADAM_RADAM_H_
 #define CUDATEST1_SRC_OPERATIONS_RADAM_RADAM_H_
 
+// clang-format off
 __global__ void radam_kernel(
           float* __restrict__ values,
           float* __restrict__ gradients,
@@ -69,5 +69,6 @@ inline void radam(SArray<float>& values,
     }
 }
 
+// clang-format on
 
-#endif //CUDATEST1_SRC_OPERATIONS_RADAM_RADAM_H_
+#endif    // CUDATEST1_SRC_OPERATIONS_RADAM_RADAM_H_

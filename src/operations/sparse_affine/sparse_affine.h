@@ -6,11 +6,12 @@
 #ifndef CUDAD_SRC_OPERATIONS_S_MM_SPARSE_AFFINE_H_
 #define CUDAD_SRC_OPERATIONS_S_MM_SPARSE_AFFINE_H_
 
-#include "../../data/Matrix.h"
 #include "../../data/DenseMatrix.h"
+#include "../../data/Matrix.h"
 #include "../../data/SparseInput.h"
 #include "../../data/mode.h"
 
+// clang-format off
 __global__ void sparse_affine_kernel(
     const float*        __restrict__ mat,
     const unsigned int* __restrict__ inp_col_indices,
@@ -86,4 +87,5 @@ inline void sparse_affine(
     }
 }
 
-#endif //CUDAD_SRC_OPERATIONS_S_MM_SPARSE_AFFINE_H_
+// clang-format on
+#endif    // CUDAD_SRC_OPERATIONS_S_MM_SPARSE_AFFINE_H_

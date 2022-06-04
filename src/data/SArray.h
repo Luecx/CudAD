@@ -82,7 +82,7 @@ class SArray {
         }
         return (*this);
     }
-    SArray<Type>& operator=(SArray<Type>&& other)  noexcept {
+    SArray<Type>& operator=(SArray<Type>&& other) noexcept {
         free_cpu();
         free_gpu();
         this->size       = other.size;

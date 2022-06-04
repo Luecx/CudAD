@@ -13,6 +13,7 @@
  * @param beta
  * @return
  */
+// clang-format off
 __global__ void add_kernel(
     const float* __restrict__ A,
     const float* __restrict__ B,
@@ -24,11 +25,11 @@ __global__ void add_kernel(
     const float alpha,
     const float beta){
 
+    // clang-format on
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
-    if(idx >= size) return;
+    if (idx >= size)
+        return;
 
-    C[idx] = (
-               A[idx % A_size] * alpha +
-               B[idx % B_size] * beta);
+    C[idx] = (A[idx % A_size] * alpha + B[idx % B_size] * beta);
 }

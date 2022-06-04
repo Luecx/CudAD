@@ -6,10 +6,12 @@
 #ifndef CUDATEST1_SRC_OPERATIONS_RELU_RELU_H_
 #define CUDATEST1_SRC_OPERATIONS_RELU_RELU_H_
 
-#include "../../data/mode.h"
 #include "../../data/SArray.h"
+#include "../../data/mode.h"
+
 #include <iostream>
 
+// clang-format off
 void relu_host(
     const float* A,
           float* B,
@@ -20,16 +22,6 @@ __global__ void relu_kernel(
           float* __restrict__ B,
     unsigned int size);
 
-/**
- * performs C = A * alpha + B * beta
- * If A and B are not the same size as C, it will repeat the data contained in A and B
- * @tparam mode
- * @param A
- * @param B
- * @param C
- * @param alpha
- * @param beta
- */
 template<Mode mode>
 inline void relu   (const SArray<float> &A,
                           SArray<float> &B){
@@ -56,4 +48,5 @@ inline void relu   (const SArray<float> &A,
     }
 }
 
-#endif //CUDATEST1_SRC_OPERATIONS_RELU_RELU_H_
+// clang-format on
+#endif    // CUDATEST1_SRC_OPERATIONS_RELU_RELU_H_

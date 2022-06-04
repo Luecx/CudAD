@@ -7,10 +7,11 @@
 #ifndef CUDAD_SRC_OPERATIONS_MSE_MSE_H_
 #define CUDAD_SRC_OPERATIONS_MSE_MSE_H_
 
-#include "../../data/mode.h"
 #include "../../data/SArray.h"
+#include "../../data/mode.h"
 #include "../../misc/config.h"
 
+// clang-format off
 __global__ void mse_kernel(
     const float* __restrict__ output,
           float* __restrict__ output_gradient,
@@ -53,5 +54,6 @@ inline void mse (const SArray<float>& output,
     }
 }
 
+// clang-format on
 
 #endif    // CUDAD_SRC_OPERATIONS_MSE_MSE_H_

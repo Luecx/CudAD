@@ -15,10 +15,10 @@ namespace logging {
 extern std::ofstream log_file;
 
 // some writen, open etc functions
-void          write(const std::string& msg, const std::string& end="\n");
-bool          isOpen();
-void          open(const std::string& path);
-void          close();
+void                 write(const std::string& msg, const std::string& end = "\n");
+bool                 isOpen();
+void                 open(const std::string& path);
+void                 close();
 }    // namespace logging
 
 #endif    // DIFFERENTIATION_SRC_LOGGING_H_

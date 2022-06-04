@@ -4,6 +4,7 @@
 //
 
 #include "sparse_affine_bp.h"
+// clang-format off
 __global__ void sparse_affine_bp_kernel(
           float*        __restrict__ mat_grd,
     const unsigned int* __restrict__ inp_col_indices,
@@ -16,29 +17,32 @@ __global__ void sparse_affine_bp_kernel(
     const unsigned int               lda,
     const unsigned int               ldc,
           float                      lasso_regularization){
+    // clang-format on
 
     // compute which output value we are looking at
     int col = blockIdx.x * blockDim.x + threadIdx.x;
     int row = blockIdx.y * blockDim.y + threadIdx.y;
 
     // skip out of bounds
-    if (col >= n || row >= m) return;
+    if (col >= n || row >= m)
+        return;
 
     // get the offset at which we look into our sparse input
-    int offset = col * (inp_col_max_entries + 1);
+    int   offset    = col * (inp_col_max_entries + 1);
     // check how many values we are going to read
-    int count = inp_col_indices[offset];
+    int   count     = inp_col_indices[offset];
 
     // track the sum
     float res_grd_v = res_grd[MATRIX_INDEX(ldc, row, col)];
 
     // lasso
-//    res_grd_v += (1.0 / 8388608.0) * (res[MATRIX_INDEX(ldc, row, col)] > 0);
+    //    res_grd_v += (1.0 / 8388608.0) * (res[MATRIX_INDEX(ldc, row, col)] > 0);
     res_grd_v += lasso_regularization * (res[MATRIX_INDEX(ldc, row, col)] > 0);
 
     // dont do anything if the gradient is 0. Theoretical impact on memory
-    if (res_grd_v == 0) return;
-    
+    if (res_grd_v == 0)
+        return;
+
     atomicAdd(&bia_grd[row], res_grd_v);
 
     // start at offset + 1 (offset contains the amount of values to read)

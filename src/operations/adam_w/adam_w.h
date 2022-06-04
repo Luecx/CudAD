@@ -5,6 +5,7 @@
 #ifndef CUDATEST1_SRC_OPERATIONS_ADAM_W_ADAM_W_H_
 #define CUDATEST1_SRC_OPERATIONS_ADAM_W_ADAM_W_H_
 
+// clang-format off
 __global__ void adam_w_kernel(
           float* __restrict__ values,
           float* __restrict__ gradients,
@@ -68,6 +69,7 @@ inline void adam_w(SArray<float>& values,
             step, lr, beta1, beta2, eps, warmup);
     }
 }
+// clang-format on
 
 
 #endif //CUDATEST1_SRC_OPERATIONS_ADAM_W_ADAM_W_H_

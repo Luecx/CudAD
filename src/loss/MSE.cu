@@ -4,11 +4,13 @@
 //
 #include "MSE.h"
 #include "../misc/logging.h"
+// clang-format off
 void MSE::apply(const SArray<float>& output,
                       SArray<float>& output_grad,
                 const SArray<float>& target,
                 const SArray<bool >& target_mask,
                 Mode                 mode) {
+// clang-format on
     if(mode == HOST){
         mse<HOST>(output, output_grad, target, target_mask, loss);
     }else{

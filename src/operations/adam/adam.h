@@ -10,6 +10,7 @@
 #ifndef CUDATEST1_SRC_OPERATIONS_ADAM_ADAM_H_
 #define CUDATEST1_SRC_OPERATIONS_ADAM_ADAM_H_
 
+// clang-format off
 __global__ void adam_kernel(
           float* __restrict__ values,
           float* __restrict__ gradients,
@@ -69,6 +70,7 @@ inline void adam(SArray<float>& values,
     }
 //    cudaDeviceSynchronize();
 }
+// clang-format on
 
 
 #endif //CUDATEST1_SRC_OPERATIONS_ADAM_ADAM_H_

@@ -4,18 +4,20 @@
 //
 #include "pairwise_multiply.h"
 
+// clang-format off
 __global__ void pairwise_multiply_kernel(
     const float* __restrict__ input,
           float* __restrict__ output,
     unsigned int outsize){
+    // clang-format on
 
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
-    if(idx >= outsize) return;
+    if (idx >= outsize)
+        return;
 
-    int idx1 = idx * 2;
-    int idx2 = idx1 + 1;
+    int idx1    = idx * 2;
+    int idx2    = idx1 + 1;
 
     output[idx] = input[idx1] * input[idx2];
-
 }

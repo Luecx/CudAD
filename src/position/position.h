@@ -33,17 +33,14 @@ struct Position {
 
     int    getPieceCount() const { return bitCount(m_occupancy); }
 
-    Square getSquare(int piece_index) const {
-        return bitscanForwardIndex(m_occupancy, piece_index);
-    }
+    Square getSquare(int piece_index) const { return bitscanForwardIndex(m_occupancy, piece_index); }
 
-    Piece getPiece(Square square) const{
-        if (getBit(m_occupancy, square)){
+    Piece  getPiece(Square square) const {
+        if (getBit(m_occupancy, square)) {
             return m_pieces.getPiece(bitCount(m_occupancy, square));
         }
         return NO_PIECE;
     }
-
 };
 
 #endif    // BINARYPOSITIONWRAPPER__PIECEBOARD_H_

@@ -5,9 +5,10 @@
 #ifndef CUDAD_SRC_OPERATIONS_BUCKET_BUCKET_H_
 #define CUDAD_SRC_OPERATIONS_BUCKET_BUCKET_H_
 
-#include "../../data/mode.h"
 #include "../../data/SArray.h"
+#include "../../data/mode.h"
 
+// clang-format off
 __global__ void bucket_kernel(
     const float* __restrict__ inp,
           float* __restrict__ out,
@@ -54,5 +55,6 @@ inline void bucket  ( const SArray<float> &inp,
 //            res_grd.leading_dimension);
     }
 }
+// clang-format on
 
 #endif    // CUDAD_SRC_OPERATIONS_BUCKET_BUCKET_H_

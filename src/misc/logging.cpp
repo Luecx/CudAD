@@ -11,12 +11,11 @@ std::ofstream logging::log_file {};
 using namespace std::chrono;
 
 void logging::write(const std::string& msg, const std::string& end) {
-    if(!isOpen()) {
+    if (!isOpen()) {
         std::cout << msg << end << std::flush;
-    }else{
+    } else {
         log_file << msg << end << std::flush;
     }
-
 }
 bool logging::isOpen() { return log_file.is_open(); }
 void logging::open(const std::string& path) {

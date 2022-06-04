@@ -5,11 +5,11 @@
 #ifndef CUDAD_SRC_OPERATIONS_PAIRWISE_MULTIPLY_PAIRWISE_MULTIPLY_H_
 #define CUDAD_SRC_OPERATIONS_PAIRWISE_MULTIPLY_PAIRWISE_MULTIPLY_H_
 
-#include "../../data/mode.h"
 #include "../../data/SArray.h"
+#include "../../data/mode.h"
 #include "../../misc/config.h"
 
-
+// clang-format off
 __global__ void pairwise_multiply_kernel(
     const float* __restrict__ input,
           float* __restrict__ output,
@@ -37,4 +37,5 @@ inline void pairwise_multiply (
     }
 }
 
+// clang-format on
 #endif    // CUDAD_SRC_OPERATIONS_PAIRWISE_MULTIPLY_PAIRWISE_MULTIPLY_H_

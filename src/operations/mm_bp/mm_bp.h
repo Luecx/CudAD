@@ -8,7 +8,7 @@
 
 #include "../mm/mm_cublas.h"
 
-
+// clang-format off
 template<Mode mode>
 inline void mm_bp(DenseMatrix &mat1,
         DenseMatrix &mat1_grd,
@@ -44,4 +44,5 @@ inline void mm_bp(DenseMatrix &mat1,
         ASSERT(false);
     }
 }
-#endif //CUDAD_SRC_OPERATIONS_MM_BP_MM_BP_H_
+// clang-format on
+#endif    // CUDAD_SRC_OPERATIONS_MM_BP_MM_BP_H_

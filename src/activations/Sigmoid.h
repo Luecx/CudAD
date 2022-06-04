@@ -6,22 +6,23 @@
 #ifndef DIFFERENTIATION_SRC_ACITVATIONS_SIGMOID_H_
 #define DIFFERENTIATION_SRC_ACITVATIONS_SIGMOID_H_
 
-#include "../data/SArray.h"
 #include "../data/DenseMatrix.h"
+#include "../data/SArray.h"
 #include "Activation.h"
-struct Sigmoid : Activation{
+struct Sigmoid : Activation {
 
     float scalar = 1;
 
+    // clang-format off
     void apply      (const SArray<float> &in,
                            SArray<float> &out, Mode mode) ;
     void backprop   (const SArray<float> &in,
                            SArray<float> &in_grd,
                      const SArray<float> &out,
                      const SArray<float> &out_grd, Mode mode) ;
+    // clang-format on
 
-    void logOverview() override;
+    void  logOverview() override;
 };
-
 
 #endif    // DIFFERENTIATION_SRC_ACITVATIONS_SIGMOID_H_

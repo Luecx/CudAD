@@ -7,10 +7,11 @@
 #ifndef CUDAD_SRC_OPERATIONS_MLE_MLE_H_
 #define CUDAD_SRC_OPERATIONS_MLE_MLE_H_
 
-#include "../../data/mode.h"
 #include "../../data/SArray.h"
+#include "../../data/mode.h"
 #include "../../misc/config.h"
 
+// clang-format off
 __global__ void mle_kernel(
     const float* __restrict__ output,
           float* __restrict__ output_gradient,
@@ -56,6 +57,6 @@ inline void mle (const SArray<float>& output,
         ASSERT(false);
     }
 }
-
+// clang-format on
 
 #endif    // CUDAD_SRC_OPERATIONS_MLE_MLE_H_

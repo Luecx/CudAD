@@ -8,29 +8,21 @@
 
 #include "defs.h"
 
-enum Colors{
-    WHITE = false,
-    BLACK = true,
-    N_COLORS = 2
-};
+enum Colors { WHITE = false, BLACK = true, N_COLORS = 2 };
 
-enum Sides{
-    KING_SIDE,
-    QUEEN_SIDE,
-    N_SIDES = 2
-};
+enum Sides { KING_SIDE, QUEEN_SIDE, N_SIDES = 2 };
 
-enum PieceTypes{
-    PAWN   = 0,
-    KNIGHT = 1,
-    BISHOP = 2,
-    ROOK   = 3,
-    QUEEN  = 4,
-    KING   = 5,
+enum PieceTypes {
+    PAWN          = 0,
+    KNIGHT        = 1,
+    BISHOP        = 2,
+    ROOK          = 3,
+    QUEEN         = 4,
+    KING          = 5,
     N_PIECE_TYPES = 6
 };
 
-enum Pieces{
+enum Pieces {
     NO_PIECE     = -1,
     WHITE_PAWN   = 0,
     WHITE_KNIGHT = 1,
@@ -47,19 +39,13 @@ enum Pieces{
     N_PIECES     = 14
 };
 
+constexpr char
+    piece_identifier[] {'P', 'N', 'B', 'R', 'Q', 'K', ' ', ' ', 'p', 'n', 'b', 'r', 'q', 'k'};
 
-constexpr char piece_identifier[] {'P', 'N', 'B', 'R', 'Q', 'K', ' ', ' ', 'p', 'n', 'b', 'r', 'q', 'k'};
+inline Color     getPieceColor(Piece p) { return p & 0x8; }
 
-inline Color getPieceColor(Piece p) {
-    return p & 0x8;
-}
+inline PieceType getPieceType(Piece p) { return p & 0x7; }
 
-inline PieceType getPieceType(Piece p) {
-    return p & 0x7;
-}
+inline Piece     getPiece(Color c, PieceType pt) { return c * 8 + pt; }
 
-inline Piece getPiece(Color c, PieceType pt) {
-    return c * 8 + pt;
-}
-
-#endif //BINARYPOSITIONWRAPPER__PIECE_H_
+#endif    // BINARYPOSITIONWRAPPER__PIECE_H_

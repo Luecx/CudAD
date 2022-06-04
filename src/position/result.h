@@ -6,15 +6,11 @@
 #ifndef BINARYPOSITIONWRAPPER_SRC_RESULT_H_
 #define BINARYPOSITIONWRAPPER_SRC_RESULT_H_
 
-enum GameResult{
-    WIN = 1,
-    DRAW = 0,
-    LOSS = -1
-};
+enum GameResult { WIN = 1, DRAW = 0, LOSS = -1 };
 
-struct Result{
+struct Result {
     int16_t score;
-    int8_t wdl;
+    int8_t  wdl;
 };
 
-#endif //BINARYPOSITIONWRAPPER_SRC_RESULT_H_
+#endif    // BINARYPOSITIONWRAPPER_SRC_RESULT_H_

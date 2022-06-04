@@ -23,18 +23,20 @@
 #ifndef DIFFERENTIATION_SRC_ACITVATIONS_RELU_H_
 #define DIFFERENTIATION_SRC_ACITVATIONS_RELU_H_
 
-#include "../data/SArray.h"
 #include "../data/DenseMatrix.h"
+#include "../data/SArray.h"
 #include "Activation.h"
 
-struct ReLU : Activation{
+struct ReLU : Activation {
 
+    // clang-format off
     void apply      (const SArray<float> &in,
                            SArray<float> &out, Mode mode) ;
     void backprop   (const SArray<float> &in,
                            SArray<float> &in_grd,
                      const SArray<float> &out,
                      const SArray<float> &out_grd, Mode mode) ;
+    // clang-format on
 
     void logOverview() override;
 };

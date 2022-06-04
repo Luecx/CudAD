@@ -5,10 +5,11 @@
 #ifndef CUDAD_SRC_OPERATIONS_PAIRWISE_MULTIPLY_BP_PAIRWISE_MULTIPLY_BP_H_
 #define CUDAD_SRC_OPERATIONS_PAIRWISE_MULTIPLY_BP_PAIRWISE_MULTIPLY_BP_H_
 
-#include "../../data/mode.h"
 #include "../../data/SArray.h"
+#include "../../data/mode.h"
 #include "../../misc/config.h"
 
+// clang-format off
 __global__ void pairwise_multiply_bp_kernel(
     const float* __restrict__ input,
           float* __restrict__ input_grd,
@@ -41,5 +42,6 @@ inline void pairwise_multiply_bp (
         ASSERT(false);
     }
 }
+// clang-format on
 
 #endif    // CUDAD_SRC_OPERATIONS_PAIRWISE_MULTIPLY_BP_PAIRWISE_MULTIPLY_BP_H_

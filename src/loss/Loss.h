@@ -12,11 +12,13 @@
 struct Loss{
 
 
+        // clang-format off
     virtual void apply   (const SArray<float> &output,
                                 SArray<float> &output_grad,
                           const SArray<float> &target,
                           const SArray<bool > &target_mask,
                                 Mode mode) = 0;
+// clang-format on
     virtual void logOverview() = 0;
     virtual SArray<float>& getLoss() = 0;
 };

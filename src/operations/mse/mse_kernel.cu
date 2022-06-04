@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 
+// clang-format off
 __global__ void mse_kernel(
     const float* __restrict__ output,
           float* __restrict__ output_gradient,
@@ -15,18 +16,19 @@ __global__ void mse_kernel(
     const bool * __restrict__ mask,
           float* __restrict__ loss,
     unsigned int size){
-
+    // clang-format on
 
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
-    if(idx >= size) return;
+    if (idx >= size)
+        return;
 
-    if(mask[idx]){
-        float difference = output[idx] - target[idx];
-//        printf("%f\n", output[idx]);
+    if (mask[idx]) {
+        float difference     = output[idx] - target[idx];
+        //        printf("%f\n", output[idx]);
         output_gradient[idx] = 2 * difference / size;
         atomicAdd(loss, difference * difference / size);
-    }else{
+    } else {
         output_gradient[idx] = 0;
     }
 }

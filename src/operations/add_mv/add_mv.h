@@ -6,11 +6,13 @@
 #ifndef CUDATEST1_SRC_OPERATIONS_ADD_MV_ADD_MV_H_
 #define CUDATEST1_SRC_OPERATIONS_ADD_MV_ADD_MV_H_
 
-#include "../../data/mode.h"
-#include "../../data/SArray.h"
 #include "../../data/DenseMatrix.h"
+#include "../../data/SArray.h"
+#include "../../data/mode.h"
+
 #include <iostream>
 
+// clang-format off
 void add_mv_host(
     const float* mat,
     const float* vec,
@@ -84,4 +86,5 @@ inline void add_mv( const DenseMatrix &mat,
     }
 }
 
-#endif //CUDATEST1_SRC_OPERATIONS_ADD_MV_ADD_MV_H_
+// clang-format on
+#endif    // CUDATEST1_SRC_OPERATIONS_ADD_MV_ADD_MV_H_

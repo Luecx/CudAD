@@ -24,4 +24,4 @@
     }
 #endif
 
-#endif //CUDAD_SRC_ASSERT_ASSERT_H_
+#endif    // CUDAD_SRC_ASSERT_ASSERT_H_

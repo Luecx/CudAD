@@ -17,7 +17,7 @@ struct Header {
     char     comments[1024];
 
     // some setters
-    void setEngine1(const std::string& string) {
+    void     setEngine1(const std::string& string) {
         std::memset(engine_1, ' ', sizeof(char) * 128);
         for (int i = 0; i < std::min((int) string.size(), 128); i++) {
             engine_1[i] = string[i];

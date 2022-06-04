@@ -12,13 +12,13 @@ void MPE::apply(const SArray<float>& output,
                 const SArray<float>& target,
                 const SArray<bool >& target_mask,
                 Mode                 mode) {
-    if(mode == HOST){
+    // clang-format on
+    if (mode == HOST) {
         mpe<HOST>(output, output_grad, target, target_mask, loss, m_power, m_avg_gradients);
-    }else{
+    } else {
         mpe<DEVICE>(output, output_grad, target, target_mask, loss, m_power, m_avg_gradients);
     }
 }
-// clang-format on
 void           MPE::logOverview() { logging::write("MPE(power=" + std::to_string(m_power) + ")"); }
 // extract the loss
 SArray<float>& MPE::getLoss() { return loss; }

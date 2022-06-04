@@ -7,20 +7,21 @@
 #define CUDAD_SRC_LOSS_MSE_H_
 
 #include "Loss.h"
-struct MSE : public Loss{
-    SArray<float> loss{1};
+struct MSE : public Loss {
+    SArray<float> loss {1};
 
     public:
     MSE();
 
+    // clang-format off
     void apply(const SArray<float> &output,
                      SArray<float> &output_grad,
                const SArray<float> &target,
                const SArray<bool > &target_mask,
                      Mode          mode) override;
-    void logOverview() override;
+    // clang-format on
+    void           logOverview() override;
     SArray<float>& getLoss() override;
 };
-
 
 #endif    // CUDAD_SRC_LOSS_MSE_H_

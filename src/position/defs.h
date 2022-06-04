@@ -14,10 +14,10 @@ typedef int8_t   Diagonal;
 typedef int8_t   AntiDiagonal;
 typedef int8_t   Direction;
 
-typedef int8_t  File;
-typedef int8_t  Rank;
-typedef int8_t  Piece;
-typedef int8_t  PieceType;
-typedef bool    Side;
-typedef bool    Color;
-#endif //BINARYPOSITIONWRAPPER_SRC_DEFS_H_
+typedef int8_t   File;
+typedef int8_t   Rank;
+typedef int8_t   Piece;
+typedef int8_t   PieceType;
+typedef bool     Side;
+typedef bool     Color;
+#endif    // BINARYPOSITIONWRAPPER_SRC_DEFS_H_

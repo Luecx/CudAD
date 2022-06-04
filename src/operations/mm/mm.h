@@ -10,18 +10,16 @@
 #include "mm_cublas.h"
 
 template<Mode mode>
-inline void mm(DenseMatrix &mat1,
-        DenseMatrix &mat2,
-        DenseMatrix &res){
+inline void mm(DenseMatrix& mat1, DenseMatrix& mat2, DenseMatrix& res) {
     ASSERT(mat1.n == mat2.m);
-    ASSERT(mat1.m == res .m);
-    ASSERT(mat2.n == res .n);
+    ASSERT(mat1.m == res.m);
+    ASSERT(mat2.n == res.n);
 
-    if(mode == DEVICE){
+    if (mode == DEVICE) {
         mm_cublas(mat1, mat2, res);
-    }else{
+    } else {
         ASSERT(false);
     }
 }
 
-#endif //CUDAD_SRC_OPERATIONS_MM_MM_H_
+#endif    // CUDAD_SRC_OPERATIONS_MM_MM_H_

@@ -5,9 +5,10 @@
 #ifndef CUDAD_SRC_OPERATIONS_BUCKET_BP_BUCKET_BP_H_
 #define CUDAD_SRC_OPERATIONS_BUCKET_BP_BUCKET_BP_H_
 
-#include "../../data/mode.h"
 #include "../../data/SArray.h"
+#include "../../data/mode.h"
 
+// clang-format off
 __global__ void bucket_bp_kernel(
     const float* __restrict__ inp,
           float* __restrict__ inp_grd,
@@ -59,4 +60,5 @@ inline void bucket_bp(const SArray<float> &inp,
     }
 }
 
+// clang-format on
 #endif    // CUDAD_SRC_OPERATIONS_BUCKET_BP_BUCKET_BP_H_

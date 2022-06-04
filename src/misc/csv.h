@@ -18,7 +18,7 @@ struct CSVWriter {
 
             csv_file << "\"" << *col << "\"";
         }
-        
+
         // new line and flush output
         csv_file << std::endl;
     }

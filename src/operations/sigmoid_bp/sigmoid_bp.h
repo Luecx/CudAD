@@ -6,10 +6,12 @@
 #ifndef CUDATEST1_SRC_OPERATIONS__SIGMOID_BP__SIGMOID_BP_H_
 #define CUDATEST1_SRC_OPERATIONS__SIGMOID_BP__SIGMOID_BP_H_
 
-#include "../../data/mode.h"
 #include "../../data/SArray.h"
+#include "../../data/mode.h"
+
 #include <iostream>
 
+// clang-format off
 void sigmoid_bp_host(
     const float* A,
           float* A_grd,
@@ -26,16 +28,6 @@ __global__ void sigmoid_bp_kernel(
     unsigned int size,
     float scalar);
 
-/**
- * performs C = A * alpha + B * beta
- * If A and B are not the same size as C, it will repeat the data contained in A and B
- * @tparam mode
- * @param A
- * @param B
- * @param C
- * @param alpha
- * @param beta
- */
 template<Mode mode>
 inline void sigmoid_bp(const SArray<float> &A,
                              SArray<float> &A_grd,
@@ -70,5 +62,6 @@ inline void sigmoid_bp(const SArray<float> &A,
             scalar);
     }
 }
+// clang-format on
 
-#endif //CUDATEST1_SRC_OPERATIONS__SIGMOID_BP__SIGMOID_BP_H_
+#endif    // CUDATEST1_SRC_OPERATIONS__SIGMOID_BP__SIGMOID_BP_H_

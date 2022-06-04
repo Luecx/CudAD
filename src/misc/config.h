@@ -10,15 +10,10 @@
 #include <cublas_v2.h>
 #include <cusparse_v2.h>
 
-
-
 extern cublasHandle_t CUBLAS_HANDLE;
 
-void init();
-void close();
-void display_header();
+void                  init();
+void                  close();
+void                  display_header();
 
-
-
-
-#endif //CUDATEST1_SRC_CONFIG_CONFIG_H_
+#endif    // CUDATEST1_SRC_CONFIG_CONFIG_H_

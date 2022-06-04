@@ -2,8 +2,9 @@
 //
 // Created by Luecx on 13.01.2022.
 //
-#include <iostream>
 #include <cmath>
+#include <iostream>
+// clang-format off
 void adam_host(
               float* values,
               float* gradients,
@@ -15,16 +16,19 @@ void adam_host(
               float beta2,
               float eps){
 
-    for(int idx = 0; idx < size; idx++){
+    // clang-format on
 
-        if(idx >= size) return;
+    for (int idx = 0; idx < size; idx++) {
 
-        first_moment[idx]  = beta1 * first_moment[idx]  + (1 - beta1) * gradients[idx];
-        second_moment[idx] = beta2 * second_moment[idx] + (1 - beta2) * gradients[idx] * gradients[idx];
+        if (idx >= size)
+            return;
+
+        first_moment[idx] = beta1 * first_moment[idx] + (1 - beta1) * gradients[idx];
+        second_moment[idx] =
+            beta2 * second_moment[idx] + (1 - beta2) * gradients[idx] * gradients[idx];
 
         float delta = alpha * first_moment[idx] / (sqrtf(second_moment[idx]) + eps);
         values[idx] -= delta;
         gradients[idx] = 0;
     }
-
 }

@@ -6,9 +6,6 @@
 #ifndef CUDAD_SRC_DATA_MODE_H_
 #define CUDAD_SRC_DATA_MODE_H_
 
-enum Mode{
-    HOST,
-    DEVICE
-};
+enum Mode { HOST, DEVICE };
 
-#endif //CUDAD_SRC_DATA_MODE_H_
+#endif    // CUDAD_SRC_DATA_MODE_H_
