@@ -32,11 +32,13 @@
 
 struct BatchLoader {
     int           batch_size;
-    volatile bool next_batch_loaded = false;
-    // The dataset being actively read from
-    DataSet  active_batch;
+    DataSet       active_batch;
 
-    DataSet* load_buffer;
+    volatile bool keep_loading      = true;
+    volatile bool next_batch_loaded = false;
+    DataSet*      load_buffer;
+
+    std::thread*  loading_thread;
 
     // files to load
     std::vector<std::string> files {};
@@ -71,11 +73,25 @@ struct BatchLoader {
         }
     }
 
-    virtual ~BatchLoader() { delete load_buffer; }
+    virtual ~BatchLoader() {
+        kill();
 
-    void start() {
-        std::thread t1(&BatchLoader::backgroundBatchLoading, this);
-        t1.detach();
+        delete loading_thread;
+        delete load_buffer;
+    }
+
+    void start() { loading_thread = new std::thread(&BatchLoader::backgroundBatchLoading, this); }
+
+    void kill() {
+        // tell the other thread to stop looping
+        keep_loading = false;
+
+        // break the other thread from potentially
+        // being in it's busy loop
+        next_batch_loaded = false;
+
+        if (loading_thread->joinable())
+            loading_thread->join();
     }
 
     void openNextFile() {
@@ -125,7 +141,7 @@ struct BatchLoader {
     }
 
     void backgroundBatchLoading() {
-        while (true) {
+        while (keep_loading) {
             fillBuffer();
 
             // mark batch as loaded and wait
