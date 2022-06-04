@@ -1,6 +1,20 @@
-//
-// Created by Luecx on 03.03.2021.
-//
+/**
+    CudAD is a CUDA neural network trainer, specific for chess engines.
+    Copyright (C) 2022 Finn Eggers
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #ifndef DIFFERENTIATION_MAPPINGS_H
 #define DIFFERENTIATION_MAPPINGS_H
@@ -200,11 +214,11 @@ inline void assign_input(Position&      p,
     constexpr static float phase_values[6] {0, 1, 1, 2, 4, 0};
 
     // track king squares
-    Square                 wKingSq = p.getKingSquare<WHITE>();
-    Square                 bKingSq = p.getKingSquare<BLACK>();
+    Square wKingSq = p.getKingSquare<WHITE>();
+    Square bKingSq = p.getKingSquare<BLACK>();
 
-    BB                     bb {p.m_occupancy};
-    int                    idx = 0;
+    BB     bb {p.m_occupancy};
+    int    idx = 0;
 
     while (bb) {
         Square sq                    = bitscanForward(bb);
@@ -234,8 +248,8 @@ inline void assign_input(Position&      p,
         w_value = -w_value;
     }
 
-    float p_target  = 1 / (1 + expf(-p_value * 2.5 / 400.0f));
-    float w_target  = (w_value + 1) / 2.0f;
+    float p_target = 1 / (1 + expf(-p_value * 2.5 / 400.0f));
+    float w_target = (w_value + 1) / 2.0f;
 
     //    int   output_bucket = (bitCount(p.m_occupancy) - 1) / 4;
 

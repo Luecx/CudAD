@@ -1,6 +1,20 @@
-//
-// Created by Luecx on 16.01.2022.
-//
+/**
+    CudAD is a CUDA neural network trainer, specific for chess engines.
+    Copyright (C) 2022 Finn Eggers
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #ifndef CUDAD_SRC_OPTIMIZER_OPTIMISER_H_
 #define CUDAD_SRC_OPTIMIZER_OPTIMISER_H_
@@ -22,7 +36,7 @@ struct Optimiser {
      * like first and second moments (adam).
      * @param layers        the layers which the network consists of
      */
-    void               init(std::vector<LayerInterface*> layers) {
+    void init(std::vector<LayerInterface*> layers) {
         for (LayerInterface* l : layers) {
             for (auto* k : l->getTunableParameters()) {
                 tunable_values.push_back(k);
@@ -34,7 +48,7 @@ struct Optimiser {
     /**
      * creates buffers for each tape. (e.g. first and second moments)
      */
-    virtual void createBuffers()       = 0;
+    virtual void createBuffers() = 0;
 
     /**
      * The function is supposed to go through the gradients of the weights and biases stored
@@ -51,12 +65,12 @@ struct Optimiser {
      * If the optimiser requires information about when a new epoch starts, this function can be used.
      * This is mostly unused.
      */
-    virtual void newEpoch()            = 0;
+    virtual void newEpoch() = 0;
 
     /**
      * Used to display information to the log file
      */
-    virtual void logOverview()         = 0;
+    virtual void logOverview() = 0;
 };
 
 #endif    // CUDAD_SRC_OPTIMIZER_OPTIMISER_H_

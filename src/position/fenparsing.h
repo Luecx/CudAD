@@ -1,6 +1,20 @@
-//
-// Created by Luecx on 27.11.2021.
-//
+/**
+    CudAD is a CUDA neural network trainer, specific for chess engines.
+    Copyright (C) 2022 Finn Eggers
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #ifndef BINARYPOSITIONWRAPPER_SRC_FENPARSING_H_
 #define BINARYPOSITIONWRAPPER_SRC_FENPARSING_H_
@@ -12,20 +26,20 @@
 
 #include <cmath>
 #include <cstring>
-#include <string>
 #include <sstream>
+#include <string>
 
 struct FenCharacter {
-    char   character{0};
-    Square skip_squares{0};
-    Piece  piece{0};
-    Rank   rank{0};
-    File   file{0};
+    char   character {0};
+    Square skip_squares {0};
+    Piece  piece {0};
+    Rank   rank {0};
+    File   file {0};
 };
 
-static FenCharacter          fen_character_lookup[128] {};
-static bool fen_character_lookup_initialised = false;
-inline void init_character_lookup() {
+static FenCharacter fen_character_lookup[128] {};
+static bool         fen_character_lookup_initialised = false;
+inline void         init_character_lookup() {
 
     if (fen_character_lookup_initialised)
         return;
@@ -55,17 +69,17 @@ inline void init_character_lookup() {
 
     fen_character_lookup['a']        = FenCharacter {'a', 1, NO_PIECE, 0, 0};
     //  fen_character_lookup['b'] = FenCharacter{'b', 2, NO_PIECE, 1, 0};
-    fen_character_lookup['c']        = FenCharacter {'c', 3, NO_PIECE, 2, 0};
-    fen_character_lookup['d']        = FenCharacter {'d', 4, NO_PIECE, 3, 0};
-    fen_character_lookup['e']        = FenCharacter {'e', 5, NO_PIECE, 4, 0};
-    fen_character_lookup['f']        = FenCharacter {'f', 6, NO_PIECE, 5, 0};
-    fen_character_lookup['g']        = FenCharacter {'g', 7, NO_PIECE, 6, 0};
-    fen_character_lookup['h']        = FenCharacter {'h', 8, NO_PIECE, 7, 0};
+    fen_character_lookup['c'] = FenCharacter {'c', 3, NO_PIECE, 2, 0};
+    fen_character_lookup['d'] = FenCharacter {'d', 4, NO_PIECE, 3, 0};
+    fen_character_lookup['e'] = FenCharacter {'e', 5, NO_PIECE, 4, 0};
+    fen_character_lookup['f'] = FenCharacter {'f', 6, NO_PIECE, 5, 0};
+    fen_character_lookup['g'] = FenCharacter {'g', 7, NO_PIECE, 6, 0};
+    fen_character_lookup['h'] = FenCharacter {'h', 8, NO_PIECE, 7, 0};
 
-    fen_character_lookup['/']        = FenCharacter {'/', -16, NO_PIECE};
+    fen_character_lookup['/'] = FenCharacter {'/', -16, NO_PIECE};
 }
 
-inline Position parseFen(const std::string &fen) {
+inline Position parseFen(const std::string& fen) {
 
     init_character_lookup();
 
@@ -73,16 +87,16 @@ inline Position parseFen(const std::string &fen) {
     int character_index = 0;
 
     // the position itself
-    Position position{};
+    Position position {};
 
     // -----------------------------------------------------------------------------------------------
     // read pieces first
     // -----------------------------------------------------------------------------------------------
     Square square = A8;
-    Piece pieces[64]{};
+    Piece  pieces[64] {};
     std::memset(pieces, (Piece) NO_PIECE, sizeof(Piece) * 64);
     for (; character_index < fen.size() && fen[character_index] != ' '; character_index++) {
-        FenCharacter &ch = fen_character_lookup[fen[character_index]];
+        FenCharacter& ch = fen_character_lookup[fen[character_index]];
         if (ch.piece != NO_PIECE) {
             pieces[square] = ch.piece;
         }
@@ -114,7 +128,8 @@ inline Position parseFen(const std::string &fen) {
     // read castling rights
     // -----------------------------------------------------------------------------------------------
     for (; character_index < fen.size() && fen[character_index] != ' '; character_index++) {
-        if(fen[character_index] == '-') continue;
+        if (fen[character_index] == '-')
+            continue;
         FenCharacter& ch    = fen_character_lookup[fen[character_index]];
         Side          side  = getPieceType(ch.piece) == QUEEN ? QUEEN_SIDE : KING_SIDE;
         Color         color = getPieceColor(ch.piece);
@@ -127,10 +142,10 @@ inline Position parseFen(const std::string &fen) {
     // -----------------------------------------------------------------------------------------------
     if (fen[character_index] != '-') {
         Rank file = fen_character_lookup[fen[character_index++]].rank;
-        Rank rank = fen_character_lookup[fen[character_index  ]].file;
+        Rank rank = fen_character_lookup[fen[character_index]].file;
         position.m_meta.setEnPassantSquare(squareIndex(rank, file));
     }
-    character_index+=2;
+    character_index += 2;
 
     // -----------------------------------------------------------------------------------------------
     // read 50 move rule
@@ -138,7 +153,7 @@ inline Position parseFen(const std::string &fen) {
     if (fen[character_index] != '-') {
         auto string_length = fen.find_first_of(' ', character_index);
         auto numeric       = std::stoi(fen.substr(character_index, string_length));
-        position.m_meta.setFiftyMoveRule(std::min(255,numeric));
+        position.m_meta.setFiftyMoveRule(std::min(255, numeric));
         character_index = string_length - 1;
     }
     character_index += 2;
@@ -149,7 +164,7 @@ inline Position parseFen(const std::string &fen) {
     if (fen[character_index] != '-') {
         auto string_length = fen.find_first_of(' ', character_index);
         auto numeric       = std::stoi(fen.substr(character_index, string_length));
-        position.m_meta.setMoveCount(std::min(255,numeric));
+        position.m_meta.setMoveCount(std::min(255, numeric));
         character_index = string_length - 1;
     }
     character_index += 1;
@@ -160,24 +175,23 @@ inline Position parseFen(const std::string &fen) {
     auto left_bracket_pos  = fen.find_first_of('[', character_index);
     auto right_bracket_pos = fen.find_first_of(']', character_index);
 
-    if (    left_bracket_pos == std::string::npos
-        || right_bracket_pos == std::string::npos) {
+    if (left_bracket_pos == std::string::npos || right_bracket_pos == std::string::npos) {
         return position;
     }
 
     auto    wdl             = std::stof(fen.substr(left_bracket_pos + 1, right_bracket_pos));
     auto    cp              = std::stof(fen.substr(right_bracket_pos + 1, fen.size()));
 
-    int8_t wdl_int = std::round(wdl * 2 - 1);
-    int16_t cp_int = std::round(cp);
+    int8_t  wdl_int         = std::round(wdl * 2 - 1);
+    int16_t cp_int          = std::round(cp);
 
     position.m_result.score = cp_int;
-    position.m_result.wdl = wdl_int;
+    position.m_result.wdl   = wdl_int;
 
     return position;
 }
 
-inline std::string writeFen(const Position &position, bool write_score = false) {
+inline std::string writeFen(const Position& position, bool write_score = false) {
     std::stringstream ss;
 
     // we do it in the same way we read a fen.
@@ -185,9 +199,9 @@ inline std::string writeFen(const Position &position, bool write_score = false) 
     for (Rank n = 7; n >= 0; n--) {
         int counting = 0;
         for (File i = 0; i < 8; i++) {
-            Square s = squareIndex(n, i);
+            Square s     = squareIndex(n, i);
 
-            int piece = position.getPiece(s);
+            int    piece = position.getPiece(s);
             if (piece == -1) {
                 counting++;
             } else {
@@ -233,19 +247,19 @@ inline std::string writeFen(const Position &position, bool write_score = false) 
         ss << "-";
     }
     // similar to castling rights, we need to add a '-' if there is no e.p. square.
-    if (position.m_meta.getEnPassantSquare() >= 0 &&
-        position.m_meta.getEnPassantSquare() < 64) {
+    if (position.m_meta.getEnPassantSquare() >= 0 && position.m_meta.getEnPassantSquare() < 64) {
         ss << " ";
         ss << square_identifier[position.m_meta.getEnPassantSquare()];
     } else {
         ss << " -";
     }
 
-    // we also add the fifty move counter and the move counter to the fen (note that we dont parse those)
+    // we also add the fifty move counter and the move counter to the fen (note that we dont parse
+    // those)
     ss << " " << (int) position.m_meta.getFiftyMoveRule();
     ss << " " << (int) position.m_meta.getMoveCount();
 
-    if(write_score){
+    if (write_score) {
         ss << " [";
         ss << (position.m_result.wdl == WIN ? "1" : (position.m_result.wdl == LOSS ? "0" : "0.5"));
         ss << "] " << position.m_result.score;
@@ -254,4 +268,4 @@ inline std::string writeFen(const Position &position, bool write_score = false) 
     return ss.str();
 }
 
-#endif //BINARYPOSITIONWRAPPER_SRC_FENPARSING_H_
+#endif    // BINARYPOSITIONWRAPPER_SRC_FENPARSING_H_

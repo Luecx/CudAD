@@ -1,12 +1,26 @@
+/**
+    CudAD is a CUDA neural network trainer, specific for chess engines.
+    Copyright (C) 2022 Finn Eggers
 
-//
-// Created by Luecx on 19.01.2022.
-//
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 #include "../operations/mle/mle.h"
 #include "Network.h"
 
 void Network::loadWeights(const std::string& file) {
-    FILE*    f     = fopen(file.c_str(), "rb");
+    FILE* f = fopen(file.c_str(), "rb");
 
     // figure out how many entries we will store
     uint64_t count = 0;
@@ -29,7 +43,7 @@ void Network::loadWeights(const std::string& file) {
     fclose(f);
 }
 void Network::saveWeights(const std::string& file) {
-    FILE*    f     = fopen(file.c_str(), "wb");
+    FILE* f = fopen(file.c_str(), "wb");
 
     // figure out how many entries we will store
     uint64_t count = 0;
