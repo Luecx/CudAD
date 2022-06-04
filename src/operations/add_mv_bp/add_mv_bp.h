@@ -1,16 +1,31 @@
+/**
+    CudAD is a CUDA neural network trainer, specific for chess engines.
+    Copyright (C) 2022 Finn Eggers
 
-//
-// Created by Luecx on 13.01.2022.
-//
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #ifndef CUDATEST1_SRC_OPERATIONS_ADD_MV_BP_ADD_MV_BP_H_
 #define CUDATEST1_SRC_OPERATIONS_ADD_MV_BP_ADD_MV_BP_H_
 
-#include "../../data/mode.h"
-#include "../../data/SArray.h"
 #include "../../data/DenseMatrix.h"
+#include "../../data/SArray.h"
+#include "../../data/mode.h"
+
 #include <iostream>
 
+// clang-format off
 void add_mv_bp_host(
           float* mat_grd,
           float* vec_grd,
@@ -82,4 +97,5 @@ inline void add_mv_bp( const DenseMatrix &mat_grd,
     }
 }
 
-#endif //CUDATEST1_SRC_OPERATIONS_ADD_MV_BP_ADD_MV_BP_H_
+// clang-format on
+#endif    // CUDATEST1_SRC_OPERATIONS_ADD_MV_BP_ADD_MV_BP_H_

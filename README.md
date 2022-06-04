@@ -23,10 +23,26 @@ cd CudAD
 
 ```bash
 cmake -B cmake-build-release -S .
-cmake -B cmake-build-release --config Release --target CudAD -j4
+cmake --build cmake-build-release --config Release --target CudAD -j4
 ```
 ### Run
 
 ```bash
 ./cmake-build-release/Release/CudAD
+```
+
+## Maintaining
+
+### Formatting
+
+This project uses `clang-format` to keep it's code formatted. The style can be found in [.clang-format](.clang-format).
+
+To format a file, with `clang-format` in your path.
+```bash
+clang-format -i <file_path>
+```
+
+Below is a helpful script to format the codebase in one go.
+```bash
+find src/ -iname *.h -o -iname *.cu | xargs clang-format -i
 ```

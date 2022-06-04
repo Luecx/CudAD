@@ -1,15 +1,30 @@
+/**
+    CudAD is a CUDA neural network trainer, specific for chess engines.
+    Copyright (C) 2022 Finn Eggers
 
-//
-// Created by Luecx on 13.01.2022.
-//
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #ifndef CUDATEST1_SRC_OPERATIONS__RELU_BP__RELU_BP_H_
 #define CUDATEST1_SRC_OPERATIONS__RELU_BP__RELU_BP_H_
 
-#include "../../data/mode.h"
 #include "../../data/SArray.h"
+#include "../../data/mode.h"
+
 #include <iostream>
 
+// clang-format off
 void relu_bp_host(
     const float* A,
           float* A_grd,
@@ -24,16 +39,6 @@ __global__ void relu_bp_kernel(
     const float* __restrict__ B_grd,
     unsigned int size);
 
-/**
- * performs C = A * alpha + B * beta
- * If A and B are not the same size as C, it will repeat the data contained in A and B
- * @tparam mode
- * @param A
- * @param B
- * @param C
- * @param alpha
- * @param beta
- */
 template<Mode mode>
 inline void relu_bp   (const SArray<float> &A,
                              SArray<float> &A_grd,
@@ -66,4 +71,5 @@ inline void relu_bp   (const SArray<float> &A,
     }
 }
 
-#endif //CUDATEST1_SRC_OPERATIONS__RELU_BP__RELU_BP_H_
+// clang-format on
+#endif    // CUDATEST1_SRC_OPERATIONS__RELU_BP__RELU_BP_H_

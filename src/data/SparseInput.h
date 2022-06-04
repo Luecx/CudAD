@@ -1,8 +1,20 @@
+/**
+    CudAD is a CUDA neural network trainer, specific for chess engines.
+    Copyright (C) 2022 Finn Eggers
 
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-//
-// Created by Luecx on 08.01.2022.
-//
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #ifndef CUDATEST1_SRC_DATA_SPARSEINPUT_H_
 #define CUDATEST1_SRC_DATA_SPARSEINPUT_H_
@@ -39,8 +51,8 @@ struct SparseInput : public Matrix {
         column_indices.cpu_values[offset + column_indices.cpu_values[offset]] = index;
     }
 
-    void clear(){
-        for(int i = 0; i < n; i++){
+    void clear() {
+        for (int i = 0; i < n; i++) {
             column_indices.cpu_values[i * (max_entries_per_column + 1)] = 0;
         }
     }
@@ -50,9 +62,9 @@ struct SparseInput : public Matrix {
         for (int p_i = 0; p_i <= data.max_entries_per_column; p_i++) {
             for (int p_n = 0; p_n < data.n; p_n++) {
                 int count = data.column_indices(p_n * (data.max_entries_per_column + 1));
-                if(p_i > count){
+                if (p_i > count) {
                     os << std::setw(11) << "";
-                }else{
+                } else {
                     os << std::setw(11)
                        << (int) data.column_indices(p_i + p_n * (data.max_entries_per_column + 1));
                 }

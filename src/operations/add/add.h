@@ -1,15 +1,30 @@
+/**
+    CudAD is a CUDA neural network trainer, specific for chess engines.
+    Copyright (C) 2022 Finn Eggers
 
-//
-// Created by Luecx on 13.01.2022.
-//
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #ifndef CUDATEST1_SRC_OPERATIONS_ADD_ADD_H_
 #define CUDATEST1_SRC_OPERATIONS_ADD_ADD_H_
 
-#include "../../data/mode.h"
 #include "../../data/SArray.h"
+#include "../../data/mode.h"
+
 #include <iostream>
 
+// clang-format off
 void add_host(
     const float* A,
     const float* B,
@@ -31,6 +46,7 @@ __global__ void add_kernel(
           unsigned int size,
           float alpha,
           float beta);
+// clang-format on
 
 /**
  * performs C = A * alpha + B * beta
@@ -43,6 +59,7 @@ __global__ void add_kernel(
  * @param beta
  */
 template<Mode mode>
+// clang-format off
 inline void add   ( const SArray<float> &A,
                     const SArray<float> &B,
                           SArray<float> &C,
@@ -87,5 +104,6 @@ inline void add   ( const SArray<float> &A,
             beta);
     }
 }
+// clang-format on
 
-#endif //CUDATEST1_SRC_OPERATIONS_ADD_ADD_H_
+#endif    // CUDATEST1_SRC_OPERATIONS_ADD_ADD_H_

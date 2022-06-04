@@ -1,6 +1,20 @@
-//
-// Created by Luecx on 25.02.2021.
-//
+/**
+    CudAD is a CUDA neural network trainer, specific for chess engines.
+    Copyright (C) 2022 Finn Eggers
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #ifndef DIFFERENTIATION_DUPLICATEDENSELAYER_H
 #define DIFFERENTIATION_DUPLICATEDENSELAYER_H
@@ -11,10 +25,12 @@
 template<int I, int O, typename F>
 class DuplicateDenseLayer : public LayerInterface {
     public:
+    // clang-format off
     Tape tunable_values {O, I + 1};               // update weights + biases at the same
     Tape weights        {tunable_values, 0, 0, O, I};    // time
     Tape bias           {tunable_values, 0, I, O, 1};
     F    f              {};
+    // clang-format on
     // regularization
     float lasso_regularization = 0;
 
@@ -32,7 +48,7 @@ class DuplicateDenseLayer : public LayerInterface {
         ASSERT(false);
     }
     void apply(std::vector<SparseInput*> inputs, Tape& out) override {
-        uint32_t    B = out.values.n;
+        uint32_t B = out.values.n;
         // create submatrices for the output
         DenseMatrix mat_res_1 {out.values, 0, 0, O, B};
         DenseMatrix mat_res_2 {out.values, O, 0, O, B};
@@ -49,13 +65,25 @@ class DuplicateDenseLayer : public LayerInterface {
         f.backprop(out.values, out.gradients, out.values, out.gradients, DEVICE);
 
         // create submatrices for the output
+        // clang-format off
         DenseMatrix mat_grd_1 {out.gradients, 0, 0, O, B};
         DenseMatrix mat_grd_2 {out.gradients, O, 0, O, B};
-        DenseMatrix mat_res_1 {out.values, 0, 0, O, B};
-        DenseMatrix mat_res_2 {out.values, O, 0, O, B};
+        DenseMatrix mat_res_1 {out.values   , 0, 0, O, B};
+        DenseMatrix mat_res_2 {out.values   , O, 0, O, B};
+        // clang-format on
 
-        sparse_affine_bp<DEVICE>(weights.gradients, *inputs[0], bias.gradients, mat_res_1, mat_grd_1, lasso_regularization);
-        sparse_affine_bp<DEVICE>(weights.gradients, *inputs[1], bias.gradients, mat_res_2, mat_grd_2, lasso_regularization);
+        sparse_affine_bp<DEVICE>(weights.gradients,
+                                 *inputs[0],
+                                 bias.gradients,
+                                 mat_res_1,
+                                 mat_grd_1,
+                                 lasso_regularization);
+        sparse_affine_bp<DEVICE>(weights.gradients,
+                                 *inputs[1],
+                                 bias.gradients,
+                                 mat_res_2,
+                                 mat_grd_2,
+                                 lasso_regularization);
     }
 
     uint32_t           getOutputSize() override { return O * 2; }

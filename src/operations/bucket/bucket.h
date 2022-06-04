@@ -1,13 +1,28 @@
-//
-// Created by Luecx on 30.01.2022.
-//
+/**
+    CudAD is a CUDA neural network trainer, specific for chess engines.
+    Copyright (C) 2022 Finn Eggers
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #ifndef CUDAD_SRC_OPERATIONS_BUCKET_BUCKET_H_
 #define CUDAD_SRC_OPERATIONS_BUCKET_BUCKET_H_
 
-#include "../../data/mode.h"
 #include "../../data/SArray.h"
+#include "../../data/mode.h"
 
+// clang-format off
 __global__ void bucket_kernel(
     const float* __restrict__ inp,
           float* __restrict__ out,
@@ -54,5 +69,6 @@ inline void bucket  ( const SArray<float> &inp,
 //            res_grd.leading_dimension);
     }
 }
+// clang-format on
 
 #endif    // CUDAD_SRC_OPERATIONS_BUCKET_BUCKET_H_

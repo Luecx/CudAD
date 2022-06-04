@@ -1,10 +1,28 @@
-#include "../../data/mode.h"
-#include "../../data/DenseMatrix.h"
+/**
+    CudAD is a CUDA neural network trainer, specific for chess engines.
+    Copyright (C) 2022 Finn Eggers
 
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+#include "../../data/DenseMatrix.h"
+#include "../../data/mode.h"
 
 #ifndef CUDATEST1_SRC_OPERATIONS_RANGER_RANGER_H_
 #define CUDATEST1_SRC_OPERATIONS_RANGER_RANGER_H_
 
+// clang-format off
 __global__ void ranger_kernel(
           float* __restrict__ values,
           float* __restrict__ gradients,
@@ -81,6 +99,6 @@ inline void ranger(SArray<float>& values,
             alpha, k, N_sma_threshold);
     }
 }
+// clang-format on
 
-
-#endif //CUDATEST1_SRC_OPERATIONS_RANGER_RANGER_H_
+#endif    // CUDATEST1_SRC_OPERATIONS_RANGER_RANGER_H_

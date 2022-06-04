@@ -1,20 +1,29 @@
+/**
+    CudAD is a CUDA neural network trainer, specific for chess engines.
+    Copyright (C) 2022 Finn Eggers
 
-//
-// Created by Luecx on 27.11.2021.
-//
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #ifndef BINARYPOSITIONWRAPPER_SRC_RESULT_H_
 #define BINARYPOSITIONWRAPPER_SRC_RESULT_H_
 
-enum GameResult{
-    WIN = 1,
-    DRAW = 0,
-    LOSS = -1
-};
+enum GameResult { WIN = 1, DRAW = 0, LOSS = -1 };
 
-struct Result{
+struct Result {
     int16_t score;
-    int8_t wdl;
+    int8_t  wdl;
 };
 
-#endif //BINARYPOSITIONWRAPPER_SRC_RESULT_H_
+#endif    // BINARYPOSITIONWRAPPER_SRC_RESULT_H_

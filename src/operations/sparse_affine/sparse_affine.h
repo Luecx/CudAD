@@ -1,16 +1,30 @@
+/**
+    CudAD is a CUDA neural network trainer, specific for chess engines.
+    Copyright (C) 2022 Finn Eggers
 
-//
-// Created by Luecx on 14.01.2022.
-//
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #ifndef CUDAD_SRC_OPERATIONS_S_MM_SPARSE_AFFINE_H_
 #define CUDAD_SRC_OPERATIONS_S_MM_SPARSE_AFFINE_H_
 
-#include "../../data/Matrix.h"
 #include "../../data/DenseMatrix.h"
+#include "../../data/Matrix.h"
 #include "../../data/SparseInput.h"
 #include "../../data/mode.h"
 
+// clang-format off
 __global__ void sparse_affine_kernel(
     const float*        __restrict__ mat,
     const unsigned int* __restrict__ inp_col_indices,
@@ -86,4 +100,5 @@ inline void sparse_affine(
     }
 }
 
-#endif //CUDAD_SRC_OPERATIONS_S_MM_SPARSE_AFFINE_H_
+// clang-format on
+#endif    // CUDAD_SRC_OPERATIONS_S_MM_SPARSE_AFFINE_H_

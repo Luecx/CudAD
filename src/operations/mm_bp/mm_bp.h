@@ -1,14 +1,27 @@
+/**
+    CudAD is a CUDA neural network trainer, specific for chess engines.
+    Copyright (C) 2022 Finn Eggers
 
-//
-// Created by Luecx on 14.01.2022.
-//
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #ifndef CUDAD_SRC_OPERATIONS_MM_BP_MM_BP_H_
 #define CUDAD_SRC_OPERATIONS_MM_BP_MM_BP_H_
 
 #include "../mm/mm_cublas.h"
 
-
+// clang-format off
 template<Mode mode>
 inline void mm_bp(DenseMatrix &mat1,
         DenseMatrix &mat1_grd,
@@ -44,4 +57,5 @@ inline void mm_bp(DenseMatrix &mat1,
         ASSERT(false);
     }
 }
-#endif //CUDAD_SRC_OPERATIONS_MM_BP_MM_BP_H_
+// clang-format on
+#endif    // CUDAD_SRC_OPERATIONS_MM_BP_MM_BP_H_

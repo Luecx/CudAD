@@ -1,7 +1,20 @@
+/**
+    CudAD is a CUDA neural network trainer, specific for chess engines.
+    Copyright (C) 2022 Finn Eggers
 
-//
-// Created by Luecx on 27.11.2021.
-//
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #ifndef BINARYPOSITIONWRAPPER_SRC_PIECELIST_H_
 #define BINARYPOSITIONWRAPPER_SRC_PIECELIST_H_
@@ -33,7 +46,7 @@ struct PieceList {
         const int offset = index % PIECES_PER_BUCKET;
 
         // compute the shift
-        const int shift  = 4 * offset;
+        const int shift = 4 * offset;
 
         // disable all in the correct place
         m_piece_buckets[bucket] &= ~(mask<4>() << shift);
@@ -65,8 +78,8 @@ struct PieceList {
         constexpr BB invPiecePat  = ~piecePattern;
 
         // check the lower 16 entries first
-        BB           mask_lower   = invPiecePat ^ m_piece_buckets[0];
-        mask_lower                = highlightGroupsOf4(mask_lower);
+        BB mask_lower = invPiecePat ^ m_piece_buckets[0];
+        mask_lower    = highlightGroupsOf4(mask_lower);
         mask_lower &= lsbPattern;
 
         if (mask_lower) {

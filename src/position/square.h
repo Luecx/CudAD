@@ -1,11 +1,25 @@
+/**
+    CudAD is a CUDA neural network trainer, specific for chess engines.
+    Copyright (C) 2022 Finn Eggers
 
-//
-// Created by Luecx on 27.11.2021.
-//
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #ifndef BINARYPOSITIONWRAPPER_SRC_SQUARE_H_
 #define BINARYPOSITIONWRAPPER_SRC_SQUARE_H_
 
+// clang-format off
 enum Squares {
     A1, B1, C1, D1, E1, F1, G1, H1,
     A2, B2, C2, D2, E2, F2, G2, H2,
@@ -25,9 +39,8 @@ constexpr char const* square_identifier[] {
     "a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7", "a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8",
 };
 
-inline Square squareIndex(Rank rank, File file) {
-    return 8 * rank + file;
-}
+// clang-format on
+inline Square squareIndex(Rank rank, File file) { return 8 * rank + file; }
 
 inline Square squareIndex(std::string& str) {
 
@@ -37,26 +50,19 @@ inline Square squareIndex(std::string& str) {
     return squareIndex(r, f);
 }
 
-inline Rank rankIndex(Square square_index) {
-    return square_index >> 3;
-}
+inline Rank   rankIndex(Square square_index) { return square_index >> 3; }
 
-inline File fileIndex(Square square_index) {
-    return square_index & 7;
-}
+inline File   fileIndex(Square square_index) { return square_index & 7; }
 
-inline Square mirrorVertically(Square square){
-    return square ^ 56;
-}
+inline Square mirrorVertically(Square square) { return square ^ 56; }
 
-inline Square mirrorHorizontally(Square square){
-    return square ^ 7;
-}
+inline Square mirrorHorizontally(Square square) { return square ^ 7; }
 
-inline Color getSquareColor(Square square){
-    constexpr BB white_squares{0x55AA55AA55AA55AAULL};
-    if (getBit(white_squares, square)) return WHITE;
+inline Color  getSquareColor(Square square) {
+    constexpr BB white_squares {0x55AA55AA55AA55AAULL};
+    if (getBit(white_squares, square))
+        return WHITE;
     return BLACK;
 }
 
-#endif //BINARYPOSITIONWRAPPER_SRC_SQUARE_H_
+#endif    // BINARYPOSITIONWRAPPER_SRC_SQUARE_H_
