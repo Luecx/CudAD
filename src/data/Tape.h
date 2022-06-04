@@ -19,7 +19,7 @@
 #ifndef CUDAD_SRC_DATA_TAPE_H_
 #define CUDAD_SRC_DATA_TAPE_H_
 
-#include "Matrix.h"
+#include "DenseMatrix.h"
 
 #include <utility>
 struct Tape {

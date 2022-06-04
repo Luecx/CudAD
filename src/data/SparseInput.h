@@ -20,6 +20,7 @@
 #define CUDATEST1_SRC_DATA_SPARSEINPUT_H_
 
 #include "../misc/config.h"
+#include "Matrix.h"
 #include "align.h"
 
 #include <cmath>

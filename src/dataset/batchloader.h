@@ -69,12 +69,14 @@ struct BatchLoader {
             logging::write("Cannot create BatchLoader with no valid files. EXITING");
             exit(-1);
         }
-
-        std::thread t1(&BatchLoader::backgroundBatchLoading, this);
-        t1.detach();
     }
 
     virtual ~BatchLoader() { delete load_buffer; }
+
+    void start() {
+        std::thread t1(&BatchLoader::backgroundBatchLoading, this);
+        t1.detach();
+    }
 
     void openNextFile() {
         if (file.is_open())

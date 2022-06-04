@@ -32,10 +32,9 @@ struct Adam : Optimiser {
     std::vector<std::tuple<float, float>> value_ranges {};
 
     public:
-    double alpha = 0.01;
-    double beta1 = 0.9;
-    double beta2 = 0.999;
-    double eps   = 1e-8;
+    double       beta1 = 0.9;
+    double       beta2 = 0.999;
+    double       eps   = 1e-8;
 
     virtual void createBuffers() {
         for (Tape* t : tunable_values) {
@@ -56,7 +55,7 @@ struct Adam : Optimiser {
                          tunable_values[i]->gradients,
                          first_moments[i],
                          second_moments[i],
-                         alpha,
+                         lr,
                          beta1,
                          beta2,
                          eps);

@@ -19,13 +19,13 @@
 #ifndef CUDAD_SRC_QUANTITIZE_H_
 #define CUDAD_SRC_QUANTITIZE_H_
 
-#include "mappings.h"
 #include "network/Network.h"
 #include "position/fenparsing.h"
 #include "position/position.h"
 
 #include <string>
 
+template<class Arch>
 void test_fen(Network& network, const std::string& fen, uint32_t input_size) {
 
     SparseInput   sp1 {input_size, 1, 32};
@@ -38,7 +38,7 @@ void test_fen(Network& network, const std::string& fen, uint32_t input_size) {
     SArray<bool> target_mask {1};
     target_mask.malloc_cpu();
 
-    dense_relative::assign_input(p, sp1, sp2, target, target_mask, 0);
+    Arch::assign_input(p, sp1, sp2, target, target_mask, 0);
     sp1.column_indices.gpu_upload();
     sp2.column_indices.gpu_upload();
 
@@ -103,12 +103,21 @@ void quantitize(const std::string& path,
     network.getLayers()[0]->getTunableParameters()[0]->values.gpu_download();
     network.getLayers()[1]->getTunableParameters()[0]->values.gpu_download();
 
-    writeLayer<int16_t, int16_t>(f, network.getLayers()[0]->getTunableParameters()[0], scalar_1, scalar_1, true);
-    writeLayer<int16_t, int32_t>(f, network.getLayers()[1]->getTunableParameters()[0], scalar_2, scalar_1 * scalar_2, false);
+    writeLayer<int16_t, int16_t>(f,
+                                 network.getLayers()[0]->getTunableParameters()[0],
+                                 scalar_1,
+                                 scalar_1,
+                                 true);
+    writeLayer<int16_t, int32_t>(f,
+                                 network.getLayers()[1]->getTunableParameters()[0],
+                                 scalar_2,
+                                 scalar_1 * scalar_2,
+                                 false);
 
     fclose(f);
 }
 
+template<class Arch>
 void computeScalars(BatchLoader& batch_loader, Network& network, int batches, uint32_t input_size) {
 
     SparseInput   sparse_input_1 {input_size, (uint32_t) batch_loader.batch_size, 32};
@@ -136,7 +145,7 @@ void computeScalars(BatchLoader& batch_loader, Network& network, int batches, ui
         // get the next dataset (batch)
         auto* ds = batch_loader.next();
         // assign to the inputs and compute the target
-        dense_relative::assign_inputs_batch(*ds, sparse_input_1, sparse_input_2, target, target_mask);
+        Arch::assign_inputs_batch(*ds, sparse_input_1, sparse_input_2, target, target_mask);
         // upload relevant data
         sparse_input_1.column_indices.gpu_upload();
         sparse_input_2.column_indices.gpu_upload();

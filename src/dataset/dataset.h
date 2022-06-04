@@ -33,6 +33,7 @@ struct DataSet {
 
     void                  addData(DataSet& other) {
         positions.insert(std::end(positions), std::begin(other.positions), std::end(other.positions));
+        header.position_count += other.header.position_count;
     }
 
     void shuffle() {

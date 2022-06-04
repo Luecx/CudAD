@@ -23,6 +23,7 @@
 #include "../operations/operations.h"
 
 struct Loss {
+    SArray<float> loss {2};
 
     // clang-format off
     virtual void apply   (const SArray<float> &output,

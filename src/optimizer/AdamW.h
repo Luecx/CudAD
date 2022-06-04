@@ -33,7 +33,6 @@ struct AdamW : Optimiser {
     std::vector<std::tuple<float, float>> value_ranges {};
 
     public:
-    double       lr     = 1e-3;
     double       beta1  = 0.9;
     double       beta2  = 0.999;
     double       eps    = 1e-8;
