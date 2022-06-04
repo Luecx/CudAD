@@ -1,7 +1,20 @@
+/**
+    CudAD is a CUDA neural network trainer, specific for chess engines.
+    Copyright (C) 2022 Finn Eggers
 
-//
-// Created by Luecx on 28.11.2021.
-//
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #ifndef BINARYPOSITIONWRAPPER_SRC_DATASET_READER_H_
 #define BINARYPOSITIONWRAPPER_SRC_DATASET_READER_H_
@@ -23,7 +36,7 @@ inline DataSet read(const std::string& file, uint64_t count = -1) {
     constexpr uint64_t CHUNK_SIZE = (1 << 20);
 
     // open the file
-    FILE*              f;
+    FILE* f;
     if (format == BINARY) {
         f = fopen(file.c_str(), "rb");
     } else if (format == TEXT) {

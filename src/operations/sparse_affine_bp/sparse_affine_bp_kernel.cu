@@ -1,7 +1,20 @@
+/**
+    CudAD is a CUDA neural network trainer, specific for chess engines.
+    Copyright (C) 2022 Finn Eggers
 
-//
-// Created by Luecx on 14.01.2022.
-//
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #include "sparse_affine_bp.h"
 // clang-format off
@@ -28,9 +41,9 @@ __global__ void sparse_affine_bp_kernel(
         return;
 
     // get the offset at which we look into our sparse input
-    int   offset    = col * (inp_col_max_entries + 1);
+    int offset = col * (inp_col_max_entries + 1);
     // check how many values we are going to read
-    int   count     = inp_col_indices[offset];
+    int count = inp_col_indices[offset];
 
     // track the sum
     float res_grd_v = res_grd[MATRIX_INDEX(ldc, row, col)];
