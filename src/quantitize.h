@@ -68,6 +68,7 @@ void writeMatrix(FILE* file, DenseMatrix& matrix, float scaling, bool column_maj
     for (uint32_t i = 0; i < (column_major ? n : m); i++) {
         for (uint32_t j = 0; j < (column_major ? m : n); j++) {
             float original_value = column_major ? matrix(j, i) : matrix(i, j);
+
             if (std::is_integral_v<type>) {
                 data(idx++) = static_cast<type>(round(original_value * scaling));
             } else if (std::is_floating_point_v<type>) {
@@ -79,40 +80,29 @@ void writeMatrix(FILE* file, DenseMatrix& matrix, float scaling, bool column_maj
     fwrite(data.cpu_values, sizeof(type), data.size, file);
 }
 
-template<typename wgt_type, typename bia_type>
-void writeLayer(FILE* file,
-                Tape* tunable_values,
-                float wgt_scaling,
-                float bia_scaling,
-                bool  column_major = false) {
-    uint32_t    m = tunable_values->values.m;
-    uint32_t    n = tunable_values->values.n - 1;
-    DenseMatrix wgt {tunable_values->values, 0, 0, m, n};
-    DenseMatrix bia {tunable_values->values, 0, n, m, 1};
+void quantitize_shallow(const std::string& path,
+                        Network&           network,
+                        float              scalar_1 = 16,
+                        float              scalar_2 = 512) {
+    FILE* f          = fopen(path.c_str(), "wb");
 
-    writeMatrix<wgt_type>(file, wgt, wgt_scaling, column_major);
-    writeMatrix<bia_type>(file, bia, bia_scaling);
-}
+    auto  l0         = network.getLayers()[0];
+    auto  l0_params  = l0->getTunableParameters();
+    auto  l0_weights = l0_params[0]->values;
+    auto  l0_biases  = l0_params[1]->values;
 
-void quantitize(const std::string& path,
-                Network&           network,
-                float              scalar_1 = 16,
-                float              scalar_2 = 512) {
-    FILE* f = fopen(path.c_str(), "wb");
+    l0_weights.gpu_download(), l0_biases.gpu_download();
+    writeMatrix<int16_t>(f, l0_weights, scalar_1, true);
+    writeMatrix<int16_t>(f, l0_biases, scalar_1);
 
-    network.getLayers()[0]->getTunableParameters()[0]->values.gpu_download();
-    network.getLayers()[1]->getTunableParameters()[0]->values.gpu_download();
+    auto l1         = network.getLayers()[1];
+    auto l1_params  = l1->getTunableParameters();
+    auto l1_weights = l1_params[0]->values;
+    auto l1_biases  = l1_params[1]->values;
 
-    writeLayer<int16_t, int16_t>(f,
-                                 network.getLayers()[0]->getTunableParameters()[0],
-                                 scalar_1,
-                                 scalar_1,
-                                 true);
-    writeLayer<int16_t, int32_t>(f,
-                                 network.getLayers()[1]->getTunableParameters()[0],
-                                 scalar_2,
-                                 scalar_1 * scalar_2,
-                                 false);
+    l1_weights.gpu_download(), l1_biases.gpu_download();
+    writeMatrix<int16_t>(f, l1_weights, scalar_2);
+    writeMatrix<int32_t>(f, l1_biases, scalar_1 * scalar_2);
 
     fclose(f);
 }

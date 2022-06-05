@@ -29,9 +29,8 @@
 template<int I, int O, typename F>
 class DenseLayer : public LayerInterface {
     public:
-    Tape tunable_values {O, I + 1};               // update weights + biases at the same
-    Tape weights {tunable_values, 0, 0, O, I};    // time
-    Tape bias {tunable_values, 0, I, O, 1};
+    Tape weights {O, I};
+    Tape bias {O, 1};
     F    f {};
 
     DenseLayer() {
@@ -75,9 +74,7 @@ class DenseLayer : public LayerInterface {
     uint32_t           getOutputSize() override { return O; }
     uint32_t           getInputSize() override { return I; }
     std::vector<Tape*> getTunableParameters() override {
-        std::vector<Tape*> values {};
-        values.push_back(&tunable_values);
-        return values;
+        return std::vector<Tape*> {&weights, &bias};
     }
     Activation* getActivationFunction() override { return &f; }
 };
