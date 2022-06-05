@@ -21,8 +21,6 @@
 
 #include "Loss.h"
 struct MSE : public Loss {
-    SArray<float> loss {1};
-
     public:
     MSE();
 

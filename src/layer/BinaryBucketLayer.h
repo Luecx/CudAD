@@ -49,11 +49,8 @@ class BinaryBucketLayer : public LayerInterface {
 
     uint32_t getOutputSize() override { return I * B; }
     uint32_t getInputSize() override { return I; }
-    std::vector<Tape*> getTunableParameters() override {
-        std::vector<Tape*> values {};
-        return values;
-    }
-    Activation* getActivationFunction() override { return &f; }
+    std::vector<Tape*> getTunableParameters() override { return std::vector<Tape*> {}; }
+    Activation*        getActivationFunction() override { return &f; }
 };
 
 #endif    // CUDAD_SRC_LAYER_BINARYBUCKETLAYER_H_

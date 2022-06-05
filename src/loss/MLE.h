@@ -21,7 +21,7 @@
 
 #include "Loss.h"
 struct MLE : public Loss {
-    SArray<float> loss {2};
+
     MLE();
     // clang-format off
     void apply(const SArray<float> &output,

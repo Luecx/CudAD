@@ -20,6 +20,8 @@
 #define CUDAD_SRC_OPTIMIZER_OPTIMISER_H_
 
 #include "../layer/Layer.h"
+#include "LRScheduler.h"
+
 /**
  * basic interface for all optimisers.
  * An optimiser has to do the following:
@@ -27,6 +29,8 @@
  * Use the gradients to optimise and adjust the values.
  */
 struct Optimiser {
+    double             lr = 1e-3;
+    LRScheduler        schedule {};
 
     std::vector<Tape*> tunable_values {};
 

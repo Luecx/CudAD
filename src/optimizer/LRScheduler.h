@@ -16,27 +16,14 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef CUDAD_SRC_LOSS_MPE_CUH_
-#define CUDAD_SRC_LOSS_MPE_CUH_
+#ifndef CUDAD_SRC_OPTIMIZER_LRSCHEDULER_H_
+#define CUDAD_SRC_OPTIMIZER_LRSCHEDULER_H_
 
-#include "Loss.h"
+struct LRScheduler {
+    int   step;
+    float gamma;
 
-struct MPE : public Loss {
-    // loss and the power to use as well as defining if gradients
-    // when backproping shall be averaged. default to true
-    float m_power         = 2;
-    bool  m_avg_gradients = true;
-    // constructor
-    MPE(float power, bool average_gradients = true);
-    // clang-format off
-    void apply(const SArray<float> &output,
-                     SArray<float> &output_grad,
-               const SArray<float> &target,
-               const SArray<bool > &target_mask,
-               Mode                 mode) override;
-    // clang-format on
-    void           logOverview() override;
-    SArray<float>& getLoss() override;
+    LRScheduler(int step = 100, float gamma = 0.3) : step(step), gamma(gamma) {}
 };
 
-#endif    // CUDAD_SRC_LOSS_MPE_CUH_
+#endif

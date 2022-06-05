@@ -42,11 +42,8 @@ class PairwiseMultiplyLayer : public LayerInterface {
 
     uint32_t getOutputSize() override { return I / 2; }
     uint32_t getInputSize() override { return I; }
-    std::vector<Tape*> getTunableParameters() override {
-        std::vector<Tape*> values {};
-        return values;
-    }
-    Activation* getActivationFunction() override { return &f; }
+    std::vector<Tape*> getTunableParameters() override { return std::vector<Tape*> {}; }
+    Activation*        getActivationFunction() override { return &f; }
 };
 
 #endif    // CUDAD_SRC_LAYER_PAIRWISEMULTIPLYLAYER_H_
