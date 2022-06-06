@@ -99,7 +99,7 @@ inline DataSet read(const std::string& file, uint64_t count = -1) {
 
 template<Format format>
 inline bool isReadable(const std::string& file) {
-    //    if (!std::filesystem::exists(file)) return false;
+    if (!std::filesystem::exists(file)) return false;
 
     if (format == BINARY) {
         std::filesystem::path p {file};
