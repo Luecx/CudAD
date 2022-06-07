@@ -218,7 +218,7 @@ inline void mix_and_shuffle_2(std::vector<std::string>& files,
     for (int i = 0; i < num_files; i++) {
         // regenerate the file name
         std::string file_name = out_format;
-        file_name             = std::regex_replace(file_name, std::regex("$"), std::to_string(i + 1));
+        file_name             = std::regex_replace(file_name, std::regex("\\$"), std::to_string(i + 1));
         // read
         DataSet ds = read<BINARY>(file_name);
         // shuffle
