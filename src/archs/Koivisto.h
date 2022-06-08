@@ -31,6 +31,7 @@
 #include "../optimizer/Adam.h"
 #include "../optimizer/Optimiser.h"
 #include "../position/fenparsing.h"
+#include "../activations/Linear.h"
 
 #include <tuple>
 
@@ -39,7 +40,7 @@ class Koivisto {
     public:
     static constexpr int   Inputs        = 16 * 12 * 64;
     static constexpr int   L2            = 512;
-    static constexpr int   Outputs       = 1;
+    static constexpr int   Outputs       = 8;
     static constexpr float SigmoidScalar = 2.5 / 400;
 
     static Optimiser*      get_optimiser() {
@@ -58,10 +59,8 @@ class Koivisto {
     }
 
     static std::vector<LayerInterface*> get_layers() {
-        DuplicateDenseLayer<Inputs, L2, ReLU>* l1 = new DuplicateDenseLayer<Inputs, L2, ReLU>();
-        l1->lasso_regularization                  = 1.0 / 8388608.0;
-
-        DenseLayer<L2 * 2, Outputs, Sigmoid>* l2  = new DenseLayer<L2 * 2, Outputs, Sigmoid>();
+        auto* l1 = new DuplicateDenseLayer<Inputs, L2, ReLU>();
+        auto* l2  = new DenseLayer<L2 * 2, Outputs, Sigmoid>();
         dynamic_cast<Sigmoid*>(l2->getActivationFunction())->scalar = SigmoidScalar;
 
         return std::vector<LayerInterface*> {l1, l2};
@@ -170,10 +169,10 @@ class Koivisto {
         float p_target = 1 / (1 + expf(-p_value * SigmoidScalar));
         float w_target = (w_value + 1) / 2.0f;
 
-        //    int   output_bucket = (bitCount(p.m_occupancy) - 1) / 4;
+        int   output_bucket = (bitCount(p.m_occupancy) - 1) / 4;
 
-        output(id)      = (p_target + w_target) / 2;
-        output_mask(id) = true;
+        output     (id * 8 + output_bucket)= (p_target + w_target) / 2;
+        output_mask(id * 8 + output_bucket) = true;
     }
 };
 

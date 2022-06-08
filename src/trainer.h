@@ -35,7 +35,7 @@
 
 using namespace std;
 
-template<class Arch, int Epochs = 450, int BatchSize = 16384, int SamplesPerEpoch = 100000000>
+template<class Arch, int Epochs = 600, int BatchSize = 16384, int SamplesPerEpoch = 100000000>
 class Trainer {
     static constexpr int MaxInputs       = 32;
     static constexpr int BatchesPerEpoch = SamplesPerEpoch / BatchSize;
@@ -69,8 +69,10 @@ class Trainer {
         training_data.start();
 
         DataSet validation_data {};
-        for (size_t i = 0; i < validation_files.size(); i++)
-            validation_data.addData(read<BINARY>(validation_files.at(i)));
+        for (size_t i = 0; i < validation_files.size(); i++){
+            DataSet ds = read<BINARY>(validation_files.at(i), 1e7);
+            validation_data.addData(ds);
+        }
 
         CSVWriter log {output + "loss.csv"};
         log.write({"epoch", "training_loss", "validation_loss"});
@@ -124,6 +126,7 @@ class Trainer {
             target_mask.gpu_upload();
 
             loss_f->loss.gpu_download();
+            loss_f->loss.cpu_values[0] *= 8;
 
             // measure time and print output
             timer->tock();
@@ -185,7 +188,7 @@ class Trainer {
 
         loss_f->loss.gpu_download();
 
-        float validation_loss = loss_f->loss(0);
+        float validation_loss = loss_f->loss(0) * 8;
 
         loss_f->loss(0)       = prev_loss;
         loss_f->loss.gpu_upload();
