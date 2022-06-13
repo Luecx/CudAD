@@ -158,6 +158,8 @@ class Trainer {
         loss_f->loss(0) = 0;
         loss_f->loss.gpu_upload();
 
+        float total_loss_sum = 0;
+
         int c = floor(validation_data->positions.size() / BatchSize);
         for (int i = 0; i < c; i++) {
             int     id1 = i * BatchSize;
@@ -181,16 +183,21 @@ class Trainer {
                           target,
                           target_mask,
                           DEVICE);
+
+            // reset loss to avoid loss of accuracy
+            loss_f->loss.gpu_download();
+            total_loss_sum += loss_f->loss.cpu_values[0];
+            loss_f->loss.cpu_values[0] = 0;
+            loss_f->loss.gpu_upload();
         }
 
-        loss_f->loss.gpu_download();
 
-        float validation_loss = loss_f->loss(0);
+        loss_f->loss.gpu_download();
 
         loss_f->loss(0)       = prev_loss;
         loss_f->loss.gpu_upload();
 
-        return validation_loss / c;
+        return total_loss_sum / c;
     }
 };
 
