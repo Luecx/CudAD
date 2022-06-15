@@ -38,7 +38,6 @@ inline void pairwise_multiply_bp (
     if(mode == DEVICE){
 
         ASSERT(input.gpu_values);
-        ASSERT(output.gpu_values);
         ASSERT(input_grd.gpu_values);
         ASSERT(output_grd.gpu_values);
         ASSERT(input.size == 2 * output_grd.size);

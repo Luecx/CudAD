@@ -26,21 +26,24 @@
 #include <string>
 
 template<class Arch>
-void test_fen(Network& network, const std::string& fen, uint32_t input_size) {
+void test_fen(Network& network, const std::string& fen) {
 
-    SparseInput   sp1 {input_size, 1, 32};
-    SparseInput   sp2 {input_size, 1, 32};
+    SparseInput   sp1 {Arch::Inputs, 1, 32};
+    SparseInput   sp2 {Arch::Inputs, 1, 32};
 
     Position      p = parseFen(fen);
 
-    SArray<float> target {1};
+    SArray<float> target {Arch::Outputs};
     target.malloc_cpu();
-    SArray<bool> target_mask {1};
+    SArray<bool> target_mask {Arch::Outputs};
     target_mask.malloc_cpu();
 
     Arch::assign_input(p, sp1, sp2, target, target_mask, 0);
     sp1.column_indices.gpu_upload();
     sp2.column_indices.gpu_upload();
+
+//    std::cout << sp1 << std::endl;
+//    std::cout << sp2 << std::endl;
 
     network.feed(std::vector<SparseInput*> {&sp1, &sp2});
     network.getOutput().values.gpu_download();
@@ -112,9 +115,9 @@ void computeScalars(BatchLoader& batch_loader, Network& network, int batches, ui
 
     SparseInput   sparse_input_1 {input_size, (uint32_t) batch_loader.batch_size, 32};
     SparseInput   sparse_input_2 {input_size, (uint32_t) batch_loader.batch_size, 32};
-    SArray<float> target {(uint32_t) batch_loader.batch_size};
+    SArray<float> target {(uint32_t) batch_loader.batch_size * Arch::Outputs};
     target.malloc_cpu();
-    SArray<bool> target_mask {(uint32_t) batch_loader.batch_size};
+    SArray<bool> target_mask {(uint32_t) batch_loader.batch_size * Arch::Outputs};
     target_mask.malloc_cpu();
 
     std::vector<SArray<float>> maximum {};
@@ -127,8 +130,14 @@ void computeScalars(BatchLoader& batch_loader, Network& network, int batches, ui
         minimum.emplace_back(layer_interface->getOutputSize());
         minimum[minimum.size() - 1].malloc_cpu();
 
-        maximum_wgt.emplace_back(layer_interface->getTunableParameters()[0]->values.max());
-        minimum_wgt.emplace_back(layer_interface->getTunableParameters()[0]->values.min());
+        if(layer_interface->getTunableParameters().size()){
+            maximum_wgt.emplace_back(layer_interface->getTunableParameters()[0]->values.max());
+            minimum_wgt.emplace_back(layer_interface->getTunableParameters()[0]->values.min());
+        }else{
+            maximum_wgt.emplace_back(0);
+            minimum_wgt.emplace_back(0);
+        }
+
     }
 
     for (int batch = 0; batch < batches; batch++) {

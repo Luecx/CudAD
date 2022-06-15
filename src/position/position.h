@@ -44,6 +44,12 @@ struct Position {
         }
     }
 
+    template<Piece piece>
+    bool has(){
+        int idx = m_pieces.template bitscanPiece<piece>();
+        return idx >= 0 && idx < 32;
+    }
+
     int    getPieceCount() const { return bitCount(m_occupancy); }
 
     Square getSquare(int piece_index) const { return bitscanForwardIndex(m_occupancy, piece_index); }
