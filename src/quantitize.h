@@ -111,10 +111,10 @@ void quantitize_shallow(const std::string& path,
 }
 
 template<class Arch>
-void computeScalars(BatchLoader& batch_loader, Network& network, int batches, uint32_t input_size) {
+void computeScalars(BatchLoader& batch_loader, Network& network, int batches) {
 
-    SparseInput   sparse_input_1 {input_size, (uint32_t) batch_loader.batch_size, 32};
-    SparseInput   sparse_input_2 {input_size, (uint32_t) batch_loader.batch_size, 32};
+    SparseInput   sparse_input_1 {Arch::Inputs, (uint32_t) batch_loader.batch_size, 32};
+    SparseInput   sparse_input_2 {Arch::Inputs, (uint32_t) batch_loader.batch_size, 32};
     SArray<float> target {(uint32_t) batch_loader.batch_size * Arch::Outputs};
     target.malloc_cpu();
     SArray<bool> target_mask {(uint32_t) batch_loader.batch_size * Arch::Outputs};
