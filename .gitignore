@@ -52,3 +52,4 @@ cmake-build-debug/
 bin/
 resources/
 .vscode
+cmake-build-release-visual-studio-cuda/

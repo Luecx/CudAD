@@ -17,7 +17,7 @@
  */
 
 #include "../../data/DenseMatrix.h"
-#include "../../data/mode.h"
+#include "../../data/Mode.h"
 
 #ifndef CUDATEST1_SRC_OPERATIONS_RADAM_RADAM_H_
 #define CUDATEST1_SRC_OPERATIONS_RADAM_RADAM_H_
@@ -68,21 +68,21 @@ inline void radam(SArray<float>& values,
 
     if(mode == DEVICE) {
         dim3 block(block_size);
-        dim3 grid (std::ceil((float)values.size / block_size));
+        dim3 grid (std::ceil((float)values.size() / block_size));
         radam_kernel<<<grid, block>>>(
-            values          .gpu_values,
-            gradients       .gpu_values,
-            first_moment    .gpu_values,
-            second_moment   .gpu_values,
-            values.size,
+            values          .gpu_address(),
+            gradients       .gpu_address(),
+            first_moment    .gpu_address(),
+            second_moment   .gpu_address(),
+            values.size(),
             step, lr, beta1, beta2, eps, N_sma_threshold);
     } else {
         radam_host(
-            values          .cpu_values,
-            gradients       .cpu_values,
-            first_moment    .cpu_values,
-            second_moment   .cpu_values,
-            values.size,
+            values          .cpu_address(),
+            gradients       .cpu_address(),
+            first_moment    .cpu_address(),
+            second_moment   .cpu_address(),
+            values.size(),
             step, lr, beta1, beta2, eps, N_sma_threshold);
     }
 }

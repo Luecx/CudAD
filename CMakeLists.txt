@@ -7,7 +7,8 @@ set(CMAKE_CUDA_STANDARD 17)
 
 file(GLOB_RECURSE SRCS src/*.cu src/*.cpp src/*.h)
 
-add_executable(CudAD ${SRCS} )
+
+add_executable(CudAD ${SRCS} src/main.cu)
 
 #add_executable(CudAD src/main.cu
 #        src/config/config.cu
@@ -15,6 +16,8 @@ add_executable(CudAD ${SRCS} )
 #        src/operations/add/add_kernel.cu)
 
 set_property(TARGET CudAD PROPERTY CUDA_ARCHITECTURES OFF)
+set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CMAKE_COMMAND} -E time")
+set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK "${CMAKE_COMMAND} -E time")
 
 set_target_properties(CudAD PROPERTIES
         CUDA_SEPARABLE_COMPILATION ON)

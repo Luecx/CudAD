@@ -21,7 +21,7 @@
 
 #include "../../data/DenseMatrix.h"
 #include "../../data/SArray.h"
-#include "../../data/mode.h"
+#include "../../data/Mode.h"
 
 #include <iostream>
 
@@ -66,9 +66,9 @@ inline void add_mv( const DenseMatrix &mat,
 
     if(mode == DEVICE){
 
-        ASSERT(mat.gpu_values);
-        ASSERT(vec.gpu_values);
-        ASSERT(res.gpu_values);
+        ASSERT(mat.gpu_address());
+        ASSERT(vec.gpu_address());
+        ASSERT(res.gpu_address());
 
         constexpr int block_size_x = 16;
         constexpr int block_size_y = 16;
@@ -76,22 +76,22 @@ inline void add_mv( const DenseMatrix &mat,
         dim3 grid (std::ceil((float)mat.n / block_size_x),
                    std::ceil((float)mat.m / block_size_y));
         add_mv_kernel<<<grid, block>>>(
-            mat.gpu_values,
-            vec.gpu_values,
-            res.gpu_values,
+            mat.gpu_address(),
+            vec.gpu_address(),
+            res.gpu_address(),
             mat.m,
             mat.n,
             mat.leading_dimension,
             res.leading_dimension);
     }else{
-        ASSERT(mat.cpu_values);
-        ASSERT(vec.cpu_values);
-        ASSERT(res.cpu_values);
+        ASSERT(mat.cpu_address());
+        ASSERT(vec.cpu_address());
+        ASSERT(res.cpu_address());
 
         add_mv_host(
-            mat.cpu_values,
-            vec.cpu_values,
-            res.cpu_values,
+            mat.cpu_address(),
+            vec.cpu_address(),
+            res.cpu_address(),
             mat.m,
             mat.n,
             mat.leading_dimension,

@@ -45,11 +45,11 @@ void test_fen(Network& network, const std::string& fen) {
 //    std::cout << sp1 << std::endl;
 //    std::cout << sp2 << std::endl;
 
-    network.feed(std::vector<SparseInput*> {&sp1, &sp2});
-    network.getOutput().values.gpu_download();
-
-    network.getOutput(0).values.gpu_download();
-    network.getOutput(1).values.gpu_download();
+//    network.feed(std::vector<SparseInput*> {&sp1, &sp2});
+//    network.getOutput().values.gpu_download();
+//
+//    network.getOutput(0).values.gpu_download();
+//    network.getOutput(1).values.gpu_download();
 
     //    std::cout << sp1 << " " << sp2 << std::endl;
     std::cout << network.getOutput(0).values << std::endl;
@@ -61,7 +61,7 @@ void test_fen(Network& network, const std::string& fen) {
 
 template<typename type>
 void writeMatrix(FILE* file, DenseMatrix& matrix, float scaling, bool column_major = false) {
-    SArray<type> data {matrix.size};
+    SArray<type> data {matrix.size()};
     data.malloc_cpu();
 
     uint32_t m   = matrix.m;
@@ -80,7 +80,7 @@ void writeMatrix(FILE* file, DenseMatrix& matrix, float scaling, bool column_maj
         }
     }
 
-    fwrite(data.cpu_values, sizeof(type), data.size, file);
+//    fwrite(data.cpu_values, sizeof(type), data.size, file);
 }
 
 void quantitize_shallow(const std::string& path,
@@ -150,7 +150,7 @@ void computeScalars(BatchLoader& batch_loader, Network& network, int batches) {
         sparse_input_2.column_indices.gpu_upload();
         target.gpu_upload();
         target_mask.gpu_upload();
-        network.feed(std::vector<SparseInput*> {&sparse_input_1, &sparse_input_2});
+//        network.feed(std::vector<SparseInput*> {&sparse_input_1, &sparse_input_2});
 
         std::cout << "\rProcessing batch: " << (batch + 1) << "/" << batches << std::flush;
 
@@ -172,18 +172,18 @@ void computeScalars(BatchLoader& batch_loader, Network& network, int batches) {
         //        std::cout << minimum[i] << "\n" << maximum[i] << std::endl;
 
         int died = 0;
-        for (int j = 0; j < minimum[i].size; j++) {
-            if (abs(maximum[i].get(j) - minimum[i].get(j)) < 1e-8) {
-                died++;
-            }
-        }
+//        for (int j = 0; j < minimum[i].size; j++) {
+//            if (abs(maximum[i].get(j) - minimum[i].get(j)) < 1e-8) {
+//                died++;
+//            }
+//        }
 
         std::cout << "layer  : " << i << std::endl;
         std::cout << "min    : " << std::left << std::setw(10) << minimum[i].min()
                   << "max    : " << std::left << std::setw(10) << maximum[i].max()
                   << "min wgt: " << std::left << std::setw(10) << minimum_wgt[i]
                   << "max wgt: " << std::left << std::setw(10) << maximum_wgt[i]
-                  << "died   : " << std::left << std::setw(10) << died * 100 / minimum[i].size << " %"
+                  << "died   : " << std::left << std::setw(10) << died * 100 / minimum[i].size() << " %"
                   << std::endl;
     }
 }

@@ -53,6 +53,7 @@ __global__ void sparse_affine_kernel(
         auto b_row = inp_col_indices[i];
         // get the corresponding weight
         auto wgt = mat[MATRIX_INDEX(lda, row, b_row)];
+
         sum += wgt;
     }
     res[MATRIX_INDEX(ldc, row, col)] = sum;

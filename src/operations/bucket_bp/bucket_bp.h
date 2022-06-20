@@ -20,7 +20,7 @@
 #define CUDAD_SRC_OPERATIONS_BUCKET_BP_BUCKET_BP_H_
 
 #include "../../data/SArray.h"
-#include "../../data/mode.h"
+#include "../../data/Mode.h"
 
 // clang-format off
 __global__ void bucket_bp_kernel(
@@ -39,34 +39,34 @@ inline void bucket_bp(const SArray<float> &inp,
                       float max_lower_bucket,
                       float min_upper_bucket){
 
-    int bucket_size = out_grd.size / inp_grd.size;
+    int bucket_size = out_grd.size() / inp_grd.size();
 
     if(mode == DEVICE){
 
-        ASSERT(inp.gpu_values);
-        ASSERT(inp_grd.gpu_values);
-        ASSERT(out_grd.gpu_values);
+        ASSERT(inp.gpu_address());
+        ASSERT(inp_grd.gpu_address());
+        ASSERT(out_grd.gpu_address());
 
         constexpr int block_size_x = 1024;
         dim3 block(block_size_x);
-        dim3 grid (std::ceil((float)inp.size / block_size_x));
+        dim3 grid (std::ceil((float)inp.size() / block_size_x));
         bucket_bp_kernel<<<grid, block>>>(
-            inp.gpu_values,
-            inp_grd.gpu_values,
-            out_grd.gpu_values,
+            inp.gpu_address(),
+            inp_grd.gpu_address(),
+            out_grd.gpu_address(),
             max_lower_bucket,
             min_upper_bucket,
             bucket_size,
-            inp.size);
+            inp.size());
     }else{
-//        ASSERT(mat_grd.cpu_values);
-//        ASSERT(vec_grd.cpu_values);
-//        ASSERT(res_grd.cpu_values);
+//        ASSERT(mat_grd.cpu_address());
+//        ASSERT(vec_grd.cpu_address());
+//        ASSERT(res_grd.cpu_address());
 //
 //        add_mv_bp_host(
-//            mat_grd.cpu_values,
-//            vec_grd.cpu_values,
-//            res_grd.cpu_values,
+//            mat_grd.cpu_address(),
+//            vec_grd.cpu_address(),
+//            res_grd.cpu_address(),
 //            mat_grd.m,
 //            mat_grd.n,
 //            mat_grd.leading_dimension,

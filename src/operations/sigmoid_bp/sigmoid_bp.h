@@ -20,7 +20,7 @@
 #define CUDATEST1_SRC_OPERATIONS__SIGMOID_BP__SIGMOID_BP_H_
 
 #include "../../data/SArray.h"
-#include "../../data/mode.h"
+#include "../../data/Mode.h"
 
 #include <iostream>
 
@@ -52,26 +52,26 @@ inline void sigmoid_bp(const SArray<float> &A,
 
     if(mode == DEVICE){
 
-        ASSERT(A.gpu_values);
-        ASSERT(B.gpu_values);
+        ASSERT(A.gpu_address());
+        ASSERT(B.gpu_address());
 
         constexpr int block_size = 1024;
         dim3 block(block_size);
-        dim3 grid (std::ceil((float)A.size / block_size));
+        dim3 grid (std::ceil((float)A.size() / block_size));
         sigmoid_bp_kernel<<<grid, block>>>(
-            A    .gpu_values,
-            A_grd.gpu_values,
-            B    .gpu_values,
-            B_grd.gpu_values,
-            A.size,
+            A    .gpu_address(),
+            A_grd.gpu_address(),
+            B    .gpu_address(),
+            B_grd.gpu_address(),
+            A.size(),
             scalar);
     }else{
         sigmoid_bp_host(
-            A    .cpu_values,
-            A_grd.cpu_values,
-            B    .cpu_values,
-            B_grd.cpu_values,
-            A.size,
+            A    .cpu_address(),
+            A_grd.cpu_address(),
+            B    .cpu_address(),
+            B_grd.cpu_address(),
+            A.size(),
             scalar);
     }
 }

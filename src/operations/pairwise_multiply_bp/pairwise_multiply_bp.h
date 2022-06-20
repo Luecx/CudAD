@@ -20,7 +20,7 @@
 #define CUDAD_SRC_OPERATIONS_PAIRWISE_MULTIPLY_BP_PAIRWISE_MULTIPLY_BP_H_
 
 #include "../../data/SArray.h"
-#include "../../data/mode.h"
+#include "../../data/Mode.h"
 #include "../../misc/config.h"
 
 // clang-format off
@@ -37,20 +37,20 @@ inline void pairwise_multiply_bp (
                const SArray<float>& output_grd){
     if(mode == DEVICE){
 
-        ASSERT(input.gpu_values);
-        ASSERT(input_grd.gpu_values);
-        ASSERT(output_grd.gpu_values);
+        ASSERT(input.gpu_address());
+        ASSERT(input_grd.gpu_address());
+        ASSERT(output_grd.gpu_address());
         ASSERT(input.size == 2 * output_grd.size);
         ASSERT(input.size == input_grd.size);
 
         constexpr int block_size = 1024;
         dim3 block(block_size);
-        dim3 grid (std::ceil((float)output_grd.size / block_size));
+        dim3 grid (std::ceil((float)output_grd.size() / block_size));
         pairwise_multiply_bp_kernel<<<grid, block>>>(
-            input     .gpu_values,
-            input_grd .gpu_values,
-            output_grd.gpu_values,
-            output_grd.size);
+            input     .gpu_address(),
+            input_grd .gpu_address(),
+            output_grd.gpu_address(),
+            output_grd.size());
     }else{
         ASSERT(false);
     }

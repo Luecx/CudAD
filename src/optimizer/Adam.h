@@ -39,8 +39,8 @@ struct Adam : Optimiser {
     virtual void createBuffers() {
         for (Tape* t : tunable_values) {
             // clang-format off
-            first_moments .push_back(SArray<float> {t->values.size});
-            second_moments.push_back(SArray<float> {t->values.size});
+            first_moments .push_back(SArray<float> {t->values.size()});
+            second_moments.push_back(SArray<float> {t->values.size()});
             first_moments [first_moments.size() - 1].malloc_gpu();
             second_moments[first_moments.size() - 1].malloc_gpu();
             // clang-format on

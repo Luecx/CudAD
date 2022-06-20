@@ -22,7 +22,7 @@
 #include "../../data/DenseMatrix.h"
 #include "../../data/Matrix.h"
 #include "../../data/SparseInput.h"
-#include "../../data/mode.h"
+#include "../../data/Mode.h"
 
 // clang-format off
 __global__ void sparse_affine_kernel(
@@ -74,10 +74,10 @@ inline void sparse_affine(
 
     if(mode == DEVICE){
 
-        ASSERT(mat.gpu_values)
-        ASSERT(inp.column_indices.gpu_values)
-        ASSERT(bia.gpu_values)
-        ASSERT(res.gpu_values)
+        ASSERT(mat.gpu_address())
+        ASSERT(inp.column_indices.gpu_address())
+        ASSERT(bia.gpu_address())
+        ASSERT(res.gpu_address())
 
         constexpr int block_size_x = 1;
         constexpr int block_size_y = 256;
@@ -87,11 +87,11 @@ inline void sparse_affine(
                    std::ceil((float)res.m / block_size_y));
 
         sparse_affine_kernel<<<grid, block>>>(
-            mat.gpu_values,
-            inp.column_indices.gpu_values,
+            mat.gpu_address(),
+            inp.column_indices.gpu_address(),
             inp.max_entries_per_column,
-            bia.gpu_values,
-            res.gpu_values,
+            bia.gpu_address(),
+            res.gpu_address(),
             M,B,
             mat.leading_dimension,
             res.leading_dimension);

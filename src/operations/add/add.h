@@ -20,7 +20,7 @@
 #define CUDATEST1_SRC_OPERATIONS_ADD_ADD_H_
 
 #include "../../data/SArray.h"
-#include "../../data/mode.h"
+#include "../../data/Mode.h"
 
 #include <iostream>
 
@@ -69,36 +69,36 @@ inline void add   ( const SArray<float> &A,
 
 
     if (size == -1){
-        size = C.size;
+        size = C.size();
     }
 
     if(mode == DEVICE){
 
-        ASSERT(A.gpu_values);
-        ASSERT(B.gpu_values);
-        ASSERT(C.gpu_values);
+        ASSERT(A.gpu_address());
+        ASSERT(B.gpu_address());
+        ASSERT(C.gpu_address());
 
         constexpr int block_size = 1024;
         dim3 block(block_size);
         dim3 grid (std::ceil((float)size / block_size));
         add_kernel<<<grid, block>>>(
-            A.gpu_values,
-            B.gpu_values,
-            C.gpu_values,
-            A.size,
-            B.size,
-            C.size,
+            A.gpu_address(),
+            B.gpu_address(),
+            C.gpu_address(),
+            A.size(),
+            B.size(),
+            C.size(),
             size,
             alpha,
             beta);
     }else{
         add_host(
-            A.cpu_values,
-            B.cpu_values,
-            C.cpu_values,
-            A.size,
-            B.size,
-            C.size,
+            A.cpu_address(),
+            B.cpu_address(),
+            C.cpu_address(),
+            A.size(),
+            B.size(),
+            C.size(),
             size,
             alpha,
             beta);

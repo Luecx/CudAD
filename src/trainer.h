@@ -35,30 +35,33 @@
 
 using namespace std;
 
-template<class Arch, int Epochs = 450, int BatchSize = 16384, int SamplesPerEpoch = 100000000>
+template<class Arch, int Epochs = 100, int BatchSize = 16384, int SamplesPerEpoch = 100000000>
 class Trainer {
     static constexpr int MaxInputs       = 32;
     static constexpr int BatchesPerEpoch = SamplesPerEpoch / BatchSize;
 
+    using LayerList = std::vector<LayerInterface*>;
+
     public:
     DenseMatrix                     target {Arch::Outputs, BatchSize};
     SArray<bool>                    target_mask {Arch::Outputs * BatchSize};
-    tuple<SparseInput, SparseInput> inputs {SparseInput {Arch::Inputs, BatchSize, MaxInputs},
-                                            SparseInput {Arch::Inputs, BatchSize, MaxInputs}};
     Network*                        network;
     Loss*                           loss_f;
     Optimiser*                      optim;
 
     Trainer() {
-        vector<LayerInterface*> layers = Arch::get_layers();
+        std::tuple<LayerList, LayerList> layers = Arch::get_layers();
+        LayerList inputs_layers = std::get<0>(layers);
+        LayerList hidden_layers = std::get<1>(layers);
 
         this->optim                    = Arch::get_optimiser();
-        this->optim->init(layers);
+        this->optim->init(hidden_layers);
 
         this->loss_f = Arch::get_loss_function();
 
-        network      = new Network(layers);
+        network      = new Network(inputs_layers, hidden_layers);
         network->setLossFunction(this->loss_f);
+        network->setBatchSize(BatchSize);
 
         target_mask.malloc_cpu();
         target_mask.malloc_gpu();
@@ -69,8 +72,11 @@ class Trainer {
         training_data.start();
 
         DataSet validation_data {};
-        for (size_t i = 0; i < validation_files.size(); i++)
-            validation_data.addData(read<BINARY>(validation_files.at(i)));
+        for (size_t i = 0; i < validation_files.size(); i++){
+
+            DataSet ds = read<BINARY>(validation_files.at(i), 3e6);
+            validation_data.addData(ds);
+        }
 
         CSVWriter log {output + "loss.csv"};
         log.write({"epoch", "training_loss", "validation_loss"});
@@ -80,9 +86,11 @@ class Trainer {
             t.tick();
 
             float epoch_loss      = train(epoch, &t, &training_data);
-            float validation_loss = validate(&validation_data);
+            float validation_loss = 0;
+//            float validation_loss = validate(&validation_data);
 
             t.tock();
+
 
             printf("\rep/ba = [%3d/%5d], ", epoch, BatchesPerEpoch);
             printf("valid_loss = [%1.8f], ", validation_loss);
@@ -98,10 +106,10 @@ class Trainer {
                        std::to_string(epoch_loss / BatchesPerEpoch),
                        std::to_string(validation_loss)});
 
-            if (epoch % 10 == 0) {
-                quantitize_shallow(output + "nn-epoch" + std::to_string(epoch) + ".nnue", *network);
-                network->saveWeights(output + "weights-epoch" + std::to_string(epoch) + ".nnue");
-            }
+//            if (epoch % 10 == 0) {
+//                quantitize_shallow(output + "nn-epoch" + std::to_string(epoch) + ".nnue", *network);
+//                network->saveWeights(output + "weights-epoch" + std::to_string(epoch) + ".nnue");
+//            }
 
             if (epoch % optim->schedule.step == 0)
                 optim->lr *= optim->schedule.gamma;
@@ -110,19 +118,20 @@ class Trainer {
 
     float train(int epoch, Timer* timer, BatchLoader* batch_loader) {
 
+
         float     epoch_loss    = 0.0;
         long long prev_duration = 0;
 
         for (int batch = 1; batch <= BatchesPerEpoch; batch++) {
             auto* ds = batch_loader->next();
 
-            Arch::assign_inputs_batch(*ds, get<0>(inputs), get<1>(inputs), target, target_mask);
+            Arch::assign_inputs_batch(*ds, *network, target, target_mask);
+            for(LayerInterface* l:network->getInputs()){
+                l->getSparseData().column_indices.gpu_upload();
+            }
 
-            get<0>(inputs).column_indices.gpu_upload();
-            get<1>(inputs).column_indices.gpu_upload();
             target.gpu_upload();
             target_mask.gpu_upload();
-
             loss_f->loss.gpu_download();
 
             // measure time and print output
@@ -140,12 +149,9 @@ class Trainer {
             }
 
             epoch_loss += loss_f->loss(0);
-
             loss_f->loss(0) = 0;
             loss_f->loss.gpu_upload();
-
-            network->batch(vector<SparseInput*> {&get<0>(inputs), &get<1>(inputs)},
-                           target,
+            network->batch(target,
                            target_mask);
             optim->apply(1);
         }
@@ -154,50 +160,50 @@ class Trainer {
     }
 
     float validate(DataSet* validation_data) {
-        float prev_loss = loss_f->loss(0);
-        loss_f->loss(0) = 0;
-        loss_f->loss.gpu_upload();
-
-        float total_loss_sum = 0;
-
-        int c = floor(validation_data->positions.size() / BatchSize);
-        for (int i = 0; i < c; i++) {
-            int     id1 = i * BatchSize;
-            int     id2 = id1 + BatchSize;
-
-            DataSet temp {};
-            temp.header.position_count = BatchSize;
-            temp.positions.assign(&validation_data->positions[id1], &validation_data->positions[id2]);
-
-            Arch::assign_inputs_batch(temp, get<0>(inputs), get<1>(inputs), target, target_mask);
-
-            get<0>(inputs).column_indices.gpu_upload();
-            get<1>(inputs).column_indices.gpu_upload();
-            target.gpu_upload();
-            target_mask.gpu_upload();
-
-            network->feed(vector<SparseInput*> {&get<0>(inputs), &get<1>(inputs)});
-
-            loss_f->apply(network->getOutput().values,
-                          network->getOutput().gradients,
-                          target,
-                          target_mask,
-                          DEVICE);
-
-            // reset loss to avoid loss of accuracy
-            loss_f->loss.gpu_download();
-            total_loss_sum += loss_f->loss.cpu_values[0];
-            loss_f->loss.cpu_values[0] = 0;
-            loss_f->loss.gpu_upload();
-        }
-
-
-        loss_f->loss.gpu_download();
-
-        loss_f->loss(0)       = prev_loss;
-        loss_f->loss.gpu_upload();
-
-        return total_loss_sum / c;
+//        float prev_loss = loss_f->loss(0);
+//        loss_f->loss(0) = 0;
+//        loss_f->loss.gpu_upload();
+//
+//        float total_loss_sum = 0;
+//
+//        int c = floor(validation_data->positions.size() / BatchSize);
+//        for (int i = 0; i < c; i++) {
+//            int     id1 = i * BatchSize;
+//            int     id2 = id1 + BatchSize;
+//
+//            DataSet temp {};
+//            temp.header.position_count = BatchSize;
+//            temp.positions.assign(&validation_data->positions[id1], &validation_data->positions[id2]);
+//
+//            Arch::assign_inputs_batch(temp, get<0>(inputs), get<1>(inputs), target, target_mask);
+//
+//            get<0>(inputs).column_indices.gpu_upload();
+//            get<1>(inputs).column_indices.gpu_upload();
+//            target.gpu_upload();
+//            target_mask.gpu_upload();
+//
+//            network->feed(vector<SparseInput*> {&get<0>(inputs), &get<1>(inputs)});
+//
+//            loss_f->apply(network->getOutput().values,
+//                          network->getOutput().gradients,
+//                          target,
+//                          target_mask,
+//                          DEVICE);
+//
+//            // reset loss to avoid loss of accuracy
+//            loss_f->loss.gpu_download();
+//            total_loss_sum += loss_f->loss.cpu_values[0];
+//            loss_f->loss.cpu_values[0] = 0;
+//            loss_f->loss.gpu_upload();
+//        }
+//
+//
+//        loss_f->loss.gpu_download();
+//
+//        loss_f->loss(0)       = prev_loss;
+//        loss_f->loss.gpu_upload();
+//
+//        return total_loss_sum / c;
     }
 };
 

@@ -23,42 +23,102 @@
 #include "../loss/Loss.h"
 #include "../operations/mse/mse.h"
 
+#include <fstream>
 #include <utility>
+#include <vector>
+
 class Network {
 
     private:
+    std::vector<LayerInterface*> inputs {};
     std::vector<LayerInterface*> layers {};
-    std::vector<Tape>            output_tapes {};
     Loss*                        loss_function {};
 
+    int                          batch_size = 1;
+
     public:
-    explicit Network(std::vector<LayerInterface*> layers) : layers(std::move(layers)) {}
+    explicit Network(std::vector<LayerInterface*> inputs, std::vector<LayerInterface*> layers)
+        : inputs {inputs}, layers {layers} {};
 
-    void                         createOutputTapes(int batch_size);
+    void feed() {
+        for (int i = 0; i < layers.size(); i++) {
+            layers[i]->apply();
+        }
+    }
+    void backprop() {
+        for (int i = layers.size() - 1; i >= 0; i--) {
+            layers[i]->backprop();
+        }
+    }
+    void batch(DenseMatrix &target, SArray<bool> &target_mask) {
+        feed();
+        loss_function->apply(getOutput().values, getOutput().gradients, target, target_mask, DEVICE);
+        backprop();
+    }
 
-    void                         batch(const std::vector<SparseInput*>& inputs,
-                                       const DenseMatrix&               target,
-                                       const SArray<bool>&              target_mask);
+    void loadWeights(const std::string& file) {
+        FILE* f = fopen(file.c_str(), "rb");
 
-    void                         batch(const std::vector<Tape*>& inputs,
-                                       const DenseMatrix&        target,
-                                       const SArray<bool>&       target_mask);
+        // figure out how many entries we will store
+        uint64_t count = 0;
+        for (LayerInterface* l : layers) {
+            for (Tape* t : l->getTunableParameters()) {
+                count += t->values.size();
+            }
+        }
 
-    void                         feed(const std::vector<SparseInput*>& inputs);
+        uint64_t fileCount = 0;
+        fread(&fileCount, sizeof(uint64_t), 1, f);
+        ASSERT(count == fileCount);
 
-    void                         feed(const std::vector<Tape*>& inputs);
+        for (LayerInterface* l : layers) {
+            for (Tape* t : l->getTunableParameters()) {
+                fread(t->values.address<HOST>(), sizeof(float), t->values.size(), f);
+                t->values.gpu_upload();
+            }
+        }
+        fclose(f);
+    };
+    void saveWeights(const std::string& file) {
+        FILE* f = fopen(file.c_str(), "wb");
 
-    Loss*                        getLossFunction() const;
-    void                         setLossFunction(Loss* loss_function);
+        // figure out how many entries we will store
+        uint64_t count = 0;
+        for (LayerInterface* l : layers) {
+            for (Tape* t : l->getTunableParameters()) {
+                count += t->values.size();
+            }
+        }
 
-    void                         loadWeights(const std::string& file);
+        fwrite(&count, sizeof(uint64_t), 1, f);
+        for (LayerInterface* l : layers) {
+            for (Tape* t : l->getTunableParameters()) {
+                t->values.gpu_download();
+                fwrite(t->values.address<HOST>(), sizeof(float), t->values.size(), f);
+            }
+        }
+        fclose(f);
+    }
 
-    void                         saveWeights(const std::string& file);
+    void setBatchSize(int batch_size) {
+        if (batch_size != this->batch_size) {
+            this->batch_size = batch_size;
+            for (LayerInterface* l : inputs) {
+                l->createOutput(batch_size);
+            }
+            for (LayerInterface* l : layers) {
+                l->createOutput(batch_size);
+            }
+        }
+    }
 
-    Tape&                        getOutput();
-    std::vector<LayerInterface*> getLayers();
+    Tape&                        getOutput() { return getOutput(layers.size() - 1); };
+    std::vector<LayerInterface*> getInputs() { return inputs; }
+    std::vector<LayerInterface*> getLayers() { return layers; }
+    Tape&                        getOutput(int layer_id) { return layers[layer_id]->getDenseData(); };
 
-    Tape&                        getOutput(int layer_id);
+    Loss*                        getLossFunction() const { return loss_function; };
+    void setLossFunction(Loss* loss_function) { this->loss_function = loss_function; }
 };
 
 #endif    // CUDAD_SRC_NETWORK_NETWORK_H_

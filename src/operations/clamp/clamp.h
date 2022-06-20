@@ -17,7 +17,7 @@
  */
 
 #include "../../data/DenseMatrix.h"
-#include "../../data/mode.h"
+#include "../../data/Mode.h"
 
 #ifndef CUDATEST1_SRC_OPERATIONS_CLAMP_CLAMP_H_
 #define CUDATEST1_SRC_OPERATIONS_CLAMP_CLAMP_H_
@@ -46,12 +46,12 @@ inline void clamp(SArray<float>& values,
         constexpr int block_size = 1024;
 
         dim3 block(block_size);
-        dim3 grid (std::ceil((float)values.size / block_size));
+        dim3 grid (std::ceil((float)values.size() / block_size));
         clamp_kernel<<<grid, block>>>(
-            values.gpu_values,min,max,values.size);
+            values.gpu_address(),min,max,values.size());
     }else{
         clamp_host(
-            values.cpu_values,min,max,values.size);
+            values.cpu_address(),min,max,values.size());
     }
 //    cudaDeviceSynchronize();
 }
