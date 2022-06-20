@@ -29,14 +29,14 @@ int main() {
     init();
 
     const string data_path = "E:/berserk/training-data/n5k/";
-    const string output    = "./resources/runs/testing/";
+    const string output    = "./resources/runs/exp49/";
 
     // Load files
     vector<string> files {};
     for (int i = 0; i < 20; i++)
         files.push_back(data_path + "n5k." + to_string(i) + ".bin");
 
-    Trainer<Berserk> trainer {};
+    Trainer<Berserk, 600> trainer {};
     trainer.fit(files, vector<string> {data_path + "validation.bin"}, output);
 
     close();
