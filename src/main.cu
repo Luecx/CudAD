@@ -30,28 +30,40 @@ int main() {
     init();
 
     const string   data_path = R"(H:\Koivisto Resourcen\Training Data 8.9\noob\)";
-    const string   output    = "../resources/runs/new_system_1/";
+    const string   output    = R"(F:\OneDrive\ProgrammSpeicher\CLionProjects\CudAD\resources\runs\experiment_35\)";
 
     vector<string> files {};
     for (int i = 1; i <= 192; i++)
         files.push_back(data_path + "shuffled_" + to_string(i) + ".bin");
 
-    Trainer<Koivisto> trainer {};
-    trainer.fit(
-        files,
-        vector<string> {R"(H:\Koivisto Resourcen\Training Data 7.9\reshuffled_generated_0.txt.bin)"},
-        output);
+//    Trainer<Koivisto> trainer {};
+//    trainer.fit(
+//        files,
+//        vector<string> {R"(H:\Koivisto Resourcen\Training Data 7.9\reshuffled_generated_0.txt.bin)"},
+//        output);
 
-    //        auto layers = ChessDotCpp::get_layers();
-    //        Network network{layers};
-    //        network.loadWeights(output + "weights-epoch20.nnue");
-    //        BatchLoader batch_loader{files, 16384};
-    //        batch_loader.start();
+    auto layers = Koivisto::get_layers();
+    Network network{std::get<0>(layers),std::get<1>(layers)};
+    network.loadWeights(output + "weights-epoch180.nnue");
+
+
+//    BatchLoader batch_loader{files, 16384};
+//    batch_loader.start();
     //        test_fen<ChessDotCpp>(network, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w QKqk - 0
     //        1", ChessDotCpp::Inputs);
-    //    test_fen<ChessDotCpp>(network, "8/2kpn3/2p1b3/1p4P1/5P2/4PQ2/3PK3/8 w - - 0 1",
+//    test_fen<Koivisto>(network, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w QKqk - 0 1");
+//    test_fen<Koivisto>(network, "r2qk2r/pppb1ppp/2n1pn2/3p4/1b1PP3/2N2N2/PPP1BPPP/R1BQK2R w KQ - 0 1");
+//    test_fen<Koivisto>(network, "r2qk2r/pppb1ppp/2n1pn2/3p4/1b1PP3/2N2N2/PPP1BPPP/R1BQK2R w kq - 0 1");
     //    ChessDotCpp::Inputs); computeScalars<ChessDotCpp>(batch_loader, network, 1024,
     //    ChessDotCpp::Inputs); quantitize_shallow(output + "20.net", network, 128, 256);
+
+//    computeScalars<Koivisto>(batch_loader, network, 1024);
+    auto f = openFile(output + "180.net");
+    writeLayer<int16_t, int16_t>(f, network, 0, 32, 32);
+    writeLayer<int16_t, int32_t>(f, network, 4, 128, 128 * 32);
+    closeFile(f);
+
+//    quantitize_shallow(output + "1000.net", network, 128, 256);
 
     close();
 }

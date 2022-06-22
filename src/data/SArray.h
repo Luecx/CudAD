@@ -178,18 +178,18 @@ class SArray : public Array<Type> {
     [[nodiscard]] Type min() const {
         if (cpu_values == nullptr)
             return 0;
-        Type m = cpu_values.get()[0];
+        Type m = get(0);
         for (int i = 0; i < this->size(); i++) {
-            m = std::min(m, cpu_values.get()[i]);
+            m = std::min(m, get(i));
         }
         return m;
     };
     [[nodiscard]] Type max() const {
         if (cpu_values == nullptr)
             return 0;
-        Type m = cpu_values.get()[0];
+        Type m = get(0);
         for (int i = 0; i < this->size(); i++) {
-            m = std::max(m, cpu_values.get()[i]);
+            m = std::max(m, get(i));
         }
         return m;
     }

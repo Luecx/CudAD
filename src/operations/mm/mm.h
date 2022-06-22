@@ -23,9 +23,11 @@
 
 template<Mode mode>
 inline void mm(DenseMatrix& mat1, DenseMatrix& mat2, DenseMatrix& res) {
+
     ERROR(mat1.n == mat2.m);
     ERROR(mat1.m == res.m);
     ERROR(mat2.n == res.n);
+
 
     if (mode == DEVICE) {
         mm_cublas(mat1, mat2, res);

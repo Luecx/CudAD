@@ -30,21 +30,20 @@
 class PairwiseMultiplyLayer : public LayerInterface {
     public:
 
-    PairwiseMultiplyLayer() {}
+    LayerInterface* previous;
 
-//    void apply(std::vector<Tape*> inputs, Tape& out) override {
-//        pairwise_multiply<DEVICE>(inputs[0]->values, out.values);
-//    }
-//    void apply(std::vector<SparseInput*> inputs, Tape& out) override { ASSERT(false); }
-//
-//    void backprop(std::vector<Tape*> inputs, Tape& out) override {
-//        pairwise_multiply_bp<DEVICE>(inputs[0]->values, inputs[0]->gradients, out.gradients);
-//    }
-//    void     backprop(std::vector<SparseInput*> inputs, Tape& out) override { ASSERT(false); }
-//
-//    uint32_t getOutputSize() override { return I / 2; }
-//    uint32_t getInputSize() override { return I; }
+    PairwiseMultiplyLayer(LayerInterface* previous) : previous(previous){}
 
+    uint32_t getOutputSize() const override { return getInputSize() / 2; }
+    uint32_t getInputSize() const override { return previous->getOutputSize(); }
+    void     apply() override {
+        pairwise_multiply<DEVICE>(previous->getDenseData().values, dense_data.values);
+    }
+    void     backprop() override {
+        pairwise_multiply_bp<DEVICE>(previous->getDenseData().values,
+                                     previous->getDenseData().gradients,
+                                     dense_data.gradients);
+    }
 
     std::vector<Tape*> getTunableParameters() override { return std::vector<Tape*> {}; }
 };

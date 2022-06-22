@@ -63,6 +63,7 @@ inline void sparse_affine(
                    DenseMatrix& res){
 
     auto M = mat.m;
+    [[maybe_unused]]
     auto N = mat.n;
     auto B = inp.n;
 

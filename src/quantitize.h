@@ -28,35 +28,42 @@
 template<class Arch>
 void test_fen(Network& network, const std::string& fen) {
 
-    SparseInput   sp1 {Arch::Inputs, 1, 32};
-    SparseInput   sp2 {Arch::Inputs, 1, 32};
-
     Position      p = parseFen(fen);
+
+    network.setBatchSize(1);
+
+    SparseInput& in1 = network.getInputs()[0]->sparse_data;
+    SparseInput& in2 = network.getInputs()[1]->sparse_data;
+    DenseMatrix& in3 = network.getInputs()[2]->dense_data.values;
+    in1.clear();
+    in2.clear();
 
     SArray<float> target {Arch::Outputs};
     target.malloc_cpu();
     SArray<bool> target_mask {Arch::Outputs};
     target_mask.malloc_cpu();
 
-    Arch::assign_input(p, sp1, sp2, target, target_mask, 0);
-    sp1.column_indices.gpu_upload();
-    sp2.column_indices.gpu_upload();
+    Arch::assign_input(p, in1, in2, in3, target, target_mask, 0);
 
-//    std::cout << sp1 << std::endl;
-//    std::cout << sp2 << std::endl;
+    for(LayerInterface* l:network.getInputs()){
+        if(l->isSparse())
+            l->getSparseData().column_indices.gpu_upload();
+        else
+            l->getDenseData().values.gpu_upload();
+    }
 
-//    network.feed(std::vector<SparseInput*> {&sp1, &sp2});
-//    network.getOutput().values.gpu_download();
-//
-//    network.getOutput(0).values.gpu_download();
-//    network.getOutput(1).values.gpu_download();
+    network.feed();
 
-    //    std::cout << sp1 << " " << sp2 << std::endl;
-    std::cout << network.getOutput(0).values << std::endl;
-    std::cout << network.getOutput(1).values << std::endl;
-
+    network.getOutput(0).values.gpu_download();
+    network.getOutput(1).values.gpu_download();
+    network.getOutput(7).values.gpu_download();
+    network.getOutput().values.gpu_download();
     std::cout << "testing fen: " << fen << std::endl;
+//    std::cout << "acc1: " << network.getOutput(0).values << std::endl;
+//    std::cout << "acc2: " << network.getOutput(1).values << std::endl;
+    std::cout << "merge: " << network.getOutput(7).values << std::endl;
     std::cout << "eval: " << network.getOutput().values << std::endl;
+
 }
 
 template<typename type>
@@ -80,7 +87,29 @@ void writeMatrix(FILE* file, DenseMatrix& matrix, float scaling, bool column_maj
         }
     }
 
-//    fwrite(data.cpu_values, sizeof(type), data.size, file);
+    fwrite(data.cpu_address(), sizeof(type), data.size(), file);
+}
+
+FILE* openFile(const std::string& path){
+    FILE* f          = fopen(path.c_str(), "wb");
+    return f;
+}
+
+void closeFile(FILE* f){
+    fclose(f);
+}
+
+template<typename T1, typename T2>
+void writeLayer(FILE* file, Network& network, int layer_id, int s1, int s2){
+    auto  l0         = network.getLayers()[layer_id];
+    auto  l0_params  = l0->getTunableParameters();
+    auto  l0_weights = l0_params[0]->values;
+    auto  l0_biases  = l0_params[1]->values;
+
+    l0_weights.gpu_download(), l0_biases.gpu_download();
+
+    writeMatrix<T1>(file, l0_weights, s1, layer_id == 0);
+    writeMatrix<T2>(file, l0_biases, s2);
 }
 
 void quantitize_shallow(const std::string& path,
@@ -113,6 +142,8 @@ void quantitize_shallow(const std::string& path,
 template<class Arch>
 void computeScalars(BatchLoader& batch_loader, Network& network, int batches) {
 
+    network.setBatchSize(batch_loader.batch_size);
+
     SparseInput   sparse_input_1 {Arch::Inputs, (uint32_t) batch_loader.batch_size, 32};
     SparseInput   sparse_input_2 {Arch::Inputs, (uint32_t) batch_loader.batch_size, 32};
     SArray<float> target {(uint32_t) batch_loader.batch_size * Arch::Outputs};
@@ -144,13 +175,12 @@ void computeScalars(BatchLoader& batch_loader, Network& network, int batches) {
         // get the next dataset (batch)
         auto* ds = batch_loader.next();
         // assign to the inputs and compute the target
-        Arch::assign_inputs_batch(*ds, sparse_input_1, sparse_input_2, target, target_mask);
+        Arch::assign_inputs_batch(*ds, network, target, target_mask);
         // upload relevant data
-        sparse_input_1.column_indices.gpu_upload();
-        sparse_input_2.column_indices.gpu_upload();
+        network.uploadInputs();
         target.gpu_upload();
         target_mask.gpu_upload();
-//        network.feed(std::vector<SparseInput*> {&sparse_input_1, &sparse_input_2});
+        network.feed();
 
         std::cout << "\rProcessing batch: " << (batch + 1) << "/" << batches << std::flush;
 
@@ -169,14 +199,14 @@ void computeScalars(BatchLoader& batch_loader, Network& network, int batches) {
     std::cout << std::endl;
 
     for (int i = 0; i < maximum.size(); i++) {
-        //        std::cout << minimum[i] << "\n" << maximum[i] << std::endl;
+//        std::cout << minimum[i] << "\n" << maximum[i] << std::endl;
 
         int died = 0;
-//        for (int j = 0; j < minimum[i].size; j++) {
-//            if (abs(maximum[i].get(j) - minimum[i].get(j)) < 1e-8) {
-//                died++;
-//            }
-//        }
+        for (int j = 0; j < minimum[i].size(); j++) {
+            if (abs(maximum[i].get(j) - minimum[i].get(j)) < 1e-8) {
+                died++;
+            }
+        }
 
         std::cout << "layer  : " << i << std::endl;
         std::cout << "min    : " << std::left << std::setw(10) << minimum[i].min()

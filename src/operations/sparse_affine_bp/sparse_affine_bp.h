@@ -67,6 +67,7 @@ inline void sparse_affine_bp(
                    float        lasso_regularization=0){
 
     auto M = mat_grd.m;
+    [[maybe_unused]]
     auto N = mat_grd.n;
     auto B = inp.n;
 

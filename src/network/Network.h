@@ -34,11 +34,13 @@ class Network {
     std::vector<LayerInterface*> layers {};
     Loss*                        loss_function {};
 
-    int                          batch_size = 1;
+    int                          batch_size = -1;
 
     public:
     explicit Network(std::vector<LayerInterface*> inputs, std::vector<LayerInterface*> layers)
-        : inputs {inputs}, layers {layers} {};
+        : inputs {inputs}, layers {layers} {
+
+                           };
 
     void feed() {
         for (int i = 0; i < layers.size(); i++) {
@@ -50,7 +52,7 @@ class Network {
             layers[i]->backprop();
         }
     }
-    void batch(DenseMatrix &target, SArray<bool> &target_mask) {
+    void batch(DenseMatrix& target, SArray<bool>& target_mask) {
         feed();
         loss_function->apply(getOutput().values, getOutput().gradients, target, target_mask, DEVICE);
         backprop();
@@ -108,6 +110,16 @@ class Network {
             }
             for (LayerInterface* l : layers) {
                 l->createOutput(batch_size);
+            }
+        }
+    }
+
+    void uploadInputs(){
+        for(LayerInterface* l:inputs){
+            if(l->isSparse()){
+                l->sparse_data.column_indices.gpu_upload();
+            }else{
+                l->dense_data.values.gpu_upload();
             }
         }
     }

@@ -34,6 +34,7 @@
 #include "../layer/ActivationLayer.h"
 #include "../layer/MergeLayer.h"
 #include "../network/Network.h"
+#include "../layer/PairwiseMultiplyLayer.h"
 
 #include <tuple>
 
@@ -54,6 +55,9 @@ class Koivisto {
         optim->beta1 = 0.95;
         optim->beta2 = 0.999;
 
+//        optim->schedule.gamma = 0.1;
+//        optim->schedule.step  = 250;
+
         return optim;
     }
 
@@ -65,16 +69,19 @@ class Koivisto {
 
     static std::tuple<LayerList, LayerList> get_layers() {
 
+        // positional inputs
         auto i1 = new Input(true, Inputs, 32);
         auto i2 = new Input(true, Inputs, 32);
 
+        // both accumulators merged + relu
         auto h1 = new DenseLayer<L2>(i1);
         auto h2 = new DenseLayer<L2>(i2, h1);
-
         auto m1 = new MergeLayer(h1,h2);
-        auto a1 = new ActivationLayer<ReLU>(m1);
 
+        // hidden of main network
+        auto a1 = new ActivationLayer<ReLU>(m1);
         auto h3 = new DenseLayer<1>(a1);
+
         auto a2 = new ActivationLayer<Sigmoid>(h3);
 
         a2->f.scalar = 2.5 / 400;
@@ -95,14 +102,18 @@ class Koivisto {
 
         SparseInput& in1 = network.getInputs()[0]->sparse_data;
         SparseInput& in2 = network.getInputs()[1]->sparse_data;
+//        DenseMatrix& in3 = network.getInputs()[2]->dense_data.values;
 
         in1.clear();
         in2.clear();
+//        in3.clear();
         output_mask.clear<HOST>();
 
 #pragma omp parallel for schedule(static) num_threads(16)
         for (int i = 0; i < positions.positions.size(); i++)
             assign_input(positions.positions[i], in1, in2, output, output_mask, i);
+
+
     }
 
     static int king_square_index(Square relative_king_square) {
@@ -150,8 +161,6 @@ class Koivisto {
                              SArray<bool>&  output_mask,
                              int            id) {
 
-        constexpr static float phase_values[6] {0, 1, 1, 2, 4, 0};
-
         // track king squares
         Square wKingSq = p.getKingSquare<WHITE>();
         Square bKingSq = p.getKingSquare<BLACK>();
@@ -189,8 +198,6 @@ class Koivisto {
 
         float p_target = 1 / (1 + expf(-p_value * SigmoidScalar));
         float w_target = (w_value + 1) / 2.0f;
-
-        //    int   output_bucket = (bitCount(p.m_occupancy) - 1) / 4;
 
         output(id)      = (p_target + w_target) / 2;
         output_mask(id) = true;
