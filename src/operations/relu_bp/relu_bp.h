@@ -45,7 +45,7 @@ inline void relu_bp   (const SArray<float> &A,
                        const SArray<float> &B,
                        const SArray<float> &B_grd){
 
-    ASSERT(A.size == B.size)
+    ASSERT(A.size() == B.size())
 
     if(mode == DEVICE){
 

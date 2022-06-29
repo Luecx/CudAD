@@ -51,12 +51,12 @@ class Koivisto {
 
     static Optimiser*      get_optimiser() {
         Adam* optim  = new Adam();
-        optim->lr    = 1e-2;
+        optim->lr    = 0.01 / 2.5f;
         optim->beta1 = 0.95;
         optim->beta2 = 0.999;
 
-//        optim->schedule.gamma = 0.1;
-//        optim->schedule.step  = 250;
+        optim->schedule.gamma = 0.3;
+        optim->schedule.step  = 100;
 
         return optim;
     }
@@ -80,7 +80,7 @@ class Koivisto {
 
         // hidden of main network
         auto a1 = new ActivationLayer<ReLU>(m1);
-        auto h3 = new DenseLayer<1>(a1);
+        auto h3 = new DenseLayer<Outputs>(a1);
 
         auto a2 = new ActivationLayer<Sigmoid>(h3);
 
@@ -97,8 +97,8 @@ class Koivisto {
                                     SArray<float>& output,
                                     SArray<bool>&  output_mask) {
 
-        ASSERT(positions.positions.size() == in1.n);
-        ASSERT(positions.positions.size() == in2.n);
+//        ASSERT(positions.positions.size() == in1.n);
+//        ASSERT(positions.positions.size() == in2.n);
 
         SparseInput& in1 = network.getInputs()[0]->sparse_data;
         SparseInput& in2 = network.getInputs()[1]->sparse_data;
@@ -107,7 +107,7 @@ class Koivisto {
         in1.clear();
         in2.clear();
 //        in3.clear();
-        output_mask.clear<HOST>();
+//        output_mask.clear<HOST>();
 
 #pragma omp parallel for schedule(static) num_threads(16)
         for (int i = 0; i < positions.positions.size(); i++)
@@ -199,8 +199,9 @@ class Koivisto {
         float p_target = 1 / (1 + expf(-p_value * SigmoidScalar));
         float w_target = (w_value + 1) / 2.0f;
 
-        output(id)      = (p_target + w_target) / 2;
+        output     (id) = (p_target + w_target) / 2;
         output_mask(id) = true;
+
     }
 };
 

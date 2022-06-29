@@ -53,6 +53,9 @@ class Network {
         }
     }
     void batch(DenseMatrix& target, SArray<bool>& target_mask) {
+        ASSERT(target.is_allocated<DEVICE>());
+        ASSERT(target_mask.is_allocated<DEVICE>());
+        ASSERT(loss_function);
         feed();
         loss_function->apply(getOutput().values, getOutput().gradients, target, target_mask, DEVICE);
         backprop();
@@ -112,6 +115,10 @@ class Network {
                 l->createOutput(batch_size);
             }
         }
+    }
+
+    int getBatchSize(){
+        return batch_size;
     }
 
     void uploadInputs(){

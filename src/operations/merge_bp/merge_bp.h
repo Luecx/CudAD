@@ -32,13 +32,13 @@ void merge_bp(const DenseMatrix &A_grd,
               const DenseMatrix &B_grd,
                     DenseMatrix &C_grd){
 
-    ASSERT(A.m + B.m == C.m);
-    ASSERT(A.n == B.n);
-    ASSERT(A.n == C.n);
+    ASSERT(A_grd.m + B_grd.m == C_grd.m);
+    ASSERT(A_grd.n == B_grd.n);
+    ASSERT(A_grd.n == C_grd.n);
 
-    ASSERT(A.address<mode>())
-    ASSERT(B.address<mode>())
-    ASSERT(C.address<mode>())
+    ASSERT(A_grd.address<mode>())
+    ASSERT(B_grd.address<mode>())
+    ASSERT(C_grd.address<mode>())
 
     if constexpr(mode == DEVICE){
         constexpr int block_size_x = 16;

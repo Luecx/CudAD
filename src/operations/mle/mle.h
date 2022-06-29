@@ -41,10 +41,10 @@ inline void mle (const SArray<float>& output,
                  const SArray< bool>& mask,
                        SArray<float>& loss){
 
-    ASSERT(output.size % 2 == 0);
-    ASSERT(target.size == output.size / 2);
-    ASSERT(target.size == mask.size);
-    ASSERT(loss.size   >= 2);
+    ASSERT(output.size() % 2 == 0);
+    ASSERT(target.size() == output.size() / 2);
+    ASSERT(target.size() == mask.size());
+    ASSERT(loss.size()   >= 2);
 
     if(mode == DEVICE){
 

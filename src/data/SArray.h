@@ -160,13 +160,13 @@ class SArray : public Array<Type> {
     // gets values from the cpu memory
     Type get(int height) const {
         ASSERT(cpu_is_allocated());
-        ASSERT(height < size);
+        ASSERT(height < this->size());
         ASSERT(height >= 0);
         return cpu_values->m_data[height];
     }
     Type& get(int height) {
         ASSERT(cpu_is_allocated());
-        ASSERT(height < size);
+        ASSERT(height < this->size());
         ASSERT(height >= 0);
         return cpu_values->m_data[height];
     }

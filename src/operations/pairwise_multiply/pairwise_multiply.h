@@ -37,7 +37,7 @@ inline void pairwise_multiply (
 
         ASSERT(input.gpu_address());
         ASSERT(output.gpu_address());
-        ASSERT(input.size == 2 * output.size);
+        ASSERT(input.size() == 2 * output.size());
 
         constexpr int block_size = 1024;
         dim3 block(block_size);

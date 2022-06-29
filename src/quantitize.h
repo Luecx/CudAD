@@ -32,9 +32,10 @@ void test_fen(Network& network, const std::string& fen) {
 
     network.setBatchSize(1);
 
+    // TODO
     SparseInput& in1 = network.getInputs()[0]->sparse_data;
     SparseInput& in2 = network.getInputs()[1]->sparse_data;
-    DenseMatrix& in3 = network.getInputs()[2]->dense_data.values;
+//    DenseMatrix& in3 = network.getInputs()[2]->dense_data.values;
     in1.clear();
     in2.clear();
 
@@ -43,27 +44,26 @@ void test_fen(Network& network, const std::string& fen) {
     SArray<bool> target_mask {Arch::Outputs};
     target_mask.malloc_cpu();
 
-    Arch::assign_input(p, in1, in2, in3, target, target_mask, 0);
+    Arch::assign_input(p, in1, in2, target, target_mask, 0);
 
-    for(LayerInterface* l:network.getInputs()){
-        if(l->isSparse())
-            l->getSparseData().column_indices.gpu_upload();
-        else
-            l->getDenseData().values.gpu_upload();
-    }
-
+    network.uploadInputs();
     network.feed();
 
-    network.getOutput(0).values.gpu_download();
-    network.getOutput(1).values.gpu_download();
-    network.getOutput(7).values.gpu_download();
-    network.getOutput().values.gpu_download();
+    std::cout << "==================================================================================\n";
     std::cout << "testing fen: " << fen << std::endl;
-//    std::cout << "acc1: " << network.getOutput(0).values << std::endl;
-//    std::cout << "acc2: " << network.getOutput(1).values << std::endl;
-    std::cout << "merge: " << network.getOutput(7).values << std::endl;
-    std::cout << "eval: " << network.getOutput().values << std::endl;
+    int idx = 0;
+    for(LayerInterface* l:network.getLayers()){
+        l->getDenseData().values.gpu_download();
 
+        std::cout << "LAYER " << (idx ++) << std::endl;
+        for(int i = 0; i < std::min(16u, l->getDenseData().values.size()); i++){
+            std::cout << std::setw(10) << l->getDenseData().values(i);
+        }
+        if(l->getDenseData().values.size() > 16){
+            std::cout << " ......... " << l->getDenseData().values(l->getDenseData().values.size()-1);
+        }
+        std::cout << "\n";
+    }
 }
 
 template<typename type>

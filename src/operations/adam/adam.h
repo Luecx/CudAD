@@ -57,9 +57,9 @@ inline void adam(SArray<float>& values,
 
     constexpr int block_size = 1024;
 
-    ASSERT(values.size == gradients.size)
-    ASSERT(values.size == first_moment.size)
-    ASSERT(values.size == second_moment.size)
+    ASSERT(values.size() == gradients.size())
+    ASSERT(values.size() == first_moment.size())
+    ASSERT(values.size() == second_moment.size())
 
     if(mode == DEVICE){
         dim3 block(block_size);

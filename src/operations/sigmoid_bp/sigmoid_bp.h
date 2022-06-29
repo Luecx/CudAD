@@ -48,7 +48,7 @@ inline void sigmoid_bp(const SArray<float> &A,
                        const SArray<float> &B_grd,
                        float scalar){
 
-    ASSERT(A.size == B.size)
+    ASSERT(A.size() == B.size())
 
     if(mode == DEVICE){
 

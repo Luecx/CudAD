@@ -42,7 +42,7 @@ inline void sigmoid   (const SArray<float> &A,
                              SArray<float> &B,
                              float scalar){
 
-    ASSERT(A.size == B.size)
+    ASSERT(A.size() == B.size())
 
     if(mode == DEVICE){
 

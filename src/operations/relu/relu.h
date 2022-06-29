@@ -39,7 +39,7 @@ template<Mode mode>
 inline void relu   (const SArray<float> &A,
                           SArray<float> &B){
 
-    ASSERT(A.size == B.size)
+    ASSERT(A.size() == B.size())
 
     if(mode == DEVICE){
 

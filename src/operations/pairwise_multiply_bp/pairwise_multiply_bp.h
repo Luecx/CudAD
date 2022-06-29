@@ -40,8 +40,8 @@ inline void pairwise_multiply_bp (
         ASSERT(input.gpu_address());
         ASSERT(input_grd.gpu_address());
         ASSERT(output_grd.gpu_address());
-        ASSERT(input.size == 2 * output_grd.size);
-        ASSERT(input.size == input_grd.size);
+        ASSERT(input.size() == 2 * output_grd.size());
+        ASSERT(input.size() == input_grd.size());
 
         constexpr int block_size = 1024;
         dim3 block(block_size);
