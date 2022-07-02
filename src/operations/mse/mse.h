@@ -20,7 +20,7 @@
 #define CUDAD_SRC_OPERATIONS_MSE_MSE_H_
 
 #include "../../data/SArray.h"
-#include "../../data/mode.h"
+#include "../../data/Mode.h"
 #include "../../misc/config.h"
 
 // clang-format off
@@ -43,23 +43,23 @@ inline void mse (const SArray<float>& output,
 
     if(mode == DEVICE){
 
-        ASSERT(output.gpu_values);
-        ASSERT(output_gradient.gpu_values);
-        ASSERT(target.gpu_values);
-        ASSERT(mask.gpu_values);
-        ASSERT(loss.gpu_values);
+        ASSERT(output.gpu_address());
+        ASSERT(output_gradient.gpu_address());
+        ASSERT(target.gpu_address());
+        ASSERT(mask.gpu_address());
+        ASSERT(loss.gpu_address());
 
 
         constexpr int block_size = 1024;
         dim3 block(block_size);
-        dim3 grid (std::ceil((float)output.size / block_size));
+        dim3 grid (std::ceil((float)output.size() / block_size));
         mse_kernel<<<grid, block>>>(
-            output          .gpu_values,
-            output_gradient .gpu_values,
-            target          .gpu_values,
-            mask            .gpu_values,
-            loss            .gpu_values,
-            output.size);
+            output          .gpu_address(),
+            output_gradient .gpu_address(),
+            target          .gpu_address(),
+            mask            .gpu_address(),
+            loss            .gpu_address(),
+            output.size());
 
     }else{
         ASSERT(false);

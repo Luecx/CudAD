@@ -31,7 +31,7 @@
 #include <sys/stat.h>
 
 template<Format format>
-inline DataSet read(const std::string& file, uint64_t count = -1) {
+inline DataSet read(const std::string& file, uint64_t count = (1ULL << 54)) {
 
     constexpr uint64_t CHUNK_SIZE = (1 << 20);
 

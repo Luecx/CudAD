@@ -20,8 +20,8 @@
 #define CUDATEST1_SRC_DATA_SPARSEINPUT_H_
 
 #include "../misc/config.h"
+#include "Align.h"
 #include "Matrix.h"
-#include "align.h"
 
 #include <cmath>
 #include <cstdio>
@@ -31,7 +31,6 @@
 #include <new>
 #include <ostream>
 
-// CSC format
 struct SparseInput : public Matrix {
 
     uint32_t         max_entries_per_column;
@@ -45,16 +44,21 @@ struct SparseInput : public Matrix {
         column_indices.malloc_cpu();
     }
 
-    void set(int input_idx, int index) {
+    void set(int input_idx, int index) const {
         auto offset = (max_entries_per_column + 1) * input_idx;
-        column_indices.cpu_values[offset]++;
-        ASSERT(column_indices.cpu_values[offset] <= max_entries_per_column);
-        column_indices.cpu_values[offset + column_indices.cpu_values[offset]] = index;
+        ASSERT(column_indices.cpu_values->m_data[offset] <= max_entries_per_column);
+        column_indices.cpu_values->m_data[offset]++;
+        column_indices.cpu_values->m_data[offset + column_indices.cpu_values->m_data[offset]] = index;
+    }
+
+    int count(int input_idx){
+       auto offset = (max_entries_per_column + 1) * input_idx;
+       return column_indices.cpu_values->m_data[offset];
     }
 
     void clear() {
         for (int i = 0; i < n; i++) {
-            column_indices.cpu_values[i * (max_entries_per_column + 1)] = 0;
+            column_indices.cpu_values->m_data[i * (max_entries_per_column + 1)] = 0;
         }
     }
 

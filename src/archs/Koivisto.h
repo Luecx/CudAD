@@ -25,12 +25,16 @@
 #include "../data/SparseInput.h"
 #include "../dataset/dataset.h"
 #include "../layer/DenseLayer.h"
-#include "../layer/DuplicateDenseLayer.h"
 #include "../loss/Loss.h"
 #include "../loss/MPE.h"
 #include "../optimizer/Adam.h"
 #include "../optimizer/Optimiser.h"
 #include "../position/fenparsing.h"
+#include "../layer/Input.h"
+#include "../layer/ActivationLayer.h"
+#include "../layer/MergeLayer.h"
+#include "../network/Network.h"
+#include "../layer/PairwiseMultiplyLayer.h"
 
 #include <tuple>
 
@@ -42,11 +46,17 @@ class Koivisto {
     static constexpr int   Outputs       = 1;
     static constexpr float SigmoidScalar = 2.5 / 400;
 
+
+    using LayerList = std::vector<LayerInterface*>;
+
     static Optimiser*      get_optimiser() {
         Adam* optim  = new Adam();
-        optim->lr    = 1e-2;
+        optim->lr    = 0.01;
         optim->beta1 = 0.95;
         optim->beta2 = 0.999;
+
+        optim->schedule.gamma = 0.3;
+        optim->schedule.step  = 100;
 
         return optim;
     }
@@ -57,32 +67,53 @@ class Koivisto {
         return loss_f;
     }
 
-    static std::vector<LayerInterface*> get_layers() {
-        DuplicateDenseLayer<Inputs, L2, ReLU>* l1 = new DuplicateDenseLayer<Inputs, L2, ReLU>();
-        l1->lasso_regularization                  = 1.0 / 8388608.0;
+    static std::tuple<LayerList, LayerList> get_layers() {
 
-        DenseLayer<L2 * 2, Outputs, Sigmoid>* l2  = new DenseLayer<L2 * 2, Outputs, Sigmoid>();
-        dynamic_cast<Sigmoid*>(l2->getActivationFunction())->scalar = SigmoidScalar;
+        // positional inputs
+        auto i1 = new Input(true, Inputs, 32);
+        auto i2 = new Input(true, Inputs, 32);
 
-        return std::vector<LayerInterface*> {l1, l2};
+        // both accumulators merged + relu
+        auto h1 = new DenseLayer<L2>(i1);
+        auto h2 = new DenseLayer<L2>(i2, h1);
+        auto m1 = new MergeLayer(h1,h2);
+
+        // hidden of main network
+        auto a1 = new ActivationLayer<ReLU>(m1);
+        auto h3 = new DenseLayer<Outputs>(a1);
+
+        auto a2 = new ActivationLayer<Sigmoid>(h3);
+
+        a2->f.scalar = 2.5 / 400;
+
+        return {
+            {i1,i2},
+            {h1,h2,m1,a1,h3,a2}
+        };
     }
 
     static void assign_inputs_batch(DataSet&       positions,
-                                    SparseInput&   in1,
-                                    SparseInput&   in2,
+                                    Network&       network,
                                     SArray<float>& output,
                                     SArray<bool>&  output_mask) {
 
-        ASSERT(positions.positions.size() == in1.n);
-        ASSERT(positions.positions.size() == in2.n);
+//        ASSERT(positions.positions.size() == in1.n);
+//        ASSERT(positions.positions.size() == in2.n);
+
+        SparseInput& in1 = network.getInputs()[0]->sparse_data;
+        SparseInput& in2 = network.getInputs()[1]->sparse_data;
+//        DenseMatrix& in3 = network.getInputs()[2]->dense_data.values;
 
         in1.clear();
         in2.clear();
-        output_mask.clear();
+//        in3.clear();
+//        output_mask.clear<HOST>();
 
-#pragma omp parallel for schedule(static) num_threads(8)
+#pragma omp parallel for schedule(static) num_threads(16)
         for (int i = 0; i < positions.positions.size(); i++)
             assign_input(positions.positions[i], in1, in2, output, output_mask, i);
+
+
     }
 
     static int king_square_index(Square relative_king_square) {
@@ -130,8 +161,6 @@ class Koivisto {
                              SArray<bool>&  output_mask,
                              int            id) {
 
-        constexpr static float phase_values[6] {0, 1, 1, 2, 4, 0};
-
         // track king squares
         Square wKingSq = p.getKingSquare<WHITE>();
         Square bKingSq = p.getKingSquare<BLACK>();
@@ -170,10 +199,9 @@ class Koivisto {
         float p_target = 1 / (1 + expf(-p_value * SigmoidScalar));
         float w_target = (w_value + 1) / 2.0f;
 
-        //    int   output_bucket = (bitCount(p.m_occupancy) - 1) / 4;
-
-        output(id)      = (p_target + w_target) / 2;
+        output     (id) = (p_target + w_target) / 2;
         output_mask(id) = true;
+
     }
 };
 

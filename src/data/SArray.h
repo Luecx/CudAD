@@ -21,8 +21,9 @@
 
 #include "../assert/Assert.h"
 #include "../assert/GPUAssert.h"
-#include "align.h"
-#include "mode.h"
+#include "Align.h"
+#include "Array.h"
+#include "Mode.h"
 
 #include <algorithm>
 #include <cmath>
@@ -34,52 +35,34 @@
 #include <random>
 
 template<typename Type = float>
-class SArray {
+class SArray : public Array<Type> {
 
-    protected:
-    // use an unaligned and aligned data access
-    Type* raw_cpu   = nullptr;
+    using CPUArrayType = CPUArray<Type>;
+    using GPUArrayType = GPUArray<Type>;
 
-    bool  clean_cpu = false;
-    bool  clean_gpu = false;
-
-    public:
-    uint32_t size {};
-    Type*    cpu_values = nullptr;
-    Type*    gpu_values = nullptr;
+    using CPtr         = std::shared_ptr<CPUArrayType>;
+    using GPtr         = std::shared_ptr<GPUArrayType>;
 
     public:
-    explicit SArray(uint32_t p_size) : size {p_size} {}
-    SArray(const SArray<Type>& other) {
-        this->size = other.size;
+    // smart pointers to cpu and gpu values
+    CPtr cpu_values = nullptr;
+    GPtr gpu_values = nullptr;
+
+    public:
+    explicit SArray(ArraySizeType p_size) : Array<Type>(p_size) {}
+    SArray(const SArray<Type>& other) : Array<Type>(other.m_size) {
         if (other.cpu_is_allocated()) {
             malloc_cpu();
-            this->template copy<HOST>(other);
+            this->template copy_from<HOST>(other);
         }
         if (other.gpu_is_allocated()) {
             malloc_gpu();
-            this->template copy<DEVICE>(other);
+            this->template copy_from<DEVICE>(other);
         }
     }
-    SArray(SArray<Type>&& other) noexcept {
-        this->size       = other.size;
-        this->raw_cpu    = other.raw_cpu;
-        this->clean_cpu  = other.clean_cpu;
-        this->clean_gpu  = other.clean_gpu;
+    SArray(SArray<Type>&& other) noexcept : Array<Type>(other.m_size) {
         this->cpu_values = other.cpu_values;
         this->gpu_values = other.gpu_values;
-        other.clean_gpu  = false;
-        other.clean_cpu  = false;
-    }
-    SArray(const SArray<Type>& other, int offset, int count) {
-        this->raw_cpu    = other.raw_cpu;
-        this->cpu_values = &(other.cpu_values[offset]);
-        this->gpu_values = &(other.gpu_values[offset]);
-        this->size       = count;
-    }
-    virtual ~SArray() {
-        free_cpu();
-        free_gpu();
     }
     SArray<Type>& operator=(const SArray<Type>& other) {
         free_cpu();
@@ -87,175 +70,177 @@ class SArray {
         this->size = other.size;
         if (other.cpu_is_allocated()) {
             malloc_cpu();
-            this->template copy<HOST>(other);
+            this->template copy_from<HOST>(other);
         }
         if (other.gpu_is_allocated()) {
             malloc_gpu();
-            this->template copy<DEVICE>(other);
+            this->template copy_from<DEVICE>(other);
         }
         return (*this);
     }
     SArray<Type>& operator=(SArray<Type>&& other) noexcept {
         free_cpu();
         free_gpu();
-        this->size       = other.size;
-        this->raw_cpu    = other.raw_cpu;
-        this->clean_cpu  = other.clean_cpu;
-        this->clean_gpu  = other.clean_gpu;
+        this->m_size     = other.m_size;
         this->cpu_values = other.cpu_values;
         this->gpu_values = other.gpu_values;
-        other.clean_gpu  = false;
-        other.clean_cpu  = false;
         return (*this);
     }
-
-    void malloc_cpu() {
-        if (cpu_is_allocated())
-            free_cpu();
-        // make sure to clean the data once we are done here
-        clean_cpu = true;
-        // allocate raw unaligned data
-        raw_cpu = new Type[size + ALIGNED_BYTES] {};
-
-        // create a void pointer which will be aligned via the std::align function
-        void* data_ptr = raw_cpu;
-        // also track how much the aligned data can hold
-        uint64_t reduced_size = size + ALIGNED_BYTES;
-
-        // align the pointer and reduce the maximum size
-        std::align(ALIGNED_BYTES, size, data_ptr, reduced_size);
-
-        // store the final pointer
-        cpu_values = (Type*) data_ptr;
+    virtual ~SArray() {
+        free_cpu();
+        free_gpu();
     }
-    void malloc_gpu() {
-        if (gpu_is_allocated())
-            free_gpu();
-        // make sure to clean once we are done
-        clean_gpu = true;
-        CUDA_ASSERT(cudaMalloc(&gpu_values, size * sizeof(Type)));
+
+    // allocate cpu and gpu memory functions
+    template<Mode mode = HOST>
+    void malloc() {
+        if (is_allocated<mode>()) {
+            free<mode>();
+        }
+        if constexpr (mode == HOST) {
+            cpu_values = CPtr(new CPUArrayType(this->m_size));
+        } else {
+            gpu_values = GPtr(new GPUArrayType(this->m_size));
+        }
     }
-    void free_cpu() {
-        if (cpu_is_allocated()) {
-            if (clean_cpu) {
-                delete[] raw_cpu;
-            }
-            raw_cpu    = nullptr;
+    void malloc_cpu() { malloc<HOST>(); }
+    void malloc_gpu() { malloc<DEVICE>(); }
+
+    // deallocate cpu and gpu memory
+    template<Mode mode = HOST>
+    void free() {
+        if constexpr (mode == HOST) {
             cpu_values = nullptr;
-
-            clean_cpu  = false;
-        }
-    }
-    void free_gpu() {
-        if (gpu_is_allocated()) {
-            if (clean_gpu) {
-                CUDA_ASSERT(cudaFree(gpu_values));
-            }
+        } else {
             gpu_values = nullptr;
-            clean_gpu  = false;
         }
     }
-    bool cpu_is_allocated() const { return cpu_values != nullptr; }
-    bool gpu_is_allocated() const { return gpu_values != nullptr; }
+    void free_cpu() { free<HOST>(); }
+    void free_gpu() { free<DEVICE>(); }
+
+    // checks if cpu and gpu memory is allocated
+    template<Mode mode = HOST>
+    bool is_allocated() const {
+        if constexpr (mode == HOST) {
+            return cpu_values != nullptr;
+        } else {
+            return gpu_values != nullptr;
+        }
+    }
+    bool cpu_is_allocated() const { return is_allocated<HOST>(); }
+    bool gpu_is_allocated() const { return is_allocated<DEVICE>(); }
+
+    // returns the address of the cpu/gpu memory
+    template<Mode mode = HOST>
+    Type* address() const {
+        if (is_allocated<mode>()) {
+            if constexpr (mode == HOST) {
+                return cpu_values->m_data;
+            } else {
+                return gpu_values->m_data;
+            }
+        }
+        return nullptr;
+    }
+    Type* cpu_address() const { return address<HOST>(); }
+    Type* gpu_address() const { return address<DEVICE>(); }
+
+    // synchronise data between the cpu and the gpu memory only if both are allocated
     void gpu_upload() {
         if (!cpu_is_allocated() || !gpu_is_allocated())
             return;
-        CUDA_ASSERT(cudaMemcpy(gpu_values, cpu_values, size * sizeof(Type), cudaMemcpyHostToDevice));
+        gpu_values->upload(*cpu_values.get());
     }
     void gpu_download() {
         if (!cpu_is_allocated() || !gpu_is_allocated())
             return;
-        CUDA_ASSERT(cudaMemcpy(cpu_values, gpu_values, size * sizeof(Type), cudaMemcpyDeviceToHost));
+        gpu_values->download(*cpu_values.get());
     }
 
-    Type& get(int height) const {
+    // gets values from the cpu memory
+    Type get(int height) const {
         ASSERT(cpu_is_allocated());
-        ASSERT(height < size);
+        ASSERT(height < this->size());
         ASSERT(height >= 0);
-        return cpu_values[height];
+        return cpu_values->m_data[height];
     }
-    Type               operator()(int height) const { return get(height); }
-    Type&              operator()(int height) { return get(height); }
+    Type& get(int height) {
+        ASSERT(cpu_is_allocated());
+        ASSERT(height < this->size());
+        ASSERT(height >= 0);
+        return cpu_values->m_data[height];
+    }
+    // operators to wrap the get functions
+    Type  operator()(int height) const { return get(height); }
+    Type& operator()(int height) { return get(height); }
 
+    // compute min max of cpu values
     [[nodiscard]] Type min() const {
         if (cpu_values == nullptr)
             return 0;
-        Type m = cpu_values[0];
-        for (int i = 0; i < size; i++) {
-            m = std::min(m, cpu_values[i]);
+        Type m = get(0);
+        for (int i = 0; i < this->size(); i++) {
+            m = std::min(m, get(i));
         }
         return m;
     };
     [[nodiscard]] Type max() const {
         if (cpu_values == nullptr)
             return 0;
-        Type m = cpu_values[0];
-        for (int i = 0; i < size; i++) {
-            m = std::max(m, cpu_values[i]);
+        Type m = get(0);
+        for (int i = 0; i < this->size(); i++) {
+            m = std::max(m, get(i));
         }
         return m;
     }
+
+    // sort values
     void sort() const {
         if (cpu_values == nullptr)
             return;
-        std::sort(cpu_values, cpu_values + size, std::greater<Type>());
+        std::sort(cpu_values->m_data, cpu_values->m_data + this->size(), std::greater<Type>());
     };
 
+    // clear the given memory
     template<Mode mode = HOST>
     void clear() const {
         if (mode == HOST) {
             if (cpu_values == nullptr)
                 return;
-            std::memset(cpu_values, 0, sizeof(Type) * size);
+            cpu_values->clear();
         }
         if (mode == DEVICE) {
             if (gpu_values == nullptr)
                 return;
-            cudaMemset(gpu_values, 0, sizeof(Type) * size);
-        }
-    }
-    template<Mode mode = HOST>
-    void copy(const SArray& other) {
-        if (mode == HOST) {
-            memcpy(cpu_values, other.cpu_values, size * sizeof(Type));
-        } else if (mode == DEVICE) {
-            cudaMemcpy(gpu_values, other.gpu_values, size * sizeof(Type), cudaMemcpyDeviceToDevice);
-        }
-    }
-    template<Mode mode = HOST>
-    void copy(const Type* data, const int count, const int offset) {
-        if (mode == HOST) {
-            memcpy(&cpu_values[offset], data, count * sizeof(Type));
-        } else if (mode == DEVICE) {
-            cudaMemcpy(&cpu_values[offset], data, count * sizeof(Type), cudaMemcpyDefault);
-        }
-    }
-    template<Mode mode = HOST>
-    void assign(const Type* data) {
-        if (mode == HOST) {
-            free_cpu();
-            this->cpu_values = data;
-        } else if (mode == DEVICE) {
-            free_gpu();
-            this->gpu_values = data;
-        }
-    }
-    template<Mode mode = HOST>
-    void assign(const SArray& other) {
-        if (mode == HOST) {
-            free_cpu();
-            this->cpu_values = other.cpu_values;
-        } else if (mode == DEVICE) {
-            free_gpu();
-            this->gpu_values = other.gpu_values;
+            gpu_values->clear();
         }
     }
 
+    // copy from another array
+    template<Mode mode = HOST>
+    void copy_from(const SArray& other) {
+        if constexpr (mode == HOST) {
+            cpu_values->copy_from(*other.cpu_values.get());
+        } else if (mode == DEVICE) {
+            gpu_values->copy_from(*other.gpu_values.get());
+        }
+    }
+
+    // randomisation
     void randomise(Type lower = 0, Type upper = 1) {
         if (cpu_values == nullptr)
             return;
-        for (int i = 0; i < size; i++) {
-            this->cpu_values[i] = static_cast<Type>(rand()) / RAND_MAX * (upper - lower) + lower;
+
+        if (std::is_integral_v<Type>) {
+            int offset = RAND_MAX / (int(upper - lower) * 2);
+            for (int i = 0; i < this->size(); i++) {
+                this->get(i) =
+                    lower + static_cast<Type>((long(rand()) + offset) * long(upper - lower) / RAND_MAX);
+            }
+        } else if (std::is_floating_point_v<Type>) {
+            for (int i = 0; i < this->size(); i++) {
+                this->get(i) = static_cast<Type>(rand()) / RAND_MAX * (upper - lower) + lower;
+            }
         }
     }
     void randomiseGaussian(Type mean, Type deviation) {
@@ -263,20 +248,22 @@ class SArray {
             return;
         std::default_random_engine     generator;
         std::normal_distribution<Type> distribution(mean, deviation);
-        for (int i = 0; i < size; i++) {
-            this->cpu_values[i] = distribution(generator);
+        for (int i = 0; i < this->size(); i++) {
+            this->get(i) = distribution(generator);
         }
     }
 
-    [[nodiscard]] SArray<Type> newInstance() const { return SArray<Type> {size}; }
+    // new instance
+    [[nodiscard]] SArray<Type> newInstance() const { return SArray<Type> {this->size()}; }
 
-    friend std::ostream&       operator<<(std::ostream& os, const SArray& data) {
-        os << "size:       " << data.size << "\n"
-           << "gpu_values: " << data.gpu_values << "    cleanUp = [" << data.clean_gpu << "]\n"
-           << "cpu_values: " << data.cpu_values << "    cleanUp = [" << data.clean_cpu << "]\n";
+    // output stream
+    friend std::ostream& operator<<(std::ostream& os, const SArray& data) {
+        os << "size:       " << data.size() << "\n"
+           << "gpu_values: " << data.gpu_address() << "\n"
+           << "cpu_values: " << data.cpu_address() << "\n";
         if (!data.cpu_is_allocated())
             return os;
-        for (int n = 0; n < data.size; n++) {
+        for (int n = 0; n < data.size(); n++) {
             os << std::setw(11) << (double) data.get(n);
         }
         os << "\n";

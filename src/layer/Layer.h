@@ -24,28 +24,42 @@
 #include "../data/SparseInput.h"
 #include "../data/Tape.h"
 
+#include <cstdint>
 #include <vector>
 
 struct LayerInterface {
-    protected:
-    int layerID = 0;
-
     public:
-    //    virtual DenseMatrix* getBias   () = 0;
-    //    virtual DenseMatrix* getWeights() = 0;
+    // depending on if this layer is sparse or dense, we have two different output buffers
+    SparseInput sparse_data {1, 1, 1};
+    Tape        dense_data {1, 1};
 
-    virtual uint32_t           getOutputSize()                                       = 0;
-    virtual uint32_t           getInputSize()                                        = 0;
+    // creates the output tape
+    virtual bool isSparse() const { return false; }
+    virtual void createOutput(uint32_t batch_size) {
 
-    virtual Activation*        getActivationFunction()                               = 0;
-    virtual std::vector<Tape*> getTunableParameters()                                = 0;
+        if (isSparse()) {
 
-    virtual void               apply(std::vector<Tape*> inputs, Tape& out)           = 0;
-    virtual void               backprop(std::vector<Tape*> inputs, Tape& out)        = 0;
-    virtual void               apply(std::vector<SparseInput*> inputs, Tape& out)    = 0;
-    virtual void               backprop(std::vector<SparseInput*> inputs, Tape& out) = 0;
+            if (sparse_data.n != batch_size || sparse_data.m != getOutputSize()) {
+                sparse_data =
+                    SparseInput(getOutputSize(), batch_size, sparse_data.max_entries_per_column);
+            }
+        } else {
+            if (dense_data.values.n != batch_size || dense_data.values.m != getOutputSize()) {
+                dense_data.values    = DenseMatrix {getOutputSize(), batch_size};
+                dense_data.gradients = DenseMatrix {getOutputSize(), batch_size};
+            }
+        }
+    }
+    SparseInput& getSparseData() { return sparse_data; }
+    Tape&        getDenseData() { return dense_data; }
 
-    void                       assignID(int id) { layerID = id; }
+    virtual uint32_t           getOutputSize() const  = 0;
+    virtual uint32_t           getInputSize() const   = 0;
+
+    virtual std::vector<Tape*> getTunableParameters() = 0;
+
+    virtual void               apply()                = 0;
+    virtual void               backprop()             = 0;
 };
 
 #endif    // DIFFERENTIATION_LAYER_H

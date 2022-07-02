@@ -20,7 +20,7 @@
 #define CUDAD_SRC_OPERATIONS_BUCKET_BUCKET_H_
 
 #include "../../data/SArray.h"
-#include "../../data/mode.h"
+#include "../../data/Mode.h"
 
 // clang-format off
 __global__ void bucket_kernel(
@@ -37,32 +37,32 @@ inline void bucket  ( const SArray<float> &inp,
                       float max_lower_bucket,
                       float min_upper_bucket){
 
-    int bucket_size = out.size / inp.size;
+    int bucket_size = out.size() / inp.size();
 
     if(mode == DEVICE){
 
-        ASSERT(inp.gpu_values);
-        ASSERT(out.gpu_values);
+        ASSERT(inp.gpu_address());
+        ASSERT(out.gpu_address());
 
         constexpr int block_size_x = 1024;
         dim3 block(block_size_x);
-        dim3 grid (std::ceil((float)inp.size / block_size_x));
+        dim3 grid (std::ceil((float)inp.size() / block_size_x));
         bucket_kernel<<<grid, block>>>(
-            inp.gpu_values,
-            out.gpu_values,
+            inp.gpu_address(),
+            out.gpu_address(),
             max_lower_bucket,
             min_upper_bucket,
             bucket_size,
-            inp.size);
+            inp.size());
     }else{
-//        ASSERT(mat_grd.cpu_values);
-//        ASSERT(vec_grd.cpu_values);
-//        ASSERT(res_grd.cpu_values);
+//        ASSERT(mat_grd.cpu_address());
+//        ASSERT(vec_grd.cpu_address());
+//        ASSERT(res_grd.cpu_address());
 //
 //        add_mv_bp_host(
-//            mat_grd.cpu_values,
-//            vec_grd.cpu_values,
-//            res_grd.cpu_values,
+//            mat_grd.cpu_address(),
+//            vec_grd.cpu_address(),
+//            res_grd.cpu_address(),
 //            mat_grd.m,
 //            mat_grd.n,
 //            mat_grd.leading_dimension,

@@ -43,10 +43,10 @@ __global__ void mpe_kernel(
         float abs_diff       = abs(difference);
         float sign           = difference > 0 ? 1 : -1;
 
-        float derivative     = powf(abs_diff, power - 1) * sign;
+        float derivative     = powf(abs_diff, power - 1) * sign * power;
         float loss_val       = powf(abs_diff, power);
 
-        output_gradient[idx] = derivative;
+        output_gradient[idx] = derivative / grad_division;
         atomicAdd(loss, loss_val / size);
     } else {
         output_gradient[idx] = 0;

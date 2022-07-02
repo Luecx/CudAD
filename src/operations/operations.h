@@ -27,6 +27,8 @@
 #include "bucket_bp/bucket_bp.h"
 #include "clipped_relu/clipped_relu.h"
 #include "clipped_relu_bp/clipped_relu_bp.h"
+#include "merge/merge.h"
+#include "merge_bp/merge_bp.h"
 #include "mle/mle.h"
 #include "mm/mm.h"
 #include "mm_bp/mm_bp.h"

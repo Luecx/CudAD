@@ -17,7 +17,7 @@
  */
 
 #include "../../data/DenseMatrix.h"
-#include "../../data/mode.h"
+#include "../../data/Mode.h"
 
 #ifndef CUDATEST1_SRC_OPERATIONS_ADAM_W_ADAM_W_H_
 #define CUDATEST1_SRC_OPERATIONS_ADAM_W_ADAM_W_H_
@@ -70,18 +70,18 @@ inline void adam_w(SArray<float>& values,
         dim3 block(block_size);
         dim3 grid (std::ceil((float)values.size / block_size));
         adam_w_kernel<<<grid, block>>>(
-            values          .gpu_values,
-            gradients       .gpu_values,
-            first_moment    .gpu_values,
-            second_moment   .gpu_values,
+            values          .gpu_address(),
+            gradients       .gpu_address(),
+            first_moment    .gpu_address(),
+            second_moment   .gpu_address(),
             values.size,
             step, lr, beta1, beta2, eps, warmup);
     } else {
         adam_w_host(
-            values          .cpu_values,
-            gradients       .cpu_values,
-            first_moment    .cpu_values,
-            second_moment   .cpu_values,
+            values          .cpu_address(),
+            gradients       .cpu_address(),
+            first_moment    .cpu_address(),
+            second_moment   .cpu_address(),
             values.size,
             step, lr, beta1, beta2, eps, warmup);
     }

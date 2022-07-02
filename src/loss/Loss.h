@@ -19,7 +19,7 @@
 #ifndef CUDAD_SRC_LOSS_LOSS_H_
 #define CUDAD_SRC_LOSS_LOSS_H_
 #include "../data/SArray.h"
-#include "../data/mode.h"
+#include "../data/Mode.h"
 #include "../operations/operations.h"
 
 struct Loss {

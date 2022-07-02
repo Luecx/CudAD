@@ -22,7 +22,7 @@
 #include "../../data/DenseMatrix.h"
 #include "../../data/Matrix.h"
 #include "../../data/SparseInput.h"
-#include "../../data/mode.h"
+#include "../../data/Mode.h"
 
 // clang-format off
 __global__ void sparse_affine_bp_kernel(
@@ -67,6 +67,7 @@ inline void sparse_affine_bp(
                    float        lasso_regularization=0){
 
     auto M = mat_grd.m;
+    [[maybe_unused]]
     auto N = mat_grd.n;
     auto B = inp.n;
 
@@ -78,11 +79,11 @@ inline void sparse_affine_bp(
 
     if(mode == DEVICE){
 
-        ASSERT(mat_grd.gpu_values)
-        ASSERT(inp    .column_indices.gpu_values)
-        ASSERT(bia_grd.gpu_values)
-        ASSERT(res_grd.gpu_values)
-        ASSERT(res    .gpu_values)
+        ASSERT(mat_grd.gpu_address())
+        ASSERT(inp    .column_indices.gpu_address())
+        ASSERT(bia_grd.gpu_address())
+        ASSERT(res_grd.gpu_address())
+        ASSERT(res    .gpu_address())
 
 //        mat_grd.clear<DEVICE>();
 //        bia_grd.clear<DEVICE>();
@@ -95,12 +96,12 @@ inline void sparse_affine_bp(
                    std::ceil((float)res_grd.m / block_size_y));
 
         sparse_affine_bp_kernel<<<grid, block>>>(
-            mat_grd.gpu_values,
-            inp.column_indices.gpu_values,
+            mat_grd.gpu_address(),
+            inp.column_indices.gpu_address(),
             inp.max_entries_per_column,
-            bia_grd.gpu_values,
-            res.gpu_values,
-            res_grd.gpu_values,
+            bia_grd.gpu_address(),
+            res.gpu_address(),
+            res_grd.gpu_address(),
             M,B,
             mat_grd.leading_dimension,
             res_grd.leading_dimension,

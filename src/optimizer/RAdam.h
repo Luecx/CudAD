@@ -40,8 +40,8 @@ struct RAdam : Optimiser {
 
     virtual void createBuffers() {
         for (Tape* t : tunable_values) {
-            exp_avg.push_back(SArray<float> {t->values.size});
-            exp_avg_sq.push_back(SArray<float> {t->values.size});
+            exp_avg.push_back(SArray<float> {t->values.size()});
+            exp_avg_sq.push_back(SArray<float> {t->values.size()});
 
             exp_avg[exp_avg.size() - 1].malloc_gpu();
             exp_avg_sq[exp_avg_sq.size() - 1].malloc_gpu();
