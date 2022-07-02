@@ -51,7 +51,7 @@ class Koivisto {
 
     static Optimiser*      get_optimiser() {
         Adam* optim  = new Adam();
-        optim->lr    = 0.01 / 2.5f;
+        optim->lr    = 0.01;
         optim->beta1 = 0.95;
         optim->beta2 = 0.999;
 
