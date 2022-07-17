@@ -67,7 +67,7 @@ class SArray : public Array<Type> {
     SArray<Type>& operator=(const SArray<Type>& other) {
         free_cpu();
         free_gpu();
-        this->size = other.size;
+        this->m_size = other.m_size;
         if (other.cpu_is_allocated()) {
             malloc_cpu();
             this->template copy_from<HOST>(other);
@@ -103,8 +103,8 @@ class SArray : public Array<Type> {
             gpu_values = GPtr(new GPUArrayType(this->m_size));
         }
     }
-    void malloc_cpu() { malloc<HOST>(); }
-    void malloc_gpu() { malloc<DEVICE>(); }
+    void mallocCpu() { malloc<HOST>(); }
+    void mallocGpu() { malloc<DEVICE>(); }
 
     // deallocate cpu and gpu memory
     template<Mode mode = HOST>
@@ -115,20 +115,20 @@ class SArray : public Array<Type> {
             gpu_values = nullptr;
         }
     }
-    void free_cpu() { free<HOST>(); }
-    void free_gpu() { free<DEVICE>(); }
+    void freeCpu() { free<HOST>(); }
+    void freeGpu() { free<DEVICE>(); }
 
     // checks if cpu and gpu memory is allocated
     template<Mode mode = HOST>
-    bool is_allocated() const {
+    bool isAllocated() const {
         if constexpr (mode == HOST) {
             return cpu_values != nullptr;
         } else {
             return gpu_values != nullptr;
         }
     }
-    bool cpu_is_allocated() const { return is_allocated<HOST>(); }
-    bool gpu_is_allocated() const { return is_allocated<DEVICE>(); }
+    bool cpuIsAllocated() const { return is_allocated<HOST>(); }
+    bool gpuIsAllocated() const { return is_allocated<DEVICE>(); }
 
     // returns the address of the cpu/gpu memory
     template<Mode mode = HOST>
@@ -142,16 +142,16 @@ class SArray : public Array<Type> {
         }
         return nullptr;
     }
-    Type* cpu_address() const { return address<HOST>(); }
-    Type* gpu_address() const { return address<DEVICE>(); }
+    Type* cpuAddress() const { return address<HOST>(); }
+    Type* gpuAddress() const { return address<DEVICE>(); }
 
     // synchronise data between the cpu and the gpu memory only if both are allocated
-    void gpu_upload() {
+    void gpuUpload() {
         if (!cpu_is_allocated() || !gpu_is_allocated())
             return;
         gpu_values->upload(*cpu_values.get());
     }
-    void gpu_download() {
+    void gpuDownload() {
         if (!cpu_is_allocated() || !gpu_is_allocated())
             return;
         gpu_values->download(*cpu_values.get());
@@ -193,6 +193,21 @@ class SArray : public Array<Type> {
         }
         return m;
     }
+    [[nodiscard]] Type mean() const{
+        Type res = 0;
+        for(int i = 0; i < this->size(); i++){
+            res += this->get(i);
+        }
+        return res / this->size();
+    }
+    [[nodiscard]] Type std() const{
+        Type res = 0;
+        Type mea = mean();
+        for(int i = 0; i < this->size(); i++){
+            res += std::pow((this->get(i) - mea),2);
+        }
+        return std::sqrt(res / (this->size()-1));
+    }
 
     // sort values
     void sort() const {
@@ -218,7 +233,7 @@ class SArray : public Array<Type> {
 
     // copy from another array
     template<Mode mode = HOST>
-    void copy_from(const SArray& other) {
+    void copyFrom(const SArray& other) {
         if constexpr (mode == HOST) {
             cpu_values->copy_from(*other.cpu_values.get());
         } else if (mode == DEVICE) {
@@ -246,7 +261,8 @@ class SArray : public Array<Type> {
     void randomiseGaussian(Type mean, Type deviation) {
         if (cpu_values == nullptr)
             return;
-        std::default_random_engine     generator;
+        std::default_random_engine     generator{};
+        generator.seed(time(NULL) * 1239128);
         std::normal_distribution<Type> distribution(mean, deviation);
         for (int i = 0; i < this->size(); i++) {
             this->get(i) = distribution(generator);

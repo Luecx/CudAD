@@ -40,6 +40,8 @@
 #include "relu_bp/relu_bp.h"
 #include "sigmoid/sigmoid.h"
 #include "sigmoid_bp/sigmoid_bp.h"
+#include "softmax/softmax.h"
+#include "softmax_bp/softmax_bp.h"
 #include "sparse_affine/sparse_affine.h"
 #include "sparse_affine_bp/sparse_affine_bp.h"
 

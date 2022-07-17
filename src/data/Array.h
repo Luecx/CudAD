@@ -38,7 +38,7 @@ struct CPUArray : Array<Type> {
     Type& operator[](ArraySizeType idx) { return this->m_data[idx]; }
     Type  operator[](ArraySizeType idx) const { return this->m_data[idx]; }
 
-    void  copy_from(const CPUArray<Type>& other) {
+    void  copyFrom(const CPUArray<Type>& other) {
         ASSERT(other.size() == this->size());
         memcpy(this->m_data, other.m_data, this->size() * sizeof(Type));
     }
@@ -65,7 +65,7 @@ struct GPUArray : Array<Type> {
                                cudaMemcpyDeviceToHost));
     }
 
-    void copy_from(const GPUArray<Type>& other) {
+    void copyFrom(const GPUArray<Type>& other) {
         ASSERT(other.size() == this->size());
         cudaMemcpy(this->m_data, other.m_data, this->size() * sizeof(Type), cudaMemcpyDeviceToDevice);
     }
