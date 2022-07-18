@@ -47,6 +47,7 @@ class Berserk {
         optim->lr    = 1e-2;
         optim->beta1 = 0.95;
         optim->beta2 = 0.999;
+        optim->schedule = LRScheduler(250, 0.1);
 
         return optim;
     }
