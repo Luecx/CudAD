@@ -35,6 +35,6 @@ void MLE::apply(const SArray<float>& output,
 void           MLE::logOverview() { logging::write("MLE"); }
 SArray<float>& MLE::getLoss() { return loss; }
 MLE::MLE() {
-    loss.malloc_gpu();
-    loss.malloc_cpu();
+    loss.mallocGpu();
+    loss.mallocCpu();
 }

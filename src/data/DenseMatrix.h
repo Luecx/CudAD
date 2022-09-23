@@ -28,8 +28,8 @@ struct DenseMatrix : public Matrix, public SArray<float> {
 
     public:
     DenseMatrix(uint32_t m, uint32_t n) : Matrix(m, n), SArray(m * n), leading_dimension {m} {
-        SArray::malloc_gpu();
-        SArray::malloc_cpu();
+        SArray::mallocGpu();
+        SArray::mallocCpu();
     }
 
     float& get(int p_m, int p_n) {
@@ -46,8 +46,8 @@ struct DenseMatrix : public Matrix, public SArray<float> {
     friend std::ostream& operator<<(std::ostream& os, const DenseMatrix& data) {
 
         os << "size:       " << data.size() << "\n"
-           << "gpu_values: " << data.gpu_address() << "]\n"
-           << "cpu_values: " << data.cpu_address() << "]\n";
+           << "gpu_values: " << data.gpuAddress() << "]\n"
+           << "cpu_values: " << data.cpuAddress() << "]\n";
 
         if (data.n != 1) {
             os << std::fixed << std::setprecision(5);

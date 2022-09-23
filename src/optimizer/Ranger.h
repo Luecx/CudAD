@@ -48,9 +48,9 @@ struct Ranger : Optimiser {
             exp_avg_sq .push_back(SArray<float>{ t->values.size()});
             slow_buffer.push_back(SArray<float>{ t->values.size()});
 
-            exp_avg    [exp_avg.size()     - 1].malloc_gpu();
-            exp_avg_sq [exp_avg_sq.size()  - 1].malloc_gpu();
-            slow_buffer[slow_buffer.size() - 1].malloc_gpu();
+            exp_avg    [exp_avg.size()     - 1].mallocGpu();
+            exp_avg_sq [exp_avg_sq.size()  - 1].mallocGpu();
+            slow_buffer[slow_buffer.size() - 1].mallocGpu();
             // clang-format on
 
             value_ranges.push_back(

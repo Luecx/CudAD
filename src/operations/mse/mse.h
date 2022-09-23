@@ -43,22 +43,22 @@ inline void mse (const SArray<float>& output,
 
     if(mode == DEVICE){
 
-        ASSERT(output.gpu_address());
-        ASSERT(output_gradient.gpu_address());
-        ASSERT(target.gpu_address());
-        ASSERT(mask.gpu_address());
-        ASSERT(loss.gpu_address());
+        ASSERT(output.gpuAddress());
+        ASSERT(output_gradient.gpuAddress());
+        ASSERT(target.gpuAddress());
+        ASSERT(mask.gpuAddress());
+        ASSERT(loss.gpuAddress());
 
 
         constexpr int block_size = 1024;
         dim3 block(block_size);
         dim3 grid (std::ceil((float)output.size() / block_size));
         mse_kernel<<<grid, block>>>(
-            output          .gpu_address(),
-            output_gradient .gpu_address(),
-            target          .gpu_address(),
-            mask            .gpu_address(),
-            loss            .gpu_address(),
+            output          .gpuAddress(),
+            output_gradient .gpuAddress(),
+            target          .gpuAddress(),
+            mask            .gpuAddress(),
+            loss            .gpuAddress(),
             output.size());
 
     }else{

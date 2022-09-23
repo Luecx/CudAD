@@ -46,9 +46,9 @@ inline void mm_cublas(
     // clang-format off
     cublasSgemm(CUBLAS_HANDLE, trans_a, trans_b,
                 m, n, k, &alpha,
-                A.gpu_address(), lda,
-                B.gpu_address(), ldb, &beta,
-                C.gpu_address(), ldc);
+                A.gpuAddress(), lda,
+                B.gpuAddress(), ldb, &beta,
+                C.gpuAddress(), ldc);
     // clang-format on
 
     CUDA_ASSERT(cudaPeekAtLastError());

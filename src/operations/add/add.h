@@ -74,17 +74,17 @@ inline void add   ( const SArray<float> &A,
 
     if(mode == DEVICE){
 
-        ASSERT(A.gpu_address());
-        ASSERT(B.gpu_address());
-        ASSERT(C.gpu_address());
+        ASSERT(A.gpuAddress());
+        ASSERT(B.gpuAddress());
+        ASSERT(C.gpuAddress());
 
         constexpr int block_size = 1024;
         dim3 block(block_size);
         dim3 grid (std::ceil((float)size / block_size));
         add_kernel<<<grid, block>>>(
-            A.gpu_address(),
-            B.gpu_address(),
-            C.gpu_address(),
+            A.gpuAddress(),
+            B.gpuAddress(),
+            C.gpuAddress(),
             A.size(),
             B.size(),
             C.size(),
@@ -93,9 +93,9 @@ inline void add   ( const SArray<float> &A,
             beta);
     }else{
         add_host(
-            A.cpu_address(),
-            B.cpu_address(),
-            C.cpu_address(),
+            A.cpuAddress(),
+            B.cpuAddress(),
+            C.cpuAddress(),
             A.size(),
             B.size(),
             C.size(),

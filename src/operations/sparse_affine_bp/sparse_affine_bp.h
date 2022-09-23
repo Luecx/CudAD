@@ -79,11 +79,11 @@ inline void sparse_affine_bp(
 
     if(mode == DEVICE){
 
-        ASSERT(mat_grd.gpu_address())
-        ASSERT(inp    .column_indices.gpu_address())
-        ASSERT(bia_grd.gpu_address())
-        ASSERT(res_grd.gpu_address())
-        ASSERT(res    .gpu_address())
+        ASSERT(mat_grd.gpuAddress())
+        ASSERT(inp    .column_indices.gpuAddress())
+        ASSERT(bia_grd.gpuAddress())
+        ASSERT(res_grd.gpuAddress())
+        ASSERT(res    .gpuAddress())
 
 //        mat_grd.clear<DEVICE>();
 //        bia_grd.clear<DEVICE>();
@@ -96,12 +96,12 @@ inline void sparse_affine_bp(
                    std::ceil((float)res_grd.m / block_size_y));
 
         sparse_affine_bp_kernel<<<grid, block>>>(
-            mat_grd.gpu_address(),
-            inp.column_indices.gpu_address(),
+            mat_grd.gpuAddress(),
+            inp.column_indices.gpuAddress(),
             inp.max_entries_per_column,
-            bia_grd.gpu_address(),
-            res.gpu_address(),
-            res_grd.gpu_address(),
+            bia_grd.gpuAddress(),
+            res.gpuAddress(),
+            res_grd.gpuAddress(),
             M,B,
             mat_grd.leading_dimension,
             res_grd.leading_dimension,

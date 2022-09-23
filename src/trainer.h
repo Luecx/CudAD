@@ -63,8 +63,8 @@ class Trainer {
         network->setLossFunction(this->loss_f);
         network->setBatchSize(BatchSize);
 
-        target_mask.malloc_cpu();
-        target_mask.malloc_gpu();
+        target_mask.mallocCpu();
+        target_mask.mallocGpu();
     }
 
     void fit(vector<string> files, vector<string> validation_files, string output) {
@@ -127,9 +127,9 @@ class Trainer {
             Arch::assign_inputs_batch(*ds, *network, target, target_mask);
             network->uploadInputs();
 
-            target.gpu_upload();
-            target_mask.gpu_upload();
-            loss_f->loss.gpu_download();
+            target.gpuUpload();
+            target_mask.gpuUpload();
+            loss_f->loss.gpuDownload();
 
             // measure time and print output
             timer->tock();
@@ -147,7 +147,7 @@ class Trainer {
 
             epoch_loss += loss_f->loss(0);
             loss_f->loss(0) = 0;
-            loss_f->loss.gpu_upload();
+            loss_f->loss.gpuUpload();
             network->batch(target,
                            target_mask);
             optim->apply(1);
@@ -159,7 +159,7 @@ class Trainer {
     float validate(DataSet* validation_data) {
         float prev_loss = loss_f->loss(0);
         loss_f->loss(0) = 0;
-        loss_f->loss.gpu_upload();
+        loss_f->loss.gpuUpload();
 
         float total_loss_sum = 0;
 
@@ -175,8 +175,8 @@ class Trainer {
             Arch::assign_inputs_batch(temp, *network, target, target_mask);
             network->uploadInputs();
 
-            target.gpu_upload();
-            target_mask.gpu_upload();
+            target.gpuUpload();
+            target_mask.gpuUpload();
 
             network->feed();
 
@@ -187,17 +187,17 @@ class Trainer {
                           DEVICE);
 
             // reset loss to avoid loss of accuracy
-            loss_f->loss.gpu_download();
+            loss_f->loss.gpuDownload();
             total_loss_sum += loss_f->loss.get(0);
             loss_f->loss.get(0) = 0;
-            loss_f->loss.gpu_upload();
+            loss_f->loss.gpuUpload();
         }
 
 
-        loss_f->loss.gpu_download();
+        loss_f->loss.gpuDownload();
 
         loss_f->loss(0)       = prev_loss;
-        loss_f->loss.gpu_upload();
+        loss_f->loss.gpuUpload();
 
         return total_loss_sum / c;
     }

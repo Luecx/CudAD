@@ -46,39 +46,39 @@ void finite_difference(Network& network, DenseMatrix& target, SArray<bool> &targ
                 auto bot_weight     = current_weight - margin;
 
                 t->values.get(wgt_idx) = top_weight;
-                t->values.gpu_upload();
+                t->values.gpuUpload();
                 // feed and download loss
                 network.batch(target, target_mask);
-                network.getLossFunction()->getLoss().gpu_download();
+                network.getLossFunction()->getLoss().gpuDownload();
                 auto top_loss = network.getLossFunction()->getLoss().get(0);
                 network.getLossFunction()->getLoss().get(0) = 0;
-                network.getLossFunction()->getLoss().gpu_upload();
+                network.getLossFunction()->getLoss().gpuUpload();
 
                 // clear gradients
                 adam.apply(network.getBatchSize());
 
                 t->values.get(wgt_idx) = bot_weight;
-                t->values.gpu_upload();
+                t->values.gpuUpload();
                 // feed and download loss
                 network.batch(target, target_mask);
-                network.getLossFunction()->getLoss().gpu_download();
+                network.getLossFunction()->getLoss().gpuDownload();
                 // clear gradients
                 adam.apply(network.getBatchSize());
 
                 auto bot_loss = network.getLossFunction()->getLoss().get(0);
                 network.getLossFunction()->getLoss().get(0) = 0;
-                network.getLossFunction()->getLoss().gpu_upload();
+                network.getLossFunction()->getLoss().gpuUpload();
 
                 t->values.get(wgt_idx) = current_weight;
-                t->values.gpu_upload();
+                t->values.gpuUpload();
                 // feed and download loss and gradients
                 network.batch(target, target_mask);
-                network.getLossFunction()->getLoss().gpu_download();
-                t->gradients.gpu_download();
+                network.getLossFunction()->getLoss().gpuDownload();
+                t->gradients.gpuDownload();
 
                 auto autodiff_gradient = t->gradients.get(wgt_idx);
                 network.getLossFunction()->getLoss().get(0) = 0;
-                network.getLossFunction()->getLoss().gpu_upload();
+                network.getLossFunction()->getLoss().gpuUpload();
 
                 // clear gradients
                 adam.apply(network.getBatchSize());

@@ -40,9 +40,9 @@ void test_fen(Network& network, const std::string& fen) {
     in2.clear();
 
     SArray<float> target {Arch::Outputs};
-    target.malloc_cpu();
+    target.mallocCpu();
     SArray<bool> target_mask {Arch::Outputs};
-    target_mask.malloc_cpu();
+    target_mask.mallocCpu();
 
     Arch::assign_input(p, in1, in2, target, target_mask, 0);
 
@@ -53,7 +53,7 @@ void test_fen(Network& network, const std::string& fen) {
     std::cout << "testing fen: " << fen << std::endl;
     int idx = 0;
     for(LayerInterface* l:network.getLayers()){
-        l->getDenseData().values.gpu_download();
+        l->getDenseData().values.gpuDownload();
 
         std::cout << "LAYER " << (idx ++) << std::endl;
         for(int i = 0; i < std::min(16u, l->getDenseData().values.size()); i++){
@@ -69,7 +69,7 @@ void test_fen(Network& network, const std::string& fen) {
 template<typename type>
 void writeMatrix(FILE* file, DenseMatrix& matrix, float scaling, bool column_major = false) {
     SArray<type> data {matrix.size()};
-    data.malloc_cpu();
+    data.mallocCpu();
 
     uint32_t m   = matrix.m;
     uint32_t n   = matrix.n;
@@ -87,7 +87,7 @@ void writeMatrix(FILE* file, DenseMatrix& matrix, float scaling, bool column_maj
         }
     }
 
-    fwrite(data.cpu_address(), sizeof(type), data.size(), file);
+    fwrite(data.cpuAddress(), sizeof(type), data.size(), file);
 }
 
 FILE* openFile(const std::string& path){
@@ -106,7 +106,7 @@ void writeLayer(FILE* file, Network& network, int layer_id, int s1, int s2){
     auto  l0_weights = l0_params[0]->values;
     auto  l0_biases  = l0_params[1]->values;
 
-    l0_weights.gpu_download(), l0_biases.gpu_download();
+    l0_weights.gpuDownload(), l0_biases.gpuDownload();
 
     writeMatrix<T1>(file, l0_weights, s1, layer_id == 0);
     writeMatrix<T2>(file, l0_biases, s2);
@@ -123,7 +123,7 @@ void quantitize_shallow(const std::string& path,
     auto  l0_weights = l0_params[0]->values;
     auto  l0_biases  = l0_params[1]->values;
 
-    l0_weights.gpu_download(), l0_biases.gpu_download();
+    l0_weights.gpuDownload(), l0_biases.gpuDownload();
     writeMatrix<int16_t>(f, l0_weights, scalar_1, true);
     writeMatrix<int16_t>(f, l0_biases, scalar_1);
 
@@ -132,7 +132,7 @@ void quantitize_shallow(const std::string& path,
     auto l1_weights = l1_params[0]->values;
     auto l1_biases  = l1_params[1]->values;
 
-    l1_weights.gpu_download(), l1_biases.gpu_download();
+    l1_weights.gpuDownload(), l1_biases.gpuDownload();
     writeMatrix<int16_t>(f, l1_weights, scalar_2);
     writeMatrix<int32_t>(f, l1_biases, scalar_1 * scalar_2);
 
@@ -147,9 +147,9 @@ void computeScalars(BatchLoader& batch_loader, Network& network, int batches) {
     SparseInput   sparse_input_1 {Arch::Inputs, (uint32_t) batch_loader.batch_size, 32};
     SparseInput   sparse_input_2 {Arch::Inputs, (uint32_t) batch_loader.batch_size, 32};
     SArray<float> target {(uint32_t) batch_loader.batch_size * Arch::Outputs};
-    target.malloc_cpu();
+    target.mallocCpu();
     SArray<bool> target_mask {(uint32_t) batch_loader.batch_size * Arch::Outputs};
-    target_mask.malloc_cpu();
+    target_mask.mallocCpu();
 
     std::vector<SArray<float>> maximum {};
     std::vector<SArray<float>> minimum {};
@@ -157,9 +157,9 @@ void computeScalars(BatchLoader& batch_loader, Network& network, int batches) {
     std::vector<float>         minimum_wgt {};
     for (LayerInterface* layer_interface : network.getLayers()) {
         maximum.emplace_back(layer_interface->getOutputSize());
-        maximum[maximum.size() - 1].malloc_cpu();
+        maximum[maximum.size() - 1].mallocCpu();
         minimum.emplace_back(layer_interface->getOutputSize());
-        minimum[minimum.size() - 1].malloc_cpu();
+        minimum[minimum.size() - 1].mallocCpu();
 
         if(layer_interface->getTunableParameters().size()){
             maximum_wgt.emplace_back(layer_interface->getTunableParameters()[0]->values.max());
@@ -178,8 +178,8 @@ void computeScalars(BatchLoader& batch_loader, Network& network, int batches) {
         Arch::assign_inputs_batch(*ds, network, target, target_mask);
         // upload relevant data
         network.uploadInputs();
-        target.gpu_upload();
-        target_mask.gpu_upload();
+        target.gpuUpload();
+        target_mask.gpuUpload();
         network.feed();
 
         std::cout << "\rProcessing batch: " << (batch + 1) << "/" << batches << std::flush;
@@ -187,7 +187,7 @@ void computeScalars(BatchLoader& batch_loader, Network& network, int batches) {
         // iterate over the layers
         for (int i = 0; i < maximum.size(); i++) {
 
-            network.getOutput(i).values.gpu_download();
+            network.getOutput(i).values.gpuDownload();
 
             for (int j = 0; j < network.getLayers()[i]->getOutputSize(); j++) {
 

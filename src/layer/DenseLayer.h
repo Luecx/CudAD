@@ -46,8 +46,8 @@ class DenseLayer : public LayerInterface {
         weights.values.randomiseGaussian(0.0f, (float) sqrt(2.0f / previous->getOutputSize()));
 
         // upload to gpu
-        weights.values.gpu_upload();
-        bias   .values.gpu_upload();
+        weights.values.gpuUpload();
+        bias   .values.gpuUpload();
     }
 
     DenseLayer(LayerInterface* previous, DenseLayer<O>* copy) : previous(previous){

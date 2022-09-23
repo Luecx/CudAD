@@ -46,21 +46,21 @@ inline void sigmoid   (const SArray<float> &A,
 
     if(mode == DEVICE){
 
-        ASSERT(A.gpu_address());
-        ASSERT(B.gpu_address());
+        ASSERT(A.gpuAddress());
+        ASSERT(B.gpuAddress());
 
         constexpr int block_size = 1024;
         dim3 block(block_size);
         dim3 grid (std::ceil((float)A.size() / block_size));
         sigmoid_kernel<<<grid, block>>>(
-            A.gpu_address(),
-            B.gpu_address(),
+            A.gpuAddress(),
+            B.gpuAddress(),
             A.size(),
             scalar);
     }else{
         sigmoid_host(
-            A.cpu_address(),
-            B.cpu_address(),
+            A.cpuAddress(),
+            B.cpuAddress(),
             A.size(),
             scalar);
     }

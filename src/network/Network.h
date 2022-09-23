@@ -53,8 +53,8 @@ class Network {
         }
     }
     void batch(DenseMatrix& target, SArray<bool>& target_mask) {
-        ASSERT(target.is_allocated<DEVICE>());
-        ASSERT(target_mask.is_allocated<DEVICE>());
+        ASSERT(target.isAllocated<DEVICE>());
+        ASSERT(target_mask.isAllocated<DEVICE>());
         ASSERT(loss_function);
         feed();
         loss_function->apply(getOutput().values, getOutput().gradients, target, target_mask, DEVICE);
@@ -79,7 +79,7 @@ class Network {
         for (LayerInterface* l : layers) {
             for (Tape* t : l->getTunableParameters()) {
                 fread(t->values.address<HOST>(), sizeof(float), t->values.size(), f);
-                t->values.gpu_upload();
+                t->values.gpuUpload();
             }
         }
         fclose(f);
@@ -98,7 +98,7 @@ class Network {
         fwrite(&count, sizeof(uint64_t), 1, f);
         for (LayerInterface* l : layers) {
             for (Tape* t : l->getTunableParameters()) {
-                t->values.gpu_download();
+                t->values.gpuDownload();
                 fwrite(t->values.address<HOST>(), sizeof(float), t->values.size(), f);
             }
         }
@@ -124,9 +124,9 @@ class Network {
     void uploadInputs(){
         for(LayerInterface* l:inputs){
             if(l->isSparse()){
-                l->sparse_data.column_indices.gpu_upload();
+                l->sparse_data.column_indices.gpuUpload();
             }else{
-                l->dense_data.values.gpu_upload();
+                l->dense_data.values.gpuUpload();
             }
         }
     }

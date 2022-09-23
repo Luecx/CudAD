@@ -41,8 +41,8 @@ struct Adam : Optimiser {
             // clang-format off
             first_moments .push_back(SArray<float> {t->values.size()});
             second_moments.push_back(SArray<float> {t->values.size()});
-            first_moments [first_moments.size() - 1].malloc_gpu();
-            second_moments[first_moments.size() - 1].malloc_gpu();
+            first_moments [first_moments.size() - 1].mallocGpu();
+            second_moments[first_moments.size() - 1].mallocGpu();
             // clang-format on
             value_ranges.push_back(
                 std::tuple<float, float> {t->min_allowed_value, t->max_allowed_value});

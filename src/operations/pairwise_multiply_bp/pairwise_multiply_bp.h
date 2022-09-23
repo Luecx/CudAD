@@ -37,9 +37,9 @@ inline void pairwise_multiply_bp (
                const SArray<float>& output_grd){
     if(mode == DEVICE){
 
-        ASSERT(input.gpu_address());
-        ASSERT(input_grd.gpu_address());
-        ASSERT(output_grd.gpu_address());
+        ASSERT(input.gpuAddress());
+        ASSERT(input_grd.gpuAddress());
+        ASSERT(output_grd.gpuAddress());
         ASSERT(input.size() == 2 * output_grd.size());
         ASSERT(input.size() == input_grd.size());
 
@@ -47,9 +47,9 @@ inline void pairwise_multiply_bp (
         dim3 block(block_size);
         dim3 grid (std::ceil((float)output_grd.size() / block_size));
         pairwise_multiply_bp_kernel<<<grid, block>>>(
-            input     .gpu_address(),
-            input_grd .gpu_address(),
-            output_grd.gpu_address(),
+            input     .gpuAddress(),
+            input_grd .gpuAddress(),
+            output_grd.gpuAddress(),
             output_grd.size());
     }else{
         ASSERT(false);

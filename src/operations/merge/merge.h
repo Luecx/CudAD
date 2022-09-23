@@ -47,9 +47,9 @@ void merge(const DenseMatrix &A,
         dim3 grid (std::ceil((float)C.n / block_size_x),
                    std::ceil((float)C.m / block_size_y));
         merge_kernel<<<grid, block>>>(
-            A.gpu_address(),
-            B.gpu_address(),
-            C.gpu_address(),
+            A.gpuAddress(),
+            B.gpuAddress(),
+            C.gpuAddress(),
             A.m,
             B.m,
             C.n);
