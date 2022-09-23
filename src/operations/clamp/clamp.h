@@ -48,10 +48,10 @@ inline void clamp(SArray<float>& values,
         dim3 block(block_size);
         dim3 grid (std::ceil((float)values.size() / block_size));
         clamp_kernel<<<grid, block>>>(
-            values.gpu_address(),min,max,values.size());
+            values.gpuAddress(),min,max,values.size());
     }else{
         clamp_host(
-            values.cpu_address(),min,max,values.size());
+            values.cpuAddress(),min,max,values.size());
     }
 //    cudaDeviceSynchronize();
 }

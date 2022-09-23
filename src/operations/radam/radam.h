@@ -70,18 +70,18 @@ inline void radam(SArray<float>& values,
         dim3 block(block_size);
         dim3 grid (std::ceil((float)values.size() / block_size));
         radam_kernel<<<grid, block>>>(
-            values          .gpu_address(),
-            gradients       .gpu_address(),
-            first_moment    .gpu_address(),
-            second_moment   .gpu_address(),
+            values          .gpuAddress(),
+            gradients       .gpuAddress(),
+            first_moment    .gpuAddress(),
+            second_moment   .gpuAddress(),
             values.size(),
             step, lr, beta1, beta2, eps, N_sma_threshold);
     } else {
         radam_host(
-            values          .cpu_address(),
-            gradients       .cpu_address(),
-            first_moment    .cpu_address(),
-            second_moment   .cpu_address(),
+            values          .cpuAddress(),
+            gradients       .cpuAddress(),
+            first_moment    .cpuAddress(),
+            second_moment   .cpuAddress(),
             values.size(),
             step, lr, beta1, beta2, eps, N_sma_threshold);
     }

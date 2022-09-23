@@ -30,22 +30,22 @@ inline void softmax   (const DenseMatrix &A,
 
     if(mode == DEVICE){
 
-        ASSERT(A.gpu_address());
-        ASSERT(B.gpu_address());
+        ASSERT(A.gpuAddress());
+        ASSERT(B.gpuAddress());
 
         constexpr int block_size_m = 1;
         constexpr int block_size_n = 1024;
         dim3 block(block_size_n, block_size_m);
         dim3 grid (std::ceil((float)A.n / block_size_n),1);
         softmax_kernel<<<grid, block>>>(
-            A.gpu_address(),
-            B.gpu_address(),
+            A.gpuAddress(),
+            B.gpuAddress(),
             A.m,
             A.n);
     }else{
 //        softmax_host(
-//            A.cpu_address(),
-//            B.cpu_address(),
+//            A.cpuAddress(),
+//            B.cpuAddress(),
 //            A.m,
 //            A.n);
         ERROR(false);

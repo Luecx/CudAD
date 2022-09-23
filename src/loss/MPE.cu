@@ -39,6 +39,6 @@ SArray<float>& MPE::getLoss() { return loss; }
 MPE::MPE(float power, bool avg_gradients) {
     m_power         = power;
     m_avg_gradients = avg_gradients;
-    loss.malloc_gpu();
-    loss.malloc_cpu();
+    loss.mallocGpu();
+    loss.mallocCpu();
 }

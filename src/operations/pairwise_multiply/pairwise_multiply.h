@@ -35,16 +35,16 @@ inline void pairwise_multiply (
                       SArray<float>& output){
     if(mode == DEVICE){
 
-        ASSERT(input.gpu_address());
-        ASSERT(output.gpu_address());
+        ASSERT(input.gpuAddress());
+        ASSERT(output.gpuAddress());
         ASSERT(input.size() == 2 * output.size());
 
         constexpr int block_size = 1024;
         dim3 block(block_size);
         dim3 grid (std::ceil((float)output.size() / block_size));
         pairwise_multiply_kernel<<<grid, block>>>(
-            input .gpu_address(),
-            output.gpu_address(),
+            input .gpuAddress(),
+            output.gpuAddress(),
             output.size());
     }else{
         ASSERT(false);

@@ -87,11 +87,11 @@ int main() {
 //    DenseMatrix target{1,1};
 //    target(0,0) = 0.3;
 //    SArray<bool> target_mask{1};
-//    target_mask.malloc_cpu();
-//    target_mask.malloc_gpu();
+//    target_mask.mallocCpu();
+//    target_mask.mallocGpu();
 //    target_mask(0) = true;
-//    target_mask.gpu_upload();
-//    target.gpu_upload();
+//    target_mask.gpuUpload();
+//    target.gpuUpload();
 //
 //    finite_difference(network, target, target_mask);
 

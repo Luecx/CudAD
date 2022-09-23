@@ -52,25 +52,25 @@ inline void clipped_relu_bp (const SArray<float> &A,
 
     if(mode == DEVICE){
 
-        ASSERT(A.gpu_address());
-        ASSERT(B.gpu_address());
+        ASSERT(A.gpuAddress());
+        ASSERT(B.gpuAddress());
 
         constexpr int block_size = 1024;
         dim3 block(block_size);
         dim3 grid (std::ceil((float)A.size() / block_size));
         clipped_relu_bp_kernel<<<grid, block>>>(
-            A    .gpu_address(),
-            A_grd.gpu_address(),
-            B    .gpu_address(),
-            B_grd.gpu_address(),
+            A    .gpuAddress(),
+            A_grd.gpuAddress(),
+            B    .gpuAddress(),
+            B_grd.gpuAddress(),
             A.size(),
             max);
     }else{
         clipped_relu_bp_host(
-            A    .cpu_address(),
-            A_grd.cpu_address(),
-            B    .cpu_address(),
-            B_grd.cpu_address(),
+            A    .cpuAddress(),
+            A_grd.cpuAddress(),
+            B    .cpuAddress(),
+            B_grd.cpuAddress(),
             A.size(),
             max);
     }

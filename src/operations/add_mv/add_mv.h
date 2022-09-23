@@ -66,9 +66,9 @@ inline void add_mv( const DenseMatrix &mat,
 
     if(mode == DEVICE){
 
-        ASSERT(mat.gpu_address());
-        ASSERT(vec.gpu_address());
-        ASSERT(res.gpu_address());
+        ASSERT(mat.gpuAddress());
+        ASSERT(vec.gpuAddress());
+        ASSERT(res.gpuAddress());
 
         constexpr int block_size_x = 16;
         constexpr int block_size_y = 16;
@@ -76,22 +76,22 @@ inline void add_mv( const DenseMatrix &mat,
         dim3 grid (std::ceil((float)mat.n / block_size_x),
                    std::ceil((float)mat.m / block_size_y));
         add_mv_kernel<<<grid, block>>>(
-            mat.gpu_address(),
-            vec.gpu_address(),
-            res.gpu_address(),
+            mat.gpuAddress(),
+            vec.gpuAddress(),
+            res.gpuAddress(),
             mat.m,
             mat.n,
             mat.leading_dimension,
             res.leading_dimension);
     }else{
-        ASSERT(mat.cpu_address());
-        ASSERT(vec.cpu_address());
-        ASSERT(res.cpu_address());
+        ASSERT(mat.cpuAddress());
+        ASSERT(vec.cpuAddress());
+        ASSERT(res.cpuAddress());
 
         add_mv_host(
-            mat.cpu_address(),
-            vec.cpu_address(),
-            res.cpu_address(),
+            mat.cpuAddress(),
+            vec.cpuAddress(),
+            res.cpuAddress(),
             mat.m,
             mat.n,
             mat.leading_dimension,

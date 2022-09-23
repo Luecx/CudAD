@@ -40,8 +40,8 @@ struct SparseInput : public Matrix {
     SparseInput(uint32_t m, uint32_t n, uint32_t max_entries_per_column)
         : Matrix(m, n), max_entries_per_column(max_entries_per_column) {
         column_indices = SArray<uint32_t> {n * (1 + max_entries_per_column)};
-        column_indices.malloc_gpu();
-        column_indices.malloc_cpu();
+        column_indices.mallocGpu();
+        column_indices.mallocCpu();
     }
 
     void set(int input_idx, int index) const {

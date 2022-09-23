@@ -34,6 +34,6 @@ void MSE::apply(const SArray<float>& output,
 void           MSE::logOverview() { logging::write("MSE"); }
 SArray<float>& MSE::getLoss() { return loss; }
 MSE::MSE() {
-    loss.malloc_gpu();
-    loss.malloc_cpu();
+    loss.mallocGpu();
+    loss.mallocCpu();
 }

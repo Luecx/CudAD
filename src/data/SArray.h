@@ -51,13 +51,13 @@ class SArray : public Array<Type> {
     public:
     explicit SArray(ArraySizeType p_size) : Array<Type>(p_size) {}
     SArray(const SArray<Type>& other) : Array<Type>(other.m_size) {
-        if (other.cpu_is_allocated()) {
-            malloc_cpu();
-            this->template copy_from<HOST>(other);
+        if (other.cpuIsAllocated()) {
+            mallocCpu();
+            this->template copyFrom<HOST>(other);
         }
-        if (other.gpu_is_allocated()) {
-            malloc_gpu();
-            this->template copy_from<DEVICE>(other);
+        if (other.gpuIsAllocated()) {
+            mallocGpu();
+            this->template copyFrom<DEVICE>(other);
         }
     }
     SArray(SArray<Type>&& other) noexcept : Array<Type>(other.m_size) {
@@ -65,36 +65,36 @@ class SArray : public Array<Type> {
         this->gpu_values = other.gpu_values;
     }
     SArray<Type>& operator=(const SArray<Type>& other) {
-        free_cpu();
-        free_gpu();
+        freeCpu();
+        freeGpu();
         this->m_size = other.m_size;
-        if (other.cpu_is_allocated()) {
-            malloc_cpu();
-            this->template copy_from<HOST>(other);
+        if (other.cpuIsAllocated()) {
+            mallocCpu();
+            this->template copyFrom<HOST>(other);
         }
-        if (other.gpu_is_allocated()) {
-            malloc_gpu();
-            this->template copy_from<DEVICE>(other);
+        if (other.gpuIsAllocated()) {
+            mallocGpu();
+            this->template copyFrom<DEVICE>(other);
         }
         return (*this);
     }
     SArray<Type>& operator=(SArray<Type>&& other) noexcept {
-        free_cpu();
-        free_gpu();
+        freeCpu();
+        freeGpu();
         this->m_size     = other.m_size;
         this->cpu_values = other.cpu_values;
         this->gpu_values = other.gpu_values;
         return (*this);
     }
     virtual ~SArray() {
-        free_cpu();
-        free_gpu();
+        freeCpu();
+        freeGpu();
     }
 
     // allocate cpu and gpu memory functions
     template<Mode mode = HOST>
     void malloc() {
-        if (is_allocated<mode>()) {
+        if (isAllocated<mode>()) {
             free<mode>();
         }
         if constexpr (mode == HOST) {
@@ -127,13 +127,13 @@ class SArray : public Array<Type> {
             return gpu_values != nullptr;
         }
     }
-    bool cpuIsAllocated() const { return is_allocated<HOST>(); }
-    bool gpuIsAllocated() const { return is_allocated<DEVICE>(); }
+    bool cpuIsAllocated() const { return isAllocated<HOST>(); }
+    bool gpuIsAllocated() const { return isAllocated<DEVICE>(); }
 
     // returns the address of the cpu/gpu memory
     template<Mode mode = HOST>
     Type* address() const {
-        if (is_allocated<mode>()) {
+        if (isAllocated<mode>()) {
             if constexpr (mode == HOST) {
                 return cpu_values->m_data;
             } else {
@@ -147,25 +147,25 @@ class SArray : public Array<Type> {
 
     // synchronise data between the cpu and the gpu memory only if both are allocated
     void gpuUpload() {
-        if (!cpu_is_allocated() || !gpu_is_allocated())
+        if (!cpuIsAllocated() || !gpuIsAllocated())
             return;
         gpu_values->upload(*cpu_values.get());
     }
     void gpuDownload() {
-        if (!cpu_is_allocated() || !gpu_is_allocated())
+        if (!cpuIsAllocated() || !gpuIsAllocated())
             return;
         gpu_values->download(*cpu_values.get());
     }
 
     // gets values from the cpu memory
     Type get(int height) const {
-        ASSERT(cpu_is_allocated());
+        ASSERT(cpuIsAllocated());
         ASSERT(height < this->size());
         ASSERT(height >= 0);
         return cpu_values->m_data[height];
     }
     Type& get(int height) {
-        ASSERT(cpu_is_allocated());
+        ASSERT(cpuIsAllocated());
         ASSERT(height < this->size());
         ASSERT(height >= 0);
         return cpu_values->m_data[height];
@@ -235,9 +235,9 @@ class SArray : public Array<Type> {
     template<Mode mode = HOST>
     void copyFrom(const SArray& other) {
         if constexpr (mode == HOST) {
-            cpu_values->copy_from(*other.cpu_values.get());
+            cpu_values->copyFrom(*other.cpu_values.get());
         } else if (mode == DEVICE) {
-            gpu_values->copy_from(*other.gpu_values.get());
+            gpu_values->copyFrom(*other.gpu_values.get());
         }
     }
 
@@ -275,9 +275,9 @@ class SArray : public Array<Type> {
     // output stream
     friend std::ostream& operator<<(std::ostream& os, const SArray& data) {
         os << "size:       " << data.size() << "\n"
-           << "gpu_values: " << data.gpu_address() << "\n"
-           << "cpu_values: " << data.cpu_address() << "\n";
-        if (!data.cpu_is_allocated())
+           << "gpu_values: " << data.gpuAddress() << "\n"
+           << "cpu_values: " << data.cpuAddress() << "\n";
+        if (!data.cpuIsAllocated())
             return os;
         for (int n = 0; n < data.size(); n++) {
             os << std::setw(11) << (double) data.get(n);

@@ -43,30 +43,30 @@ inline void bucket_bp(const SArray<float> &inp,
 
     if(mode == DEVICE){
 
-        ASSERT(inp.gpu_address());
-        ASSERT(inp_grd.gpu_address());
-        ASSERT(out_grd.gpu_address());
+        ASSERT(inp.gpuAddress());
+        ASSERT(inp_grd.gpuAddress());
+        ASSERT(out_grd.gpuAddress());
 
         constexpr int block_size_x = 1024;
         dim3 block(block_size_x);
         dim3 grid (std::ceil((float)inp.size() / block_size_x));
         bucket_bp_kernel<<<grid, block>>>(
-            inp.gpu_address(),
-            inp_grd.gpu_address(),
-            out_grd.gpu_address(),
+            inp.gpuAddress(),
+            inp_grd.gpuAddress(),
+            out_grd.gpuAddress(),
             max_lower_bucket,
             min_upper_bucket,
             bucket_size,
             inp.size());
     }else{
-//        ASSERT(mat_grd.cpu_address());
-//        ASSERT(vec_grd.cpu_address());
-//        ASSERT(res_grd.cpu_address());
+//        ASSERT(mat_grd.cpuAddress());
+//        ASSERT(vec_grd.cpuAddress());
+//        ASSERT(res_grd.cpuAddress());
 //
 //        add_mv_bp_host(
-//            mat_grd.cpu_address(),
-//            vec_grd.cpu_address(),
-//            res_grd.cpu_address(),
+//            mat_grd.cpuAddress(),
+//            vec_grd.cpuAddress(),
+//            res_grd.cpuAddress(),
 //            mat_grd.m,
 //            mat_grd.n,
 //            mat_grd.leading_dimension,

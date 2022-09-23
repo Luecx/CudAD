@@ -64,9 +64,9 @@ inline void add_mv_bp( const DenseMatrix &mat_grd,
 
     if(mode == DEVICE){
 
-        ASSERT(mat_grd.gpu_address());
-        ASSERT(vec_grd.gpu_address());
-        ASSERT(res_grd.gpu_address());
+        ASSERT(mat_grd.gpuAddress());
+        ASSERT(vec_grd.gpuAddress());
+        ASSERT(res_grd.gpuAddress());
 
         constexpr int block_size_x = 16;
         constexpr int block_size_y = 16;
@@ -74,22 +74,22 @@ inline void add_mv_bp( const DenseMatrix &mat_grd,
         dim3 grid (std::ceil((float)mat_grd.n / block_size_x),
                    std::ceil((float)mat_grd.m / block_size_y));
         add_mv_bp_kernel<<<grid, block>>>(
-            mat_grd.gpu_address(),
-            vec_grd.gpu_address(),
-            res_grd.gpu_address(),
+            mat_grd.gpuAddress(),
+            vec_grd.gpuAddress(),
+            res_grd.gpuAddress(),
             mat_grd.m,
             mat_grd.n,
             mat_grd.leading_dimension,
             res_grd.leading_dimension);
     }else{
-        ASSERT(mat_grd.cpu_address());
-        ASSERT(vec_grd.cpu_address());
-        ASSERT(res_grd.cpu_address());
+        ASSERT(mat_grd.cpuAddress());
+        ASSERT(vec_grd.cpuAddress());
+        ASSERT(res_grd.cpuAddress());
 
         add_mv_bp_host(
-            mat_grd.cpu_address(),
-            vec_grd.cpu_address(),
-            res_grd.cpu_address(),
+            mat_grd.cpuAddress(),
+            vec_grd.cpuAddress(),
+            res_grd.cpuAddress(),
             mat_grd.m,
             mat_grd.n,
             mat_grd.leading_dimension,
