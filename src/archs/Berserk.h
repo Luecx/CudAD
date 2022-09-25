@@ -40,7 +40,7 @@ class Berserk {
     static constexpr int   Inputs        = 8 * 12 * 64;
     static constexpr int   L2            = 512;
     static constexpr int   Outputs       = 1;
-    static constexpr float SigmoidScalar = 1.0 / 139;
+    static constexpr float SigmoidScalar = 1.0 / 160;
 
     static Optimiser*      get_optimiser() {
         Adam* optim  = new Adam();
@@ -60,7 +60,7 @@ class Berserk {
 
     static std::vector<LayerInterface*> get_layers() {
         DuplicateDenseLayer<Inputs, L2, ReLU>* l1 = new DuplicateDenseLayer<Inputs, L2, ReLU>();
-        l1->lasso_regularization                  = 1.0 / 8388608.0;
+        l1->lasso_regularization                  = 1.0 / 3355443.2;
 
         DenseLayer<L2 * 2, Outputs, Sigmoid>* l2  = new DenseLayer<L2 * 2, Outputs, Sigmoid>();
         dynamic_cast<Sigmoid*>(l2->getActivationFunction())->scalar = SigmoidScalar;

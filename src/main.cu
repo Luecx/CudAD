@@ -28,8 +28,8 @@ using namespace std;
 int main() {
     init();
 
-    const string data_path = "E:/berserk/training-data/n5k/";
-    const string output    = "./resources/runs/exp49/";
+    const string data_path = "E:/berserk/training-data/master/";
+    const string output    = "./resources/runs/exp100/";
 
     // Load files
     vector<string> files {};
