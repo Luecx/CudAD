@@ -37,19 +37,19 @@
 class Berserk {
 
     public:
-    static constexpr int   Inputs        = 8 * 12 * 64;
+    static constexpr int   Inputs        = 12 * 12 * 64;
     static constexpr int   L2            = 512;
     static constexpr int   Outputs       = 1;
     static constexpr float SigmoidScalar = 1.0 / 160;
 
     static Optimiser*      get_optimiser() {
-        Adam* optim  = new Adam();
-        optim->lr    = 1e-2;
-        optim->beta1 = 0.95;
-        optim->beta2 = 0.999;
-        optim->schedule = LRScheduler(250, 0.1);
+             Adam* optim     = new Adam();
+             optim->lr       = 1e-2;
+             optim->beta1    = 0.95;
+             optim->beta2    = 0.999;
+             optim->schedule = LRScheduler(250, 0.1);
 
-        return optim;
+             return optim;
     }
 
     static Loss* get_loss_function() {
@@ -84,14 +84,14 @@ class Berserk {
 
     static int king_square_index(int relative_king_square) {
         constexpr int indices[N_SQUARES] {
-            -1, -1, -1, -1, 7, 7, 7, 7,    //
-            -1, -1, -1, -1, 7, 7, 7, 7,    //
-            -1, -1, -1, -1, 6, 6, 6, 6,    //
-            -1, -1, -1, -1, 6, 6, 6, 6,    //
-            -1, -1, -1, -1, 4, 4, 5, 5,    //
-            -1, -1, -1, -1, 4, 4, 5, 5,    //
-            -1, -1, -1, -1, 0, 1, 2, 3,    //
-            -1, -1, -1, -1, 0, 1, 2, 3,    //
+            -1, -1, -1, -1, 11, 11, 11, 11,    //
+            -1, -1, -1, -1, 11, 11, 11, 11,    //
+            -1, -1, -1, -1, 10, 10, 10, 10,    //
+            -1, -1, -1, -1, 10, 10, 10, 10,    //
+            -1, -1, -1, -1, 8,  8,  9,  9,     //
+            -1, -1, -1, -1, 8,  8,  9,  9,     //
+            -1, -1, -1, -1, 4,  5,  6,  7,     //
+            -1, -1, -1, -1, 0,  1,  2,  3,     //
         };
 
         return indices[relative_king_square];
