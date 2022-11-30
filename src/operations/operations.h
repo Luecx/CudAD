@@ -29,6 +29,7 @@
 #include "clipped_relu_bp/clipped_relu_bp.h"
 #include "merge/merge.h"
 #include "merge_bp/merge_bp.h"
+#include "reduce/reduce.h"
 #include "mle/mle.h"
 #include "mm/mm.h"
 #include "mm_bp/mm_bp.h"

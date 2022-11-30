@@ -30,95 +30,127 @@ using namespace std;
 int main() {
     init();
 
-    const string   data_path = R"(D:\Koivisto Resourcen\Training Data 8.9\noob\)";
-    const string   output    = R"(F:\OneDrive\ProgrammSpeicher\CLionProjects\CudAD\resources\runs\experiment_36\)";
+    DenseMatrix inp{16,4};
+    DenseMatrix wgt{16,1};
+    DenseMatrix bia{2,1};
+    DenseMatrix out{2,4};
 
-    vector<string> files {};
-    for (int i = 1; i <= 192; i++)
-        files.push_back(data_path + "shuffled_" + to_string(i) + ".bin");
+    inp.randomise(0,1);
+    wgt.randomise(0,1);
 
-//    Trainer<Koivisto> trainer {};
-//    trainer.fit(
-//        files,
-//        vector<string> {R"(D:\Koivisto Resourcen\Training Data 7.9\reshuffled_generated_0.txt.bin)"},
-//        output);
 
-    auto layers = Koivisto::get_layers();
-    Network network{std::get<0>(layers),std::get<1>(layers)};
-//    network.setLossFunction(Koivisto::get_loss_function());
-//    network.loadWeights(output + "weights-epoch10.nnue");
+    std::cout << inp << std::endl;
+    std::cout << wgt << std::endl;
+    std::cout << bia << std::endl;
+    std::cout << out << std::endl;
+
+    inp.gpuUpload();
+    wgt.gpuUpload();
+    bia.gpuUpload();
+//    out.gpuUpload();
+
+    reduce<DEVICE>(inp, wgt, out);
+
+    inp.gpuDownload();
+    wgt.gpuDownload();
+    bia.gpuDownload();
+    out.gpuDownload();
+
+//    std::cout << inp << std::endl;
+//    std::cout << wgt << std::endl;
+//    std::cout << bia << std::endl;
+    std::cout << out << std::endl;
+
+
+//    const string   data_path = R"(D:\Koivisto Resourcen\Training Data 8.9\noob\)";
+//    const string   output    = R"(F:\OneDrive\ProgrammSpeicher\CLionProjects\CudAD\resources\runs\experiment_36\)";
 //
-
-//    test_fen<Koivisto>(network, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-//    test_fen<Koivisto>(network, "8/8/6R1/5k1P/6p1/4K3/8/8 b - - 1 53");
-//    network.loadWeights(output + "weights-epoch10.nnue");
-//    test_fen<Koivisto>(network, "8/8/6R1/5k1P/6p1/4K3/8/8 b - - 1 53");
-//    network.loadWeights(output + "weights-epoch20.nnue");
-//    test_fen<Koivisto>(network, "8/8/6R1/5k1P/6p1/4K3/8/8 b - - 1 53");
-//    network.loadWeights(output + "weights-epoch30.nnue");
-//    test_fen<Koivisto>(network, "8/8/6R1/5k1P/6p1/4K3/8/8 b - - 1 53");
-//    network.loadWeights(output + "weights-epoch40.nnue");
-//    test_fen<Koivisto>(network, "8/8/6R1/5k1P/6p1/4K3/8/8 b - - 1 53");
-//    network.loadWeights(output + "weights-epoch50.nnue");
-//    test_fen<Koivisto>(network, "8/8/6R1/5k1P/6p1/4K3/8/8 b - - 1 53");
-//    network.loadWeights(output + "weights-epoch60.nnue");
-//    test_fen<Koivisto>(network, "8/8/6R1/5k1P/6p1/4K3/8/8 b - - 1 53");
-//    network.loadWeights(output + "weights-epoch70.nnue");
-//    test_fen<Koivisto>(network, "8/8/6R1/5k1P/6p1/4K3/8/8 b - - 1 53");
-//    network.loadWeights(output + "weights-epoch80.nnue");
-//    test_fen<Koivisto>(network, "8/8/6R1/5k1P/6p1/4K3/8/8 b - - 1 53");
-//    network.loadWeights(output + "weights-epoch90.nnue");
-//    test_fen<Koivisto>(network, "8/8/6R1/5k1P/6p1/4K3/8/8 b - - 1 53");
-//    network.loadWeights(output + "weights-epoch100.nnue");
-//    test_fen<Koivisto>(network, "8/8/6R1/5k1P/6p1/4K3/8/8 b - - 1 53");
-//    network.loadWeights(output + "weights-epoch110.nnue");
-//    test_fen<Koivisto>(network, "8/8/6R1/5k1P/6p1/4K3/8/8 b - - 1 53");
-//    network.loadWeights(output + "weights-epoch120.nnue");
-//    test_fen<Koivisto>(network, "8/8/6R1/5k1P/6p1/4K3/8/8 b - - 1 53");
-//    network.loadWeights(output + "weights-epoch130.nnue");
-//    test_fen<Koivisto>(network, "8/8/6R1/5k1P/6p1/4K3/8/8 b - - 1 53");
-//    network.loadWeights(output + "weights-epoch140.nnue");
-//    test_fen<Koivisto>(network, "8/8/6R1/5k1P/6p1/4K3/8/8 b - - 1 53");
-//    network.loadWeights(output + "weights-epoch160.nnue");
-//    test_fen<Koivisto>(network, "8/8/6R1/5k1P/6p1/4K3/8/8 b - - 1 53");
-    network.loadWeights(output + "weights-epoch420.nnue");
-    test_fen<Koivisto>(network, "8/8/6R1/5k1P/6p1/4K3/8/8 b - - 1 53");
+//    vector<string> files {};
+//    for (int i = 1; i <= 192; i++)
+//        files.push_back(data_path + "shuffled_" + to_string(i) + ".bin");
 //
-//    DenseMatrix target{1,1};
-//    target(0,0) = 0.3;
-//    SArray<bool> target_mask{1};
-//    target_mask.mallocCpu();
-//    target_mask.mallocGpu();
-//    target_mask(0) = true;
-//    target_mask.gpuUpload();
-//    target.gpuUpload();
+////    Trainer<Koivisto> trainer {};
+////    trainer.fit(
+////        files,
+////        vector<string> {R"(D:\Koivisto Resourcen\Training Data 7.9\reshuffled_generated_0.txt.bin)"},
+////        output);
 //
-//    finite_difference(network, target, target_mask);
-
-//    network.loadWeights(output + "weights-epoch120.nnue");
-//    test_fen<Koivisto>(network, "8/8/6R1/5k1P/6p1/4K3/8/8 b - - 1 53");
-//    network.loadWeights(output + "weights-epoch30.nnue");
-//    test_fen<Koivisto>(network, "8/8/6R1/5k1P/6p1/4K3/8/8 b - - 1 53");
+//    auto layers = Koivisto::get_layers();
+//    Network network{std::get<0>(layers),std::get<1>(layers)};
+////    network.setLossFunction(Koivisto::get_loss_function());
+////    network.loadWeights(output + "weights-epoch10.nnue");
+////
 //
-//    network.loadWeights(output + "weights-epoch50.nnue");
-//    test_fen<Koivisto>(network, "8/8/6R1/5k1P/6p1/4K3/8/8 b - - 1 53");
+////    test_fen<Koivisto>(network, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+////    test_fen<Koivisto>(network, "8/8/6R1/5k1P/6p1/4K3/8/8 b - - 1 53");
+////    network.loadWeights(output + "weights-epoch10.nnue");
+////    test_fen<Koivisto>(network, "8/8/6R1/5k1P/6p1/4K3/8/8 b - - 1 53");
+////    network.loadWeights(output + "weights-epoch20.nnue");
+////    test_fen<Koivisto>(network, "8/8/6R1/5k1P/6p1/4K3/8/8 b - - 1 53");
+////    network.loadWeights(output + "weights-epoch30.nnue");
+////    test_fen<Koivisto>(network, "8/8/6R1/5k1P/6p1/4K3/8/8 b - - 1 53");
+////    network.loadWeights(output + "weights-epoch40.nnue");
+////    test_fen<Koivisto>(network, "8/8/6R1/5k1P/6p1/4K3/8/8 b - - 1 53");
+////    network.loadWeights(output + "weights-epoch50.nnue");
+////    test_fen<Koivisto>(network, "8/8/6R1/5k1P/6p1/4K3/8/8 b - - 1 53");
+////    network.loadWeights(output + "weights-epoch60.nnue");
+////    test_fen<Koivisto>(network, "8/8/6R1/5k1P/6p1/4K3/8/8 b - - 1 53");
+////    network.loadWeights(output + "weights-epoch70.nnue");
+////    test_fen<Koivisto>(network, "8/8/6R1/5k1P/6p1/4K3/8/8 b - - 1 53");
+////    network.loadWeights(output + "weights-epoch80.nnue");
+////    test_fen<Koivisto>(network, "8/8/6R1/5k1P/6p1/4K3/8/8 b - - 1 53");
+////    network.loadWeights(output + "weights-epoch90.nnue");
+////    test_fen<Koivisto>(network, "8/8/6R1/5k1P/6p1/4K3/8/8 b - - 1 53");
+////    network.loadWeights(output + "weights-epoch100.nnue");
+////    test_fen<Koivisto>(network, "8/8/6R1/5k1P/6p1/4K3/8/8 b - - 1 53");
+////    network.loadWeights(output + "weights-epoch110.nnue");
+////    test_fen<Koivisto>(network, "8/8/6R1/5k1P/6p1/4K3/8/8 b - - 1 53");
+////    network.loadWeights(output + "weights-epoch120.nnue");
+////    test_fen<Koivisto>(network, "8/8/6R1/5k1P/6p1/4K3/8/8 b - - 1 53");
+////    network.loadWeights(output + "weights-epoch130.nnue");
+////    test_fen<Koivisto>(network, "8/8/6R1/5k1P/6p1/4K3/8/8 b - - 1 53");
+////    network.loadWeights(output + "weights-epoch140.nnue");
+////    test_fen<Koivisto>(network, "8/8/6R1/5k1P/6p1/4K3/8/8 b - - 1 53");
+////    network.loadWeights(output + "weights-epoch160.nnue");
+////    test_fen<Koivisto>(network, "8/8/6R1/5k1P/6p1/4K3/8/8 b - - 1 53");
+////    network.loadWeights(output + "weights-epoch420.nnue");
+////    test_fen<Koivisto>(network, "8/8/6R1/5k1P/6p1/4K3/8/8 b - - 1 53");
+////
+////    DenseMatrix target{1,1};
+////    target(0,0) = 0.3;
+////    SArray<bool> target_mask{1};
+////    target_mask.mallocCpu();
+////    target_mask.mallocGpu();
+////    target_mask(0) = true;
+////    target_mask.gpuUpload();
+////    target.gpuUpload();
+////
+////    finite_difference(network, target, target_mask);
+//
+////    network.loadWeights(output + "weights-epoch120.nnue");
+////    test_fen<Koivisto>(network, "8/8/6R1/5k1P/6p1/4K3/8/8 b - - 1 53");
+////    network.loadWeights(output + "weights-epoch30.nnue");
+////    test_fen<Koivisto>(network, "8/8/6R1/5k1P/6p1/4K3/8/8 b - - 1 53");
+////
+////    network.loadWeights(output + "weights-epoch50.nnue");
+////    test_fen<Koivisto>(network, "8/8/6R1/5k1P/6p1/4K3/8/8 b - - 1 53");
+////
+////
+////    network.loadWeights(output + "weights-epoch80.nnue");
+////    test_fen<Koivisto>(network, "8/8/6R1/5k1P/6p1/4K3/8/8 b - - 1 53");
+//
+////    test_fen<Koivisto>(network, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+////    test_fen<Koivisto>(network, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 //
 //
-//    network.loadWeights(output + "weights-epoch80.nnue");
-//    test_fen<Koivisto>(network, "8/8/6R1/5k1P/6p1/4K3/8/8 b - - 1 53");
-
-//    test_fen<Koivisto>(network, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-//    test_fen<Koivisto>(network, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-
-
-    BatchLoader batch_loader{files, 16384};
-    batch_loader.start();
-    computeScalars<Koivisto>(batch_loader, network, 128);
-
-    auto f = openFile(output + "420.net");
-    writeLayer<int16_t, int16_t>(f, network, 0, 32, 32);
-    writeLayer<int16_t, int32_t>(f, network, 4, 128, 128 * 32);
-    closeFile(f);
+//    BatchLoader batch_loader{files, 16384};
+//    batch_loader.start();
+//    computeScalars<Koivisto>(batch_loader, network, 128);
+//
+//    auto f = openFile(output + "420.net");
+//    writeLayer<int16_t, int16_t>(f, network, 0, 32, 32);
+//    writeLayer<int16_t, int32_t>(f, network, 4, 128, 128 * 32);
+//    closeFile(f);
 
     close();
 }
